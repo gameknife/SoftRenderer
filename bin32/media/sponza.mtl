@@ -1,0 +1,230 @@
+newmtl sponza_00SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_thorn_diff.bmp
+bump media\sponza\sponza_thorn_ddn.bmp -bm 0.02
+alpha_test 0.01
+Ni 1.00
+Ks 0.36 0.36 0.36
+Ns 4.00
+newmtl sponza_01SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\vase_plant.bmp
+alpha_test 0.01
+Ni 1.00
+Ks 0.18 0.18 0.18
+Ns 4.0
+newmtl sponza_01SG1
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\vase_round.bmp
+bump media\sponza\vase_round_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.90 0.90 0.90
+Ns 30.00
+newmtl sponza_03SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\background.bmp
+bump media\sponza\background_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.90 0.90 0.90
+Ns 30.00
+newmtl sponza_05SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\spnza_bricks_a_diff.bmp
+bump media\sponza\spnza_bricks_a_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.90 0.90 0.90
+Ns 30.00
+newmtl sponza_07SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_arch_diff.bmp
+bump media\sponza\sponza_arch_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 12.0
+newmtl sponza_08SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_ceiling_a_diff.bmp
+Ni 1.00
+Ks 0.90 0.90 0.90
+Ns 30.00
+newmtl sponza_09SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_column_a_diff.bmp
+bump media\sponza\sponza_column_a_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 12.0
+newmtl sponza_18SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_floor_a_diff.bmp
+Ni 1.00
+Ks 0.33 0.33 0.33
+Ns 6.0
+newmtl sponza_22SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_column_c_diff.bmp
+bump media\sponza\sponza_column_c_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 12.0
+newmtl sponza_70SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_details_diff.bmp
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 14.0
+newmtl sponza_125SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_column_b_diff.bmp
+bump media\sponza\sponza_column_b_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 12.0
+newmtl sponza_259SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_flagpole_diff.bmp
+Ni 1.00
+Ks 0.68 0.68 0.68
+Ns 11.93
+newmtl sponza_282SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_fabric_green_diff.bmp
+Ni 1.00
+Ks 0.85 0.85 0.85
+Ns 3.66
+newmtl sponza_283SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_fabric_blue_diff.bmp
+Ni 1.00
+Ks 0.85 0.85 0.85
+Ns 3.66
+newmtl sponza_284SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_fabric_diff.bmp
+Ni 1.00
+Ks 0.85 0.85 0.85
+Ns 3.66
+newmtl sponza_320SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_curtain_blue_diff.bmp
+Ni 1.00
+Ks 0.85 0.85 0.85
+Ns 3.66
+newmtl sponza_321SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_curtain_diff.bmp
+Ni 1.00
+Ks 0.85 0.85 0.85
+Ns 3.66
+newmtl sponza_322SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_curtain_green_diff.bmp
+Ni 1.00
+Ks 0.85 0.85 0.85
+Ns 3.66
+newmtl sponza_330SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\chain_texture.bmp
+bump media\sponza\chain_texture_ddn.bmp -bm 0.02
+alpha_test 0.01
+Ni 1.00
+Ks 0.72 0.72 0.72
+Ns 14.00
+newmtl sponza_334SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\vase_hanging.bmp
+Ni 1.00
+Ks 0.72 0.72 0.72
+Ns 14.00
+newmtl sponza_373SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\vase_dif.bmp
+bump media\sponza\vase_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.90 0.90 0.90
+Ns 30.00
+newmtl sponza_377SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\lion.bmp
+bump media\sponza\lion_ddn.bmp -bm 0.02
+Ni 1.00
+Ks 0.90 0.90 0.90
+Ns 30.00
+newmtl sponza_380SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.59 0.59 0.59
+Tf 1.00 1.00 1.00
+map_Kd media\sponza\sponza_roof_diff.bmp
+Ni 1.00
+Ks 0.30 0.30 0.30
+Ns 12.0

@@ -1,0 +1,2 @@
+directx sdk june2010 : for Hw Text Flushing
+havok sdk free win32 : for Animation Driven
