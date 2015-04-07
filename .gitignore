@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+*.exp
+*.swsl
+*.opensdf
+*.sdf
+immediate/
+bin32/log.txt
