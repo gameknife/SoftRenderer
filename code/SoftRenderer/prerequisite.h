@@ -30,7 +30,11 @@
 // stl
 #include <iostream>
 // 修改版本的vector以支持内存对齐
+#if _MSC_VER <= 1600
 #include "myvector"
+#else
+#include <vector>
+#endif
 #include <map>
 #include <string>
 #include <stack>
