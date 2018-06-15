@@ -79,7 +79,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	// 排序三角形，变为
 	//  |
 	// \|/
-	//  y
+	//  y5
 	// 	     0
 	// 	    /|
 	// 	   / |

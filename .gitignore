@@ -36,3 +36,6 @@ bin32/log.txt
 *.user
 *.suo
 *.log
+
+bin32/
+.vs/

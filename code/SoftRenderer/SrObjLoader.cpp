@@ -4,7 +4,7 @@
 #include "SrMaterial.h"
 
 #include "mmgr/mmgr.h"
-
+#include <tchar.h>
 
 
 SrObjLoader::SrObjLoader(void)
@@ -157,25 +157,25 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 		if( !InFile )
 			break;
 
-		if( 0 == _tcscmp( strCommand, _T("#") ) )
+		if( 0 == strcmp( strCommand, "#" ) )
 		{
 			// Comment
 		}
-		else if( 0 == _tcscmp( strCommand, _T("g") ) )
+		else if( 0 == strcmp( strCommand, "g" ) )
 		{
 			// 物体
 			flushFace = true;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("usemtl") ) )
+		else if( 0 == strcmp( strCommand, "usemtl" ) )
 		{
 			// 物体材质
 			InFile >> currMtlName;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("mtllib") ) )
+		else if( 0 == strcmp( strCommand, "mtllib" ) )
 		{
 			// 物体材质
 		}
-		else if( 0 == _tcscmp( strCommand, _T("v") ) )
+		else if( 0 == strcmp( strCommand, "v" ) )
 		{
 			if (flushFace)
 			{
@@ -194,7 +194,7 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 
 			// for3DsMax, 加入点列，随后方便走面的时候，输入normal和tc
 		}
-		else if( 0 == _tcscmp( strCommand, _T("vt") ) )
+		else if( 0 == strcmp( strCommand, "vt" ) )
 		{
 			// Vertex TexCoord
 			float u, v;
@@ -202,14 +202,14 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 			// for3DsMax, 加入点列，随后方便走面的时候，输入normal和tc
 			TexCoords.push_back( float2( u, 1-v ) );
 		}
-		else if( 0 == _tcscmp( strCommand, _T("vn"))  )
+		else if( 0 == strcmp( strCommand, "vn")  )
 		{
 			// Vertex Normal
 			float x, y, z;
 			InFile >> x >> y >> z;
 			Normals.push_back( float3( x, y, z) );
 		}
-		else if( 0 == _tcscmp( strCommand, _T("f") ) )
+		else if( 0 == strcmp( strCommand, "f" ) )
 		{
 			// Face
 			int iPosition, iTexCoord, iNormal;
@@ -436,73 +436,73 @@ bool SrObjLoader::LoadMaterialFromMTL( const char* strFileData )
 		if( !InFile )
 			break;
 
-		if( 0 == _tcscmp( strCommand, _T("#") ) )
+		if( 0 == strcmp( strCommand, "#") ) 
 		{
 			// Comment
 		}
-		else if( 0 == _tcscmp( strCommand, _T("newmtl") ) )
+		else if( 0 == strcmp( strCommand, "newmtl") ) 
 		{
 			param.CreateMat();
 			InFile >> param.mtlname;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("shading") ) )
+		else if( 0 == strcmp( strCommand, "shading") ) 
 		{
 			InFile >> param.shading_mode;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("Ka") ) )
+		else if( 0 == strcmp( strCommand, "Ka") ) 
 		{
 			//InFile >> Ka.r >> Ka.g >> Ka.b;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("Kd") ) )
+		else if( 0 == strcmp( strCommand, "Kd") ) 
 		{
 			InFile >> param.Kd.r >> param.Kd.g >> param.Kd.b;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("Ks"))  )
+		else if( 0 == strcmp( strCommand, "Ks"))  
 		{
 			InFile >> param.Ks.r >> param.Ks.g >> param.Ks.b;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("Ns") ) )
+		else if( 0 == strcmp( strCommand, "Ns") ) 
 		{
 			InFile >> param.Glossness;
 			param.Glossness = Clamp(param.Glossness, 0.0f, 255.f);
 		}
-		else if( 0 == _tcscmp( strCommand, _T("Nfsp") ) )		// custom attr: fresnel power
+		else if( 0 == strcmp( strCommand, "Nfsp") ) 		// custom attr: fresnel power
 		{
 			InFile >> param.FresnelPower;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("Nfsb") ) )		// custom attr: fresnel bia
+		else if( 0 == strcmp( strCommand, "Nfsb") ) 		// custom attr: fresnel bia
 		{
 			InFile >> param.FresnelBia;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("Nfss") ) )		// custom attr: fresnel scale
+		else if( 0 == strcmp( strCommand, "Nfss") ) 		// custom attr: fresnel scale
 		{
 			InFile >> param.FresnelScale;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("map_Kd") ) )
+		else if( 0 == strcmp( strCommand, "map_Kd") ) 
 		{		
 			InFile >> param.Kd_map;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("map_Kb") ) )
+		else if( 0 == strcmp( strCommand, "map_Kb") ) 
 		{
 			InFile >> param.Kb_map;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("bump") ) )
+		else if( 0 == strcmp( strCommand, "bump") ) 
 		{
 			InFile >> param.Kb_map;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("map_Ks") ) )
+		else if( 0 == strcmp( strCommand, "map_Ks") ) 
 		{
 			InFile >> param.Ks_map;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("map_Kr") ) )
+		else if( 0 == strcmp( strCommand, "map_Kr") ) 
 		{
 			InFile >> param.Kr_map;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("map_Kspc0") ) )
+		else if( 0 == strcmp( strCommand, "map_Kspc0") ) 
 		{
 			InFile >> param.kspc0_map;
 		}
-		else if( 0 == _tcscmp( strCommand, _T("alpha_test") ) )
+		else if( 0 == strcmp( strCommand, "alpha_test") ) 
 		{
 			InFile >> param.AlphaTest;
 		}

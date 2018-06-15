@@ -11,7 +11,7 @@
 
 std::map<const void*, void*> m_align_pt_mapper;
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
+int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPTSTR    lpCmdLine,
                      int       nCmdShow)
@@ -23,9 +23,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 #endif
 	
 	SoftRenderApp app;
-	
-	app.RegisterTask(new SrModelViewerApp);
+
 	app.RegisterTask(new SrSponzaApp);
+	app.RegisterTask(new SrModelViewerApp);
 
 	app.Init(hInstance);
 	app.Run();
