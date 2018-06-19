@@ -1,0 +1,14 @@
+{
+  "name": "nodegyp-helloworld",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node-gyp --silent build && node test.js"
+  },
+  "dependencies": {
+  	"nan": "*"
+  },
+  "author": "gameKnife",
+  "license": "MIT"
+}
