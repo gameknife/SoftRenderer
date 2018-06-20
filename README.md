@@ -1,10 +1,10 @@
 # SoftRenderer
 An SoftRenderer for experiment &amp; learn.
 
-# 重启计划
-2018年，重启softrender工程，旨在重新回归本源，并且将新技术应用进行扩展，同时依情况构建一系列软渲染教程
+## 重启计划
+2018年，重启softrender工程，旨在重新回归本源，并且将一些新技术应用起来，同时依时间情况构建一系列软渲染教程
 
-## 关键实现
+### 关键实现
 * 跨平台实现
   * 脱离winapi, 更加现代
   * 得以在移动平台运行
@@ -15,6 +15,6 @@ An SoftRenderer for experiment &amp; learn.
   * 更加方便后来者学习
   * 更加方便后续构建课程
 
-## 时间安排
+### 时间安排
 * 2018年夏季
 * 2018年秋季
