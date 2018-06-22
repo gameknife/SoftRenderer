@@ -45,6 +45,9 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{9ae0fe04-50ae-4def-b753-6e4ded74d757}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{57ce5263-f786-4361-b700-50549d5c72c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -187,6 +190,12 @@
     <ClInclude Include="renderer\SrSoftRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="shader\AdvanceShaders.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="shader\BasicShaders.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SrBitmap.cpp">
@@ -281,6 +290,12 @@
     </ClCompile>
     <ClCompile Include="renderer\SrSoftRenderer.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="shader\AdvanceShaders.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="shader\BasicShaders.cpp">
+      <Filter>Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

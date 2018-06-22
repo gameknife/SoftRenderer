@@ -5,12 +5,6 @@ VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoftRenderer", "SoftRenderer\SoftRenderer.vcxproj", "{EF60994C-480F-406A-BE9A-4AEEC3EC277A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicShaders", "BasicShaders\BasicShaders.vcxproj", "{4473F102-F580-467A-8FF6-1942F7F527FE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceShaders", "AdvanceShaders\AdvanceShaders.vcxproj", "{FDAF7C58-D734-4DB6-A2D9-CB73B22EFD27}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SwShaders", "SwShaders", "{AEAC1A49-5D49-4EF8-8DDD-D7C63EB5D25B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Win32 = Release|Win32
@@ -21,19 +15,9 @@ Global
 		{EF60994C-480F-406A-BE9A-4AEEC3EC277A}.Release|Win32.Build.0 = Release|Win32
 		{EF60994C-480F-406A-BE9A-4AEEC3EC277A}.Release|x64.ActiveCfg = Release|x64
 		{EF60994C-480F-406A-BE9A-4AEEC3EC277A}.Release|x64.Build.0 = Release|x64
-		{4473F102-F580-467A-8FF6-1942F7F527FE}.Release|Win32.ActiveCfg = Release|Win32
-		{4473F102-F580-467A-8FF6-1942F7F527FE}.Release|Win32.Build.0 = Release|Win32
-		{4473F102-F580-467A-8FF6-1942F7F527FE}.Release|x64.ActiveCfg = Release|Win32
-		{FDAF7C58-D734-4DB6-A2D9-CB73B22EFD27}.Release|Win32.ActiveCfg = Release|Win32
-		{FDAF7C58-D734-4DB6-A2D9-CB73B22EFD27}.Release|Win32.Build.0 = Release|Win32
-		{FDAF7C58-D734-4DB6-A2D9-CB73B22EFD27}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{4473F102-F580-467A-8FF6-1942F7F527FE} = {AEAC1A49-5D49-4EF8-8DDD-D7C63EB5D25B}
-		{FDAF7C58-D734-4DB6-A2D9-CB73B22EFD27} = {AEAC1A49-5D49-4EF8-8DDD-D7C63EB5D25B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {63BB30B1-763D-468E-A145-A68DB9A088E4}

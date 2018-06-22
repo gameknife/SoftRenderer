@@ -17,6 +17,8 @@
 #include "SrSwShader.h"
 
 #include "mmgr/mmgr.h"
+#include "shader/BasicShaders.h"
+#include "shader/AdvanceShaders.h"
 
 #define SR_NORMALIZE_VB_MAX_SIZE 1024 * 1024 * 10
 
@@ -54,12 +56,6 @@ bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 
 bool SrSoftRenderer::ShutdownRenderer()
 {
-	for (uint32 i=0; i < m_swHandles.size(); ++i)
-	{
-		FreeLibrary( m_swHandles[i] );
-	}
-	m_swHandles.clear();
-
 	_mm_free_custom(m_normalizeVertexBuffer);
 	m_normalizeVertexBuffer = 0;
 	_mm_free_custom(m_shaderConstants);
@@ -255,59 +251,61 @@ uint32 SrSoftRenderer::Tex2D( float2& texcoord, const SrTexture* texture  ) cons
 typedef void (*fnModuleInit)(GlobalEnvironment* pgEnv);
 typedef SrSwShader* (*fnLoadShader)(const char* shaderName);
 
+SrSwShader* LoadShader(const char* shaderName)
+{
+	std::vector<SrSwShader*> shaders;
+
+	shaders.push_back(&g_FlatShadingShader);
+	shaders.push_back(&g_PhongShadingShader);
+	shaders.push_back(&g_GourandShadingShader);
+	shaders.push_back(&g_PhongShadingWithNormalShader);
+
+	shaders.push_back(&g_SkinSimShader);
+	shaders.push_back(&g_FresnelNormalShader);
+	shaders.push_back(&g_HairShader);
+
+	for (uint32 i = 0; i < shaders.size(); ++i)
+	{
+		if (!stricmp(shaders[i]->getName(), shaderName))
+		{
+			return shaders[i];
+		}
+	}
+
+	return NULL;
+}
+
 bool SrSoftRenderer::InnerInitShaders()
 {
 	m_swShaders.clear();
 
-	std::string dir = "\\shader\\";
-	std::string path = "\\shader\\*.swsl";
-	getMediaPath(dir);
-	getMediaPath(path);
-	 
-	WIN32_FIND_DATAA fd;
-	HANDLE hff = FindFirstFileA(path.c_str(), &fd);
-	BOOL bIsFind = TRUE;
-	 
-	while(hff && bIsFind)
+	//fnModuleInit fnCount = (fnModuleInit)(GetProcAddress( hDllHandle, "ModuleInit" ));
+	//fnLoadShader fnLoad = (fnLoadShader)(GetProcAddress( hDllHandle, "LoadShader" ));
+
+	//fnCount(gEnv);
+
+	// add other shaders
+	SrResourceManager* resMng = (SrResourceManager*)gEnv->resourceMgr;
+	SrResourceLibrary::iterator it = resMng->m_shaderLibrary.begin();
+	for (; it != resMng->m_shaderLibrary.end(); ++it)
 	{
-	 	if(fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
-	 	{
-	 		// do not get into
-	 	}
-	 	else
-	 	{
-	 		std::string fullpath = dir + fd.cFileName;
-	 
-	 		// load dll shaders
-	 		HMODULE hDllHandle = 0;
-	 		hDllHandle = LoadLibraryA( fullpath.c_str() );
-	 		if (hDllHandle)
-	 		{
-				fnModuleInit fnCount = (fnModuleInit)(GetProcAddress( hDllHandle, "ModuleInit" ));
-	 			fnLoadShader fnLoad = (fnLoadShader)(GetProcAddress( hDllHandle, "LoadShader" ));
-	 
-				fnCount(gEnv);
+		SrSwShader* shader = LoadShader(it->second->getName());
+		if (shader)
+		{
+			shader->m_bindShader = reinterpret_cast<SrShader*>(it->second);
+			m_swShaders.push_back(shader);
+		}
 
-				// add other shaders
-				SrResourceManager* resMng = (SrResourceManager*)gEnv->resourceMgr;
-				SrResourceLibrary::iterator it = resMng->m_shaderLibrary.begin();
-				for (; it != resMng->m_shaderLibrary.end(); ++it)
-				{
-					SrSwShader* shader = fnLoad(it->second->getName());
-					if (shader)
-					{
-						shader->m_bindShader = reinterpret_cast<SrShader*>(it->second);
-						m_swShaders.push_back(shader);
-					}
-					
-				}
-
- 	 			m_swHandles.push_back(hDllHandle);
-	 		}		
-	 	}
-	 	bIsFind = FindNextFileA(hff, &fd);
 	}
 
+	m_swShaders.push_back(&g_FlatShadingShader);
+	m_swShaders.push_back(&g_PhongShadingShader);
+	m_swShaders.push_back(&g_GourandShadingShader);
+	m_swShaders.push_back(&g_PhongShadingWithNormalShader);
+
+	m_swShaders.push_back(&g_SkinSimShader);
+	m_swShaders.push_back(&g_FresnelNormalShader);
+	m_swShaders.push_back(&g_HairShader);
 
 	return true;
 }

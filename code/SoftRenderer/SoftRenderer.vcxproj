@@ -492,6 +492,8 @@
     <ClInclude Include="renderer\SrRasterizer.h" />
     <ClInclude Include="renderer\SrSoftRenderer.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="shader\AdvanceShaders.h" />
+    <ClInclude Include="shader\BasicShaders.h" />
     <ClInclude Include="SrLogger.h" />
     <ClInclude Include="SrModelViewerApp.h" />
     <ClInclude Include="SrSwShader.h" />
@@ -549,6 +551,8 @@
     <ClCompile Include="renderer\SrRasterizer_Algo.cpp" />
     <ClCompile Include="renderer\SrRasterize_Clip.cpp" />
     <ClCompile Include="renderer\SrSoftRenderer.cpp" />
+    <ClCompile Include="shader\AdvanceShaders.cpp" />
+    <ClCompile Include="shader\BasicShaders.cpp" />
     <ClCompile Include="SoftRenderApp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SrBitmap.cpp" />

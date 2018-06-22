@@ -1,35 +1,8 @@
 #include "StdAfx.h"
 #include "BasicShaders.h"
-#include "../SoftRenderer/renderer/SrFragmentBuffer.h"
+#include "../renderer/SrFragmentBuffer.h"
 
 #include "mmgr/mmgr.h"
-
-
-GlobalEnvironment* gEnv = NULL;
-
-extern "C" __declspec(dllexport) void ModuleInit( GlobalEnvironment* pgEnv )
-{
-	gEnv = pgEnv;
-}
-
-extern "C" __declspec(dllexport) SrSwShader* LoadShader( const char* shaderName )
-{
-	std::vector<SrSwShader*> shaders;
-	shaders.push_back( &g_FlatShadingShader );
-	shaders.push_back( &g_PhongShadingShader );
-	shaders.push_back( &g_GourandShadingShader );
-	shaders.push_back( &g_PhongShadingWithNormalShader );
-
-	for (uint32 i=0; i < shaders.size(); ++i)
-	{
-		if ( !stricmp(shaders[i]->getName(), shaderName))
-		{
-			return shaders[i];
-		}
-	}
-
-	return NULL;
-}
 
 SrFlatShader g_FlatShadingShader;
 SrPhongShader g_PhongShadingShader;

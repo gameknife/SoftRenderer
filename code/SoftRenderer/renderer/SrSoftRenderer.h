@@ -90,7 +90,6 @@ private:
 	const SrSwShader* m_currShader;
 	SrSwShaders m_swShaders;
 	float4* m_shaderConstants;
-	SrHandleList m_swHandles;
 
 	SrTextLines m_textLines;
 };

@@ -13,31 +13,6 @@
 
 #include "mmgr/mmgr.h"
 
-GlobalEnvironment* gEnv = NULL;
-
-extern "C" __declspec(dllexport) void ModuleInit( GlobalEnvironment* pgEnv )
-{
-	gEnv = pgEnv;
-}
-
-extern "C" __declspec(dllexport) SrSwShader* LoadShader( const char* shaderName )
-{
-	std::vector<SrSwShader*> shaders;
-	shaders.push_back( &g_SkinSimShader );
-	shaders.push_back( &g_FresnelNormalShader );
-	shaders.push_back( &g_HairShader );
-
-	for (uint32 i=0; i < shaders.size(); ++i)
-	{
-		if ( !stricmp(shaders[i]->getName(), shaderName))
-		{
-			return shaders[i];
-		}
-	}
-
-	return NULL;
-}
-
 SrSkinSimShader g_SkinSimShader;
 SrFresnelNormalShader g_FresnelNormalShader;
 SrHairShader g_HairShader;
