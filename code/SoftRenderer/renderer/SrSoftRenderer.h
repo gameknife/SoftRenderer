@@ -73,13 +73,6 @@ private:
 
 	virtual bool InnerInitShaders();
 
-	
-
-	// DX硬件对象
-	struct IDirect3D9* m_d3d9;
-	struct IDirect3DDevice9* m_hwDevice;
-	struct IDirect3DSurface9* m_drawSurface;
-	
 	// 光栅处理器
 	SrRasterizer* m_rasterizer;
 
@@ -99,9 +92,6 @@ private:
 	float4* m_shaderConstants;
 	SrHandleList m_swHandles;
 
-
-	HFONT m_bigFont;
-	HFONT m_smallFont;
 	SrTextLines m_textLines;
 };
 

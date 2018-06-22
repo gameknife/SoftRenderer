@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "BasicShaders.h"
-#include "../SrSwRendererCpu/SrFragmentBuffer.h"
+#include "../SoftRenderer/renderer/SrFragmentBuffer.h"
 
 #include "mmgr/mmgr.h"
 

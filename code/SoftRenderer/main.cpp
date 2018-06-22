@@ -7,6 +7,7 @@
 #include "SrModelViewerApp.h"
 
 #include "mmgr/mmgr.h"
+#include "SrBitmap.h"
 
 
 std::map<const void*, void*> m_align_pt_mapper;
@@ -24,9 +25,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	
 	SoftRenderApp app;
 
-	app.RegisterTask(new SrSponzaApp);
 	app.RegisterTask(new SrModelViewerApp);
-
 	app.Init(hInstance);
 	app.Run();
 	app.Destroy();

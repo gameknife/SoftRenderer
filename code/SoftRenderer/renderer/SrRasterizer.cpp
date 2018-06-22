@@ -149,8 +149,8 @@ void SrRasterizer::Flush()
 	// Fragment Buffer 和 OutBaffer的Clear
 	uint32* memBuffer = (uint32*)m_MemSBuffer->getBuffer();
 	uint32* backBuffer = (uint32*)m_BackSBuffer->getBuffer();
-	uint32* gpuBuffer = (uint32*)m_renderer->getBuffer();
-	uint32* outBuffer = (uint32*)m_renderer->getBuffer();
+	//uint32* gpuBuffer = (uint32*)m_renderer->getBuffer();
+	uint32* outBuffer = memBuffer;// (uint32*)m_renderer->getBuffer();
 	SrFragment* fragBuffer = fBuffer->fBuffer;
 
 	// VIDEO MEM 2 SYSTEM MEM, VERY VERY VERY SLOW!!!
@@ -286,28 +286,7 @@ void SrRasterizer::Flush()
 			}
 		}
 	}
-// 	for ( uint32 i = 0; i < m_rendPrimitives.size(); ++i)
-// 	{
-// 		gEnv->profiler->setIncrement(ePe_BatchCount);
-// 
-// 		SrVertexBuffer* vb = m_rendPrimitives[i].vb;
-// 		SrIndexBuffer* ib = m_rendPrimitives[i].ib;
-// 
-// 		if (vb && ib)
-// 		{
-// 			uint32 triCount = ib->count / 3;
-// 
-// 			for (uint32 j = 0; j < triCount; j += RASTERIZE_TASK_BLOCK )
-// 			{
-// 				uint32 end =  j + RASTERIZE_TASK_BLOCK;
-// 				if ( end > triCount )
-// 				{
-// 					end = triCount;
-// 				}
-// 				m_rasTaskDispatcher->PushTask( new SrRasTask_Rasterize(&(m_rendPrimitives[i]), vb, ib, j, end ) );
-// 			}
-// 		}
-// 	}
+
 	for ( std::list<SrRendPrimitve*>::iterator it = m_rendPrimitivesRHZ.begin(); it != m_rendPrimitivesRHZ.end(); ++it)
 	{
 		gEnv->profiler->setIncrement(ePe_BatchCount);
@@ -330,28 +309,6 @@ void SrRasterizer::Flush()
 			}
 		}
 	}
-// 	for ( uint32 i = 0; i < m_rendPrimitivesRHZ.size(); ++i)
-// 	{
-// 		gEnv->profiler->setIncrement(ePe_BatchCount);
-// 
-// 		SrVertexBuffer* vb = m_rendPrimitivesRHZ[i].vb;
-// 		SrIndexBuffer* ib = m_rendPrimitivesRHZ[i].ib;
-// 
-// 		if (vb && ib)
-// 		{
-// 			uint32 triCount = ib->count / 3;
-// 
-// 			for (uint32 j = 0; j < triCount; j += RASTERIZE_TASK_BLOCK )
-// 			{
-// 				uint32 end =  j + RASTERIZE_TASK_BLOCK;
-// 				if ( end > triCount )
-// 				{
-// 					end = triCount;
-// 				}
-// 				m_rasTaskDispatcher->PushTask( new SrRasTask_Rasterize(&(m_rendPrimitivesRHZ[i]), vb, ib, j, end ) );
-// 			}
-// 		}
-// 	}
 
 	// RHZ PRIMITIVE
 	
@@ -399,60 +356,33 @@ void SrRasterizer::Flush()
 	//////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
-	// line helper draw
-
-	// FIXME
-
-// 	for (uint32 i=0; i < m_rendDynamicVertex.size(); i+=2)
-// 	{
-// 		float4 line0 = gEnv->renderer->GetMatrix(eMd_WorldViewProj) * m_rendDynamicVertex[i];
-// 		float4 line1 = gEnv->renderer->GetMatrix(eMd_WorldViewProj) * m_rendDynamicVertex[i+1];
-// 		
-// 		// trans to screen space
-// 		if (line0.w < .5f)
-// 		{
-// 			line0.w = .5f;
-// 		}
-// 		if (line1.w < .5f)
-// 		{
-// 			line1.w = .5f;
-// 		}
-// 
-// 		line0.xyz /= line0.w;
-// 		line1.xyz /= line1.w;
-// 
-// 		line0.x = ((-line0.x * .5f + 0.5f) * g_context->width);
-// 		line0.y = ((-line0.y * .5f + 0.5f) * g_context->height);
-// 		line1.x = ((-line1.x * .5f + 0.5f) * g_context->width);
-// 		line1.y = ((-line1.y * .5f + 0.5f) * g_context->height);
-// 
-// 		Draw_Clip_Line( (int)line0.x, (int)line0.y, (int)line1.x, (int)line1.y, 0xffffffff, outBuffer, g_context->width );
-// 	}
-
-
-
-	//////////////////////////////////////////////////////////////////////////
 	// 后期处理
 	gEnv->profiler->setBegin(ePe_PostProcessTime);
 
-	// SSAO
 
-	// Depth of Field
+	if (gEnv->output == false)
+	{
+		m_MemSBuffer->WriteToFile("testbmp.bmp");
+		gEnv->output = true;
+	}
 
 	// jit AA
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 	{
-		int quadsize = g_context->width * g_context->height / 4;
 
-		m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( 0,				quadsize,		memBuffer, backBuffer, gpuBuffer ) );
-		m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	memBuffer, backBuffer, gpuBuffer ) );
-		m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	memBuffer, backBuffer, gpuBuffer ) );
-		m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	memBuffer, backBuffer, gpuBuffer ) );
 
-		m_rasTaskDispatcher->FlushCoop();
-		m_rasTaskDispatcher->Wait();
 
-		memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);		
+		//int quadsize = g_context->width * g_context->height / 4;
+
+		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( 0,				quadsize,		memBuffer, backBuffer, gpuBuffer ) );
+		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	memBuffer, backBuffer, gpuBuffer ) );
+		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	memBuffer, backBuffer, gpuBuffer ) );
+		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	memBuffer, backBuffer, gpuBuffer ) );
+  //
+		// m_rasTaskDispatcher->FlushCoop();
+		// m_rasTaskDispatcher->Wait();
+
+		//memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);
 	}
 	
 	// 后期处理结束

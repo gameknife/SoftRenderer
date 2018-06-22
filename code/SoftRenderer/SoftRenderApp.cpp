@@ -7,6 +7,7 @@
 #include "SrProfiler.h"
 #include "SrShader.h"
 #include "SrLogger.h"
+#include "renderer/SrSoftRenderer.h"
 
 #include "mmgr/mmgr.h"
 
@@ -232,12 +233,6 @@ bool SoftRenderApp::Update()
 	
 	gEnv->renderer->HwClear();
 
-// 	SrApps::iterator it = m_tasks.begin();
-// 	for (; it != m_tasks.end(); ++it)
-// 	{
-// 		(*it)->OnUpdate();
-// 	}
-
 	if( m_curr_task < m_tasks.size())
 	{
 		m_tasks[m_curr_task]->OnUpdate();
@@ -422,63 +417,16 @@ void SoftRenderApp::LoadShaderList()
 
 bool SoftRenderApp::InitRenderers()
 {
-	std::string dir = "\\renderer\\";
-	std::string path = "\\renderer\\*.dll";
-	getMediaPath(dir);
-	getMediaPath(path);
-
-	WIN32_FIND_DATAA fd;
-	HANDLE hff = FindFirstFileA(path.c_str(), &fd);
-	BOOL bIsFind = TRUE;
-
-	while(hff && bIsFind)
-	{
-		if(fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
-		{
-			// do not get into
-		}
-		else
-		{
-			std::string fullpath = dir + fd.cFileName;
-
-			// load dll shaders
-			HMODULE hDllHandle = 0;
-			hDllHandle = LoadLibraryA( fullpath.c_str() );
-			if (hDllHandle)
-			{
-				fnLoadRenderer fnLoad = (fnLoadRenderer)(GetProcAddress( hDllHandle, "LoadRenderer" ));
-
-				IRenderer* renderer = fnLoad(gEnv);
-				//renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32);
-
-
-				m_renderers.push_back(renderer);
-
-				m_rendHandles.push_back(hDllHandle);
-			}		
-		}
-		bIsFind = FindNextFileA(hff, &fd);
-	}
-
-	if ( m_renderers.empty() )
-	{
-		return false;
-	}
+	m_renderer = new SrSoftRenderer();
 	m_currRendererIndex = 0;
-	gEnv->renderer = m_renderers[m_currRendererIndex];
+	gEnv->renderer = m_renderer;
 	gEnv->renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32);
+
+	return true;
 }
 
 void SoftRenderApp::ShutdownRenderers()
 {
-	for (uint32 i=0; i < m_rendHandles.size(); ++i)
-	{
-		m_renderers[i]->ShutdownRenderer();
-
-		fnFreeRenderer fnFree = (fnFreeRenderer)(GetProcAddress( m_rendHandles[i], "FreeRenderer" ));
-
-		fnFree();
-
-		FreeLibrary( m_rendHandles[i] );
-	}
+	m_renderer->ShutdownRenderer();
+	delete m_renderer;
 }

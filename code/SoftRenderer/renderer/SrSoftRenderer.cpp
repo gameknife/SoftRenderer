@@ -10,23 +10,17 @@
 
 #include "StdAfx.h"
 
-#include <d3d9.h>
-
 #include "SrSoftRenderer.h"
 #include "srBitmap.h"
 #include "SrRasterizer.h"
 #include "SrProfiler.h"
 #include "SrSwShader.h"
-#include <gl/GL.h>
 
 #include "mmgr/mmgr.h"
 
 #define SR_NORMALIZE_VB_MAX_SIZE 1024 * 1024 * 10
 
 SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
-	m_d3d9(NULL),
-	m_drawSurface(NULL),
-	m_hwDevice(NULL),
 	m_cachedBuffer(NULL),
 	m_bufferPitch(0),
 	m_renderState(0),
@@ -36,61 +30,15 @@ SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
 {
 	m_textureStages.assign( SR_MAX_TEXTURE_STAGE_NUM , NULL );
 	m_normalizeVBAllocSize = 0;
-
-	// create HFONT
-	LOGFONT lfont;
-	memset   (&lfont,   0,   sizeof   (LOGFONT));   
-	lfont.lfHeight=14;
-	lfont.lfWeight=800;   
-	lfont.lfClipPrecision=CLIP_LH_ANGLES; 
-	lfont.lfQuality = NONANTIALIASED_QUALITY; // THIS COULD BOOST
-	strcpy_s( lfont.lfFaceName, "verdana" );
-	m_bigFont = CreateFontIndirect( &lfont );
-
-	lfont.lfHeight=12;
-	lfont.lfWeight=0;  
-	m_smallFont = CreateFontIndirect( &lfont );
-
 }
 
 SrSoftRenderer::~SrSoftRenderer(void)
 {
-	DeleteObject(m_smallFont);
-	DeleteObject(m_bigFont);
+
 }
 
 bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 {
-	//////////////////////////////////////////////////////////////////////////
-	// create d3d device for Show Soft Buffer
-	if( NULL == ( m_d3d9 = Direct3DCreate9( D3D_SDK_VERSION ) ) )
-		return false;
-
-	D3DPRESENT_PARAMETERS d3dpp; 
-	ZeroMemory( &d3dpp, sizeof(d3dpp) );
-	d3dpp.Windowed = TRUE;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	// bpp 32 XRGB
-	d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
-	d3dpp.EnableAutoDepthStencil = FALSE;
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
-	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-	d3dpp.BackBufferWidth = width;
-	d3dpp.BackBufferHeight = height;
-	d3dpp.Flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
-
-	// Create the D3DDevice
-	if( FAILED( m_d3d9->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, hWnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-		&d3dpp, &m_hwDevice ) ) )
-	{
-		MessageBox(hWnd,"无法创建DX设备","",MB_OK);
-		return false;
-	}
-
-	// Get backBuffrt
-	m_hwDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_drawSurface);
-
 	// 创建光栅化处理器
 	m_rasterizer = new SrRasterizer;
 	m_rasterizer->Init(this);
@@ -118,34 +66,17 @@ bool SrSoftRenderer::ShutdownRenderer()
 	m_shaderConstants = 0;
 
 	SAFE_DELETE( m_rasterizer );
-
-	SAFE_RELEASE( m_drawSurface );
-	SAFE_RELEASE( m_hwDevice );
-	SAFE_RELEASE( m_d3d9 );
-
 	return true;
 }
 
 bool SrSoftRenderer::HwClear()
 {
-// 	if (!m_drawSurface)
-// 		return false;
-// 
-// 	HRESULT res = m_hwDevice->ColorFill(m_drawSurface,0,D3DCOLOR_ARGB(255,50,50,50));
-// 	if (res!=S_OK)
-// 	{
-// 		return false;
-// 	}
-
 	return true;
 }
 
 bool SrSoftRenderer::Swap()
 {
 	m_renderState |= eRS_Swaping;
-
-	m_hwDevice->Present(NULL, NULL, NULL, NULL);
-
 	m_renderState &= ~eRS_Swaping;
 	return true;
 }
@@ -160,23 +91,30 @@ void SrSoftRenderer::BeginFrame()
 
 void SrSoftRenderer::EndFrame()
 {
-		D3DLOCKED_RECT lockinfo;
-		memset(&lockinfo,0,sizeof(lockinfo));
-
-		HRESULT res = m_drawSurface->LockRect(&lockinfo,NULL,D3DLOCK_DISCARD);
-		if (res!=S_OK)
-		{
-			// FATAL ERROR
-			return;			
-		}
-
-		m_cachedBuffer = lockinfo.pBits;
-		m_bufferPitch = lockinfo.Pitch;
+		// D3DLOCKED_RECT lockinfo;
+		// memset(&lockinfo,0,sizeof(lockinfo));
+  //
+		// HRESULT res = m_drawSurface->LockRect(&lockinfo,NULL,D3DLOCK_DISCARD);
+		// if (res!=S_OK)
+		// {
+		// 	// FATAL ERROR
+		// 	return;			
+		// }
+  //
+		// m_cachedBuffer = lockinfo.pBits;
+		// m_bufferPitch = lockinfo.Pitch;
 		m_rasterizer->Flush();
+		// m_drawSurface->UnlockRect();
 
-		m_drawSurface->UnlockRect();
+ 		//FlushText();
 
- 		FlushText();
+		// uint8 padding_data[64 * 64 * 4];
+		// memset(padding_data, 0, 64 * 64 * 4);
+		// memset(padding_data, 0xff, 64 * 32);
+		// memset(padding_data + 64*64, 0xff, 64 * 32);
+  //
+		// SrBitmap bmp(64, 64, 4, (uint8*)padding_data);
+		// bmp.WriteToFile("testbmp1.bmp");
  
  		m_textLines.clear();
 
@@ -226,41 +164,7 @@ bool SrSoftRenderer::DrawPrimitive( SrPrimitve* primitive )
 
 void SrSoftRenderer::FlushText()
 {
-	if (!m_drawSurface)
-		return;
- 
-  	HDC hdc ;
-  	HRESULT res = m_drawSurface->GetDC(&hdc);
-  	if (res!=S_OK)
-  	{
-  		return;
-  	}
-  
-  	SrTextLines::iterator it = m_textLines.begin();
-  	for ( ; it != m_textLines.end(); ++it )
-  	{
-  		RECT rect;
-  		rect.left = it->pos.x;
-  		rect.right =(LONG)(strlen(it->text.c_str()) * 10 + it->pos.x);
-  		rect.top = it->pos.y;
-  		rect.bottom = it->pos.y+20;
-  		int len = (int)strlen(it->text.c_str());
-  
-  		if ( it->size == 0)
-  		{
-  			SelectObject(hdc, m_bigFont);
-  		}
-  		else
-  		{
-  			SelectObject(hdc, m_smallFont);
-  		}
-  		
-  		SetBkMode(hdc, TRANSPARENT);
-  		SetTextColor(hdc, it->color);
-  		DrawTextA(hdc,it->text.c_str(),len,&rect,DT_LEFT);	
-  	}
-  
-  	m_drawSurface->ReleaseDC(hdc);
+
 }
 
 

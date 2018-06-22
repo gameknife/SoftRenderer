@@ -37,8 +37,7 @@ private:
 	HINSTANCE m_hInst;								// current instance
 	HWND m_hWnd;
 	SrApps m_tasks;
-	SrRendererList m_renderers;
-	SrHandleList m_rendHandles;
+	IRenderer* m_renderer;
 	uint32 m_currRendererIndex;
 
 	void LoadShaderList();

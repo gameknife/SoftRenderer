@@ -19,7 +19,6 @@ public:
 	// file bitmap
 	SrBitmap(const char* name);
 	virtual ~SrBitmap(void);
-
 public:
 
 private:

@@ -72,7 +72,7 @@
 // 渲染规格配置
 #define SR_MAX_TEXTURE_STAGE_NUM 16
 #define FBUFFER_CHANNEL_SIZE 4
-#define SR_GREYSCALE_CLEARCOLOR 0x0
+#define SR_GREYSCALE_CLEARCOLOR 0x1
 #define SR_SHADER_CONSTANTS_NUM 8
 
 // 软件光栅化分块策略
@@ -162,6 +162,8 @@ struct GlobalEnvironment
 	SrScene*				sceneMgr;
 	ILogger*				logger;
 	SrRendContext*			context;
+
+	bool					output = false;
 };
 extern GlobalEnvironment* gEnv;
 

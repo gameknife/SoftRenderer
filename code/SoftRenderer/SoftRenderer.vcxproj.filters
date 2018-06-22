@@ -42,6 +42,9 @@
     <Filter Include="RenderSys\SoftwareRenderer\swShader">
       <UniqueIdentifier>{131c4f7c-b557-4ba2-ad13-e5289435735f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{9ae0fe04-50ae-4def-b753-6e4ded74d757}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -169,6 +172,21 @@
     <ClInclude Include="SrModelViewerApp.h">
       <Filter>AppLayer\App</Filter>
     </ClInclude>
+    <ClInclude Include="renderer\SrFragmentBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\SrRasTaskDispatcher.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\SrRasTasks.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\SrRasterizer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\SrSoftRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SrBitmap.cpp">
@@ -242,6 +260,27 @@
     </ClCompile>
     <ClCompile Include="SrModelViewerApp.cpp">
       <Filter>AppLayer\App</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\SrFragmentBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\SrRasTaskDispatcher.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\SrRasTasks.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\SrRasterize_Clip.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\SrRasterizer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\SrRasterizer_Algo.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\SrSoftRenderer.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

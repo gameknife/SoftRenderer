@@ -9,11 +9,11 @@
  */
 
 #include "StdAfx.h"
+
 #include "SrBitmap.h"
 #include "SrProfiler.h"
 
 #include "mmgr/mmgr.h"
-
 
 SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 {

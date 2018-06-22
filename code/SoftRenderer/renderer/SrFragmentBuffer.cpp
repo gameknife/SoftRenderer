@@ -2,7 +2,7 @@
 #include "SrFragmentBuffer.h"
 #include "SrSoftRenderer.h"
 
-std::map<const void*, void*> m_align_pt_mapper;
+//std::map<const void*, void*> m_align_pt_mapper;
 
 SrFragmentBuffer::SrFragmentBuffer( int width, int height, SrSoftRenderer* renderer):m_width(width), m_height(height), m_renderer(renderer)
 {
