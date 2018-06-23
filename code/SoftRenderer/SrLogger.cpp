@@ -52,7 +52,7 @@ void SrLogger::Log( const char* line )
 			SetConsoleTextAttribute(consolehwnd, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE );
 			break;
 		case '1':
-			SetConsoleTextAttribute(consolehwnd, FOREGROUND_BLUE | FOREGROUND_GREEN );
+			SetConsoleTextAttribute(consolehwnd, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 			break;
 		case '2':
 			SetConsoleTextAttribute(consolehwnd, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY );
@@ -71,6 +71,8 @@ void SrLogger::Log( const char* line )
 		std::cout << buffer;
 
 		delete[] buffer;
+	
+		SetConsoleTextAttribute(consolehwnd, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
 	}
 	
 }
