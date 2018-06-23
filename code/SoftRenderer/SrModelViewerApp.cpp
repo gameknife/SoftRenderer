@@ -155,6 +155,10 @@ void SrModelViewerApp::OnInit()
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
 	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
+
+	// set shademode -> 0
+	m_shade_mode = 0;
+	UpdateShader();
 }
 
 void SrModelViewerApp::OnUpdate()

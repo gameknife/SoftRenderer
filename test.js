@@ -1,4 +1,4 @@
-let addon = require('./build/Release/addon.node');
+let addon = require('./node_natives/build/Release/addon.node');
 
 let buffer = Buffer.from("ABC");
 

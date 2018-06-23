@@ -87,32 +87,8 @@ void SrSoftRenderer::BeginFrame()
 
 void SrSoftRenderer::EndFrame()
 {
-		// D3DLOCKED_RECT lockinfo;
-		// memset(&lockinfo,0,sizeof(lockinfo));
-  //
-		// HRESULT res = m_drawSurface->LockRect(&lockinfo,NULL,D3DLOCK_DISCARD);
-		// if (res!=S_OK)
-		// {
-		// 	// FATAL ERROR
-		// 	return;			
-		// }
-  //
-		// m_cachedBuffer = lockinfo.pBits;
-		// m_bufferPitch = lockinfo.Pitch;
-		m_rasterizer->Flush();
-		// m_drawSurface->UnlockRect();
-
- 		//FlushText();
-
-		// uint8 padding_data[64 * 64 * 4];
-		// memset(padding_data, 0, 64 * 64 * 4);
-		// memset(padding_data, 0xff, 64 * 32);
-		// memset(padding_data + 64*64, 0xff, 64 * 32);
-  //
-		// SrBitmap bmp(64, 64, 4, (uint8*)padding_data);
-		// bmp.WriteToFile("testbmp1.bmp");
- 
- 		m_textLines.clear();
+	m_rasterizer->Flush();
+ 	m_textLines.clear();
 
 	m_renderState &= ~eRs_Rendering;
 
@@ -128,9 +104,15 @@ void SrSoftRenderer::EndFrame()
 	m_normalizeVBAllocSize = 0;
 }
 
-void* SrSoftRenderer::getBuffer()
+const uint8* SrSoftRenderer::getBuffer()
 {
-	return m_cachedBuffer;
+	return m_rasterizer->m_MemSBuffer->getBuffer();
+}
+
+int SrSoftRenderer::getBufferLength()
+{
+	int length = m_rasterizer->m_MemSBuffer->getWidth() * m_rasterizer->m_MemSBuffer->getHeight() * m_rasterizer->m_MemSBuffer->getBPP();
+	return length;
 }
 
 bool SrSoftRenderer::SetTextureStage( const SrTexture* texture, int stage )

@@ -7,7 +7,7 @@
     "start": "electron .",
     "build": "webpack",
     "build&run": "webpack && electron .",
-    "nbuild": "cd ./node_natives && node-gyp build --target=1.7.15 --arch=x64 --dist-url=https://atom.io/download/electron"
+    "nbuild": "cd ./node_natives && node-gyp rebuild --target=1.7.15 --arch=x64 --dist-url=https://atom.io/download/electron"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
@@ -20,7 +20,7 @@
     "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
     "browserify": "^15.0.0",
-    "electron": "~1.7.8",
+    "electron": "1.7.15",
     "webpack": "^3.10.0"
   },
   "author": "gameKnife",

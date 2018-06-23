@@ -23,3 +23,24 @@ int main()
 	return 0;
 }
 
+SoftRenderApp* g_app;
+
+void initOfflineSystem()
+{
+	g_app = new SoftRenderApp();
+	g_app->RegisterTask(new SrModelViewerApp);
+	g_app->Init();
+}
+
+void renderToBuffer()
+{
+	g_app->Update();
+}
+
+void shutDown()
+{
+	g_app->Destroy();
+}
+
+
+

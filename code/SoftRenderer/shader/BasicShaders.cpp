@@ -316,11 +316,12 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 	diffuseAcc = diffuseAcc * matDiff * cBuffer->difColor;
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec;
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
-
+	//diffuseAcc.a = 1.0f;
 	// srgb»¹Ô­
 	diffuseAcc.sqrt();
 
 	*out = float4_2_uint32(diffuseAcc);
+	//*out = 0x0000ff00;
 }
 
 void SrPhongWithNormalShader::ProcessPatch( void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const

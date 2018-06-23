@@ -44,8 +44,9 @@ public:
 	bool HwClear();
 
 	// 获取ScreenBuffer函数
-	void* getBuffer();
-	
+	virtual const uint8* getBuffer();
+	virtual int getBufferLength();
+
 	// 纹理通道设置
 	bool SetTextureStage( const SrTexture* texture, int stage );
 	void ClearTextureStage();

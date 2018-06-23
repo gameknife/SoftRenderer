@@ -17,7 +17,7 @@
 // 全局开关
 
 // 光栅化同步_修正多线程光栅化可能造成的Z冲突
-//#define RASTERIZER_SYNC
+#define RASTERIZER_SYNC
 // 固定函数光栅化调用
 //#define FIXED_FUNCTION_RASTERIZOR
 // SIMD加速
