@@ -30,7 +30,7 @@ public:
 	virtual const char* getName();
 
 	// Æô¶¯£¬¹Ø±Õº¯Êý
-	bool InitRenderer(HWND hWnd, int width, int height, int bpp);
+	bool InitRenderer(int width, int height, int bpp);
 	bool ShutdownRenderer();
 	bool Resize(uint32 width, uint32 height);
 	virtual uint32 getWidth();

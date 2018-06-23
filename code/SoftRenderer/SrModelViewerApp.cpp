@@ -95,8 +95,8 @@ SrModelViewerApp::~SrModelViewerApp(void)
 void SrModelViewerApp::OnInit()
 {
 	// 打开渲染特性
-	g_context->OpenFeature(eRFeature_MThreadRendering);
-	g_context->OpenFeature(eRFeature_JitAA);
+	//g_context->OpenFeature(eRFeature_MThreadRendering);
+	//g_context->OpenFeature(eRFeature_JitAA);
 	g_context->OpenFeature(eRFeature_LinearFiltering);
 
 	// 创建场景
@@ -155,9 +155,6 @@ void SrModelViewerApp::OnInit()
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
 	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
-
-	// 添加输入设备回调
-	gEnv->inputSys->AddListener(this);
 }
 
 void SrModelViewerApp::OnUpdate()
@@ -196,189 +193,6 @@ void SrModelViewerApp::OnDestroy()
 	m_ents.clear();
 	m_ent = NULL;
 	delete m_scene;
-	gEnv->inputSys->RemoveListener(this);
-}
-
-bool SrModelViewerApp::OnInputEvent( const SInputEvent &event )
-{
-	static bool rotateMode = false;
-	static float speed = 5.f;
-	static bool shiftMode = false;
-	static bool altMode = false;
-	static bool ctrlMode = false;
-	switch(event.keyId)
-	{
-	case  eKI_LShift:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				speed = 20.f;
-				shiftMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				speed = 5.f;
-				shiftMode = false;
-			}
-		}
-		break;
-	case  eKI_LAlt:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				altMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				altMode = false;
-			}
-		}
-		break;
-	case  eKI_LCtrl:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				ctrlMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				ctrlMode = false;
-			}
-		}
-		break;
-	case eKI_Mouse1:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				rotateMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				rotateMode = false;
-			}
-		}
-		break;
-	case eKI_Right:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				m_curr_ent++;
-				m_curr_ent %= m_ents.size();
-				UpdateShader();
-			}
-		}
-		break;
-	case eKI_Left:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				m_curr_ent--;
-				if (m_curr_ent < 0)
-				{
-					m_curr_ent = m_ents.size() - 1;
-				}
-				m_curr_ent %= m_ents.size();
-				UpdateShader();
-			}
-		}
-		break;
-	case eKI_MouseWheelDown:
-		{
-			if (event.state == eIS_Down)
-			{
-				m_camdist *= 1.1f;
-
-				updateCam();
-			}
-		}
-		break;
-	case eKI_MouseWheelUp:
-		{
-			if (event.state == eIS_Down)
-			{
-				m_camdist *= 0.9f;
-
-				updateCam();
-			}
-		}
-		break;
-	case eKI_MouseX:
-		{
-			if (event.state == eIS_Changed && rotateMode)
-			{
-				m_camera->Rotate( 0, event.value * -0.002f );
-
-				updateCam();
-
-			}
-		}
-		break;
-	case eKI_MouseY:
-		{
-			if (event.state == eIS_Changed && rotateMode)
-			{
-				m_camera->Rotate( -event.value * 0.002f, 0 );
-
-				updateCam();
-			}
-		}
-		break;
-	case eKI_P:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				SwitchSSAO();
-			}
-			break;
-		}
-
-	case eKI_K:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
-				{
-					g_context->CloseFeature(eRFeature_DotCoverageRendering);
-				}
-				else
-				{
-					g_context->OpenFeature(eRFeature_DotCoverageRendering);
-				}
-			}
-		}
-		break;
-	case eKI_J:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				if (g_context->IsFeatureEnable(eRFeature_JitAA))
-				{
-					g_context->CloseFeature(eRFeature_JitAA);
-				}
-				else
-				{
-					g_context->OpenFeature(eRFeature_JitAA);
-				}
-			}
-		}
-		break;
-	case eKI_N:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				if (g_context->IsFeatureEnable(eRFeature_LinearFiltering))
-				{
-					g_context->CloseFeature(eRFeature_LinearFiltering);
-				}
-				else
-				{
-					g_context->OpenFeature(eRFeature_LinearFiltering);
-				}
-			}
-		}
-		break;
-	}
-	return false;
 }
 
 void SrModelViewerApp::SwitchSSAO()

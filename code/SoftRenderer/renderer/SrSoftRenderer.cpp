@@ -39,7 +39,7 @@ SrSoftRenderer::~SrSoftRenderer(void)
 
 }
 
-bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
+bool SrSoftRenderer::InitRenderer(int width, int height, int bpp )
 {
 	// 创建光栅化处理器
 	m_rasterizer = new SrRasterizer;

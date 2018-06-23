@@ -127,7 +127,6 @@ inline void _mm_free_16byte(void* p)
 //////////////////////////////////////////////////////////////////////////
 // ÖÃÇ°ÉùÃ÷
 class IRenderer;
-class SrInputManager;
 struct SrRendPrimitve;
 class IProfiler;
 struct SrShaderContext;
@@ -156,7 +155,6 @@ struct GlobalEnvironment
 {
 	IRenderer*				renderer;
 	SrTimer*				timer;
-	SrInputManager*			inputSys;
 	IProfiler*				profiler;
 	IResourceManager*		resourceMgr;
 	SrScene*				sceneMgr;

@@ -18,9 +18,6 @@
     <Filter Include="RenderSys">
       <UniqueIdentifier>{0df6e1fe-4fd7-478e-bc08-e5984d0dc88c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="InputSys">
-      <UniqueIdentifier>{e0efd3f6-433e-4957-8390-d7a881769307}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AppLayer">
       <UniqueIdentifier>{aaa250af-e19e-442e-853d-00a73fda9cbe}</UniqueIdentifier>
     </Filter>
@@ -100,17 +97,8 @@
     <ClInclude Include="util\memfile.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>InputSys</Filter>
-    </ClInclude>
     <ClInclude Include="SoftRenderApp.h">
       <Filter>AppLayer\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>InputSys</Filter>
-    </ClInclude>
-    <ClInclude Include="Mouse.h">
-      <Filter>InputSys</Filter>
     </ClInclude>
     <ClInclude Include="util\thread.h">
       <Filter>util</Filter>
@@ -207,9 +195,6 @@
     <ClCompile Include="SrObjLoader.cpp">
       <Filter>RenderSys\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>InputSys</Filter>
-    </ClCompile>
     <ClCompile Include="SoftRenderApp.cpp">
       <Filter>AppLayer\System</Filter>
     </ClCompile>
@@ -218,12 +203,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>AppLayer\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard.cpp">
-      <Filter>InputSys</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>InputSys</Filter>
     </ClCompile>
     <ClCompile Include="SrProfiler.cpp">
       <Filter>AppLayer\System</Filter>

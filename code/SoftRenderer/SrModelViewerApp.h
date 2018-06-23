@@ -13,10 +13,9 @@
 
 #include "prerequisite.h"
 #include "srappframework.h"
-#include "InputManager.h"
 
 class SrModelViewerApp :
-	public SrAppFramework, public IInputEventListener
+	public SrAppFramework
 {
 public:
 	SrModelViewerApp(void);
@@ -27,8 +26,6 @@ public:
 	virtual void OnUpdate();
 
 	virtual void OnDestroy();
-
-	virtual bool OnInputEvent( const SInputEvent &event );
 
 	void updateCam();
 

@@ -124,7 +124,7 @@ public:
 
 	ERendererType m_rendererType;
 
-	virtual bool InitRenderer(HWND hWnd, int width, int height, int bpp) =0;
+	virtual bool InitRenderer(int width, int height, int bpp) =0;
 	virtual bool ShutdownRenderer() =0;
 
 protected:

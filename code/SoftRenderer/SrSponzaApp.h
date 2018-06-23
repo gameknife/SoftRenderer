@@ -13,10 +13,9 @@
 
 #include "prerequisite.h"
 #include "srappframework.h"
-#include "InputManager.h"
 
 class SrSponzaApp :
-	public SrAppFramework, public IInputEventListener
+	public SrAppFramework 
 {
 public:
 	SrSponzaApp(void);
@@ -27,8 +26,6 @@ public:
 	virtual void OnUpdate();
 
 	virtual void OnDestroy();
-
-	virtual bool OnInputEvent( const SInputEvent &event );
 
 private:
 	void SwitchSSAO();

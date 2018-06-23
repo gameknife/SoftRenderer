@@ -12,16 +12,15 @@
 #define SoftRenderApp_h__
 
 #include "SrAppFramework.h"
-#include "InputManager.h"
 
 typedef std::vector<IRenderer*> SrRendererList;
 
-class SoftRenderApp : public IInputEventListener
+class SoftRenderApp 
 {
 public:
 	SoftRenderApp(void);
 	virtual ~SoftRenderApp(void);
-	BOOL Init( HINSTANCE hInstance );
+	BOOL Init();
 	void Destroy();
 	void Run();
 
@@ -34,15 +33,11 @@ public:
 	void ShutdownRenderers();
 
 private:
-	HINSTANCE m_hInst;								// current instance
-	HWND m_hWnd;
 	SrApps m_tasks;
 	IRenderer* m_renderer;
 	uint32 m_currRendererIndex;
 
 	void LoadShaderList();
-
-	virtual bool OnInputEvent( const SInputEvent &event );
 
 	int m_curr_task;
 
