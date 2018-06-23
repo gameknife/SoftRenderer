@@ -13,7 +13,7 @@
 #include "SrBitmap.h"
 #include "SrProfiler.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 {

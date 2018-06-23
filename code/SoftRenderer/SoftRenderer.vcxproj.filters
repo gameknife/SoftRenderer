@@ -67,26 +67,8 @@
     <ClInclude Include="prerequisite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\math_def.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\vector.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\pathutil.h">
-      <Filter>util</Filter>
-    </ClInclude>
     <ClInclude Include="SrBitmap.h">
       <Filter>RenderSys\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="util\matrix.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\quaternion.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\timer.h">
-      <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="SrMesh.h">
       <Filter>RenderSys\Resource</Filter>
@@ -94,17 +76,8 @@
     <ClInclude Include="SrObjLoader.h">
       <Filter>RenderSys\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="util\memfile.h">
-      <Filter>util</Filter>
-    </ClInclude>
     <ClInclude Include="SoftRenderApp.h">
       <Filter>AppLayer\System</Filter>
-    </ClInclude>
-    <ClInclude Include="util\thread.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\event.h">
-      <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="SrProfiler.h">
       <Filter>AppLayer\System</Filter>
@@ -139,9 +112,6 @@
     <ClInclude Include="SrAppFramework.h">
       <Filter>AppLayer\App</Filter>
     </ClInclude>
-    <ClInclude Include="util\sr_intrinsic_hack.h">
-      <Filter>util</Filter>
-    </ClInclude>
     <ClInclude Include="SrSponzaApp.h">
       <Filter>AppLayer\App</Filter>
     </ClInclude>
@@ -163,26 +133,62 @@
     <ClInclude Include="SrModelViewerApp.h">
       <Filter>AppLayer\App</Filter>
     </ClInclude>
-    <ClInclude Include="renderer\SrFragmentBuffer.h">
+    <ClInclude Include="AdvanceShaders.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="renderer\SrRasTaskDispatcher.h">
+    <ClInclude Include="BasicShaders.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="renderer\SrRasTasks.h">
+    <ClInclude Include="event.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="renderer\SrRasterizer.h">
+    <ClInclude Include="math_def.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="renderer\SrSoftRenderer.h">
+    <ClInclude Include="matrix.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="shader\AdvanceShaders.h">
-      <Filter>Shaders</Filter>
+    <ClInclude Include="memfile.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="shader\BasicShaders.h">
-      <Filter>Shaders</Filter>
+    <ClInclude Include="mmgr.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="nommgr.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="pathutil.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="quaternion.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="sr_intrinsic_hack.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SrFragmentBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SrRasTaskDispatcher.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SrRasTasks.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SrRasterizer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SrSoftRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="thread.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,9 +212,6 @@
     </ClCompile>
     <ClCompile Include="SrProfiler.cpp">
       <Filter>AppLayer\System</Filter>
-    </ClCompile>
-    <ClCompile Include="util\memfile.cpp">
-      <Filter>util</Filter>
     </ClCompile>
     <ClCompile Include="SrMaterial.cpp">
       <Filter>RenderSys\Resource</Filter>
@@ -237,9 +240,6 @@
     <ClCompile Include="SrDefaultMedia.cpp">
       <Filter>RenderSys\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="mmgr\mmgr.cpp">
-      <Filter>mmgr</Filter>
-    </ClCompile>
     <ClCompile Include="SrSponzaApp.cpp">
       <Filter>AppLayer\App</Filter>
     </ClCompile>
@@ -249,32 +249,38 @@
     <ClCompile Include="SrModelViewerApp.cpp">
       <Filter>AppLayer\App</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\SrFragmentBuffer.cpp">
+    <ClCompile Include="AdvanceShaders.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\SrRasTaskDispatcher.cpp">
+    <ClCompile Include="BasicShaders.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\SrRasTasks.cpp">
+    <ClCompile Include="memfile.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\SrRasterize_Clip.cpp">
+    <ClCompile Include="mmgr.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\SrRasterizer.cpp">
+    <ClCompile Include="SrFragmentBuffer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\SrRasterizer_Algo.cpp">
+    <ClCompile Include="SrRasTaskDispatcher.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="renderer\SrSoftRenderer.cpp">
+    <ClCompile Include="SrRasTasks.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="shader\AdvanceShaders.cpp">
-      <Filter>Shaders</Filter>
+    <ClCompile Include="SrRasterize_Clip.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="shader\BasicShaders.cpp">
-      <Filter>Shaders</Filter>
+    <ClCompile Include="SrRasterizer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SrRasterizer_Algo.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SrSoftRenderer.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

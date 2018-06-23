@@ -13,7 +13,7 @@
 #include "SrTexture.h"
 #include "SrObjLoader.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 
 static const char* g_defaultMesh = "\

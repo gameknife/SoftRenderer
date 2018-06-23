@@ -277,18 +277,26 @@
     <None Include="SoftRenderer.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdvanceShaders.h" />
+    <ClInclude Include="BasicShaders.h" />
+    <ClInclude Include="event.h" />
+    <ClInclude Include="math_def.h" />
+    <ClInclude Include="matrix.h" />
+    <ClInclude Include="memfile.h" />
+    <ClInclude Include="mmgr.h" />
+    <ClInclude Include="nommgr.h" />
+    <ClInclude Include="pathutil.h" />
     <ClInclude Include="prerequisite.h" />
+    <ClInclude Include="quaternion.h" />
     <ClInclude Include="RendererBase.h" />
-    <ClInclude Include="renderer\SrFragmentBuffer.h" />
-    <ClInclude Include="renderer\SrRasTaskDispatcher.h" />
-    <ClInclude Include="renderer\SrRasTasks.h" />
-    <ClInclude Include="renderer\SrRasterizer.h" />
-    <ClInclude Include="renderer\SrSoftRenderer.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="shader\AdvanceShaders.h" />
-    <ClInclude Include="shader\BasicShaders.h" />
+    <ClInclude Include="SrFragmentBuffer.h" />
     <ClInclude Include="SrLogger.h" />
     <ClInclude Include="SrModelViewerApp.h" />
+    <ClInclude Include="SrRasTaskDispatcher.h" />
+    <ClInclude Include="SrRasTasks.h" />
+    <ClInclude Include="SrRasterizer.h" />
+    <ClInclude Include="SrSoftRenderer.h" />
     <ClInclude Include="SrSwShader.h" />
     <ClInclude Include="SoftRenderApp.h" />
     <ClInclude Include="SrAppFramework.h" />
@@ -308,53 +316,46 @@
     <ClInclude Include="SrScene.h" />
     <ClInclude Include="SrSponzaApp.h" />
     <ClInclude Include="SrTexture.h" />
+    <ClInclude Include="sr_intrinsic_hack.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="util\event.h" />
-    <ClInclude Include="util\math_def.h" />
-    <ClInclude Include="util\matrix.h" />
-    <ClInclude Include="util\memfile.h" />
-    <ClInclude Include="util\pathutil.h" />
-    <ClInclude Include="util\quaternion.h" />
-    <ClInclude Include="util\sr_intrinsic_hack.h" />
-    <ClInclude Include="util\thread.h" />
-    <ClInclude Include="util\timer.h" />
-    <ClInclude Include="util\vector.h" />
+    <ClInclude Include="thread.h" />
+    <ClInclude Include="timer.h" />
+    <ClInclude Include="vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mmgr\mmgr.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="AdvanceShaders.cpp" />
+    <ClCompile Include="BasicShaders.cpp" />
+    <ClCompile Include="memfile.cpp" />
+    <ClCompile Include="mmgr.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="renderer\SrFragmentBuffer.cpp" />
-    <ClCompile Include="renderer\SrRasTaskDispatcher.cpp" />
-    <ClCompile Include="renderer\SrRasTasks.cpp" />
-    <ClCompile Include="renderer\SrRasterizer.cpp" />
-    <ClCompile Include="renderer\SrRasterizer_Algo.cpp" />
-    <ClCompile Include="renderer\SrRasterize_Clip.cpp" />
-    <ClCompile Include="renderer\SrSoftRenderer.cpp" />
-    <ClCompile Include="shader\AdvanceShaders.cpp" />
-    <ClCompile Include="shader\BasicShaders.cpp" />
     <ClCompile Include="SoftRenderApp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SrBitmap.cpp" />
     <ClCompile Include="SrCamera.cpp" />
     <ClCompile Include="SrDefaultMedia.cpp" />
     <ClCompile Include="SrEntity.cpp" />
+    <ClCompile Include="SrFragmentBuffer.cpp" />
     <ClCompile Include="SrLogger.cpp" />
     <ClCompile Include="SrMaterial.cpp" />
     <ClCompile Include="SrMesh.cpp" />
     <ClCompile Include="SrModelViewerApp.cpp" />
     <ClCompile Include="SrObjLoader.cpp" />
     <ClCompile Include="SrProfiler.cpp" />
+    <ClCompile Include="SrRasTaskDispatcher.cpp" />
+    <ClCompile Include="SrRasTasks.cpp" />
+    <ClCompile Include="SrRasterizer.cpp" />
+    <ClCompile Include="SrRasterizer_Algo.cpp" />
+    <ClCompile Include="SrRasterize_Clip.cpp" />
     <ClCompile Include="SrRenderTexture.cpp" />
     <ClCompile Include="SrResource.cpp" />
     <ClCompile Include="SrResourceManager.cpp" />
     <ClCompile Include="SrScene.cpp" />
+    <ClCompile Include="SrSoftRenderer.cpp" />
     <ClCompile Include="SrSponzaApp.cpp" />
     <ClCompile Include="SrTexture.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -365,7 +366,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="util\memfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderer.rc" />

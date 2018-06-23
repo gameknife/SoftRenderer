@@ -2,7 +2,7 @@
 #include "SrRasTaskDispatcher.h"
 #include "SrProfiler.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 CRITICAL_SECTION g_taskCS;
 

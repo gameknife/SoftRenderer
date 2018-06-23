@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 
 const int MIN_RGB = 0;

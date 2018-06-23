@@ -18,7 +18,7 @@
 #include "SrSoftRenderer.h"
 #include "SrFragmentBuffer.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 SrFragmentBuffer* fBuffer = NULL;						/// fragment Buffer
 
@@ -358,13 +358,6 @@ void SrRasterizer::Flush()
 	//////////////////////////////////////////////////////////////////////////
 	// 后期处理
 	gEnv->profiler->setBegin(ePe_PostProcessTime);
-
-
-	if (gEnv->output == false)
-	{
-		m_MemSBuffer->WriteToFile("testbmp.bmp");
-		gEnv->output = true;
-	}
 
 	// jit AA
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))

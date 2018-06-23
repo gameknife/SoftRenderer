@@ -16,9 +16,9 @@
 #include "SrProfiler.h"
 #include "SrSwShader.h"
 
-#include "mmgr/mmgr.h"
-#include "shader/BasicShaders.h"
-#include "shader/AdvanceShaders.h"
+#include "mmgr.h"
+#include "BasicShaders.h"
+#include "AdvanceShaders.h"
 
 #define SR_NORMALIZE_VB_MAX_SIZE 1024 * 1024 * 10
 

@@ -10,7 +10,7 @@
 #include "StdAfx.h"
 #include "SrProfiler.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 SrProfiler::SrProfiler()
 {

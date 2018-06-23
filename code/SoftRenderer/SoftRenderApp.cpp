@@ -6,9 +6,9 @@
 #include "SrProfiler.h"
 #include "SrShader.h"
 #include "SrLogger.h"
-#include "renderer/SrSoftRenderer.h"
+#include "SrSoftRenderer.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 GlobalEnvironment* gEnv = NULL;
 SrLogger* g_logger = NULL;

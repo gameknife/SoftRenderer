@@ -164,6 +164,10 @@ void SrModelViewerApp::OnInit()
 void SrModelViewerApp::OnUpdate()
 {
 	selectEnt(m_curr_ent);
+
+	//float3 move(0.1f,0,0);
+	//m_ents[m_curr_ent]->MoveLocal(move);
+	
 	m_scene->Update();
 
 	// dotCovarage«ø÷∆πÿ±’JITAA

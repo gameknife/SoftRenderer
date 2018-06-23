@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "BasicShaders.h"
-#include "../renderer/SrFragmentBuffer.h"
+#include "SrFragmentBuffer.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 SrFlatShader g_FlatShadingShader;
 SrPhongShader g_PhongShadingShader;

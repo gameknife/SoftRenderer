@@ -4,7 +4,7 @@
   "description": "",
   "main": "./build/main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "webpack && electron .",
     "build": "webpack",
     "build&run": "webpack && electron .",
     "nbuild": "cd ./node_natives && node-gyp rebuild --target=1.7.15 --arch=x64 --dist-url=https://atom.io/download/electron"

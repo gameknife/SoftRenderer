@@ -9,9 +9,9 @@ SrLogger::SrLogger(void)
 	m_data = new char[LOG_FILE_SZIE];
 	m_size = 0;
 
-	//AllocConsole();
-	//freopen("CONOUT$","w+t",stdout);  
-	//freopen("CONIN$","r+t",stdin);
+	AllocConsole();
+	freopen("CONOUT$","w+t",stdout);  
+	freopen("CONIN$","r+t",stdin);
 }
 
 SrLogger::~SrLogger(void)
@@ -20,9 +20,9 @@ SrLogger::~SrLogger(void)
 
 	delete[] m_data;
 
-	//fclose(stdout);
-	//fclose(stdin);
-	//FreeConsole();
+	fclose(stdout);
+	fclose(stdin);
+	FreeConsole();
 }
 
 void SrLogger::Log( const char* line )
@@ -30,7 +30,7 @@ void SrLogger::Log( const char* line )
 	uint32 length = strlen(line);
 	
 	// 缓存装不下了，写入文件
-	if (m_size + length + 2 > LOG_FILE_SZIE)
+	//if (m_size + length + 2 > LOG_FILE_SZIE)
 	{
 		FlushToFile();
 	}

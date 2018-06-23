@@ -60,12 +60,12 @@
 
 //////////////////////////////////////////////////////////////////////////
 // ¹¤¾ß°ü
-#include "util/math_def.h"
-#include "util/pathutil.h"
-#include "util/timer.h"
-#include "util/thread.h"
-#include "util/memfile.h"
-#include "util/event.h"
+#include "math_def.h"
+#include "pathutil.h"
+#include "timer.h"
+#include "thread.h"
+#include "memfile.h"
+#include "event.h"
 
 
 //////////////////////////////////////////////////////////////////////////

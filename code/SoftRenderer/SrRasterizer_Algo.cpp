@@ -16,7 +16,7 @@
 #include "SrSwShader.h"
 #include "SrFragmentBuffer.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 {

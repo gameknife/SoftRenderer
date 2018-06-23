@@ -6,7 +6,7 @@
 #include "SrResourceManager.h"
 #include "SrDefaultMedia.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 
 SrMaterial::SrMaterial( const char* name ):SrResource(name,  eRT_Material)

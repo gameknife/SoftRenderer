@@ -3,9 +3,7 @@
 #include <sstream>
 #include "SrMaterial.h"
 
-#include "mmgr/mmgr.h"
-#include <tchar.h>
-
+#include "mmgr.h"
 
 SrObjLoader::SrObjLoader(void)
 {

@@ -5,7 +5,7 @@
 #include "SrResourceManager.h"
 #include "SrDefaultMedia.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 
 SrMesh::SrMesh(const char* filename):SrResource(filename, eRt_Mesh)

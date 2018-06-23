@@ -8,7 +8,7 @@
 #include "SrObjLoader.h"
 #include "SrShader.h"
 
-#include "mmgr/mmgr.h"
+#include "mmgr.h"
 
 
 
