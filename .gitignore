@@ -37,6 +37,8 @@ bin32/log.txt
 *.suo
 *.log
 
+log.txt
+
 build/
 node_modules/
 bin32/

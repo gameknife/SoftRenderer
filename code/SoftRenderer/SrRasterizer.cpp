@@ -225,23 +225,6 @@ void SrRasterizer::Flush()
 		}
 	}
 
-// 	for ( uint32 i = 0; i < m_rendPrimitives.size(); ++i)
-//  	{
-// 		SrRendPrimitve& primitive = m_rendPrimitives[i];
-// 		uint32 vertexCount = 0;
-// 
-// 		for (uint32 i = 0; i < primitive.vb->elementCount; i += VERTEX_TASK_BLOCK )
-// 		{
-// 			uint32 end =  i + VERTEX_TASK_BLOCK;
-// 			if ( end > (primitive.vb->elementCount))
-// 			{
-// 				end = primitive.vb->elementCount;
-// 			}
-// 			m_rasTaskDispatcher->PushTask( new SrRasTask_Vertex(i, end, primitive.vb, &primitive) );
-// 			gEnv->profiler->setIncrement(ePe_VertexCount, end - i);
-// 		}
-//  	}
-
 	// 执行任务队列
 	m_rasTaskDispatcher->FlushCoop();
 	m_rasTaskDispatcher->Wait();

@@ -9,7 +9,7 @@ SrLogger::SrLogger(void)
 	m_data = new char[LOG_FILE_SZIE];
 	m_size = 0;
 
-	AllocConsole();
+	//AllocConsole();
 	freopen("CONOUT$","w+t",stdout);  
 	freopen("CONIN$","r+t",stdin);
 }
@@ -22,7 +22,7 @@ SrLogger::~SrLogger(void)
 
 	fclose(stdout);
 	fclose(stdin);
-	FreeConsole();
+	//FreeConsole();
 }
 
 void SrLogger::Log( const char* line )

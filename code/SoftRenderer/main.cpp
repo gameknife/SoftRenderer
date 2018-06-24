@@ -10,9 +10,27 @@
 
 
 std::map<const void*, void*> m_align_pt_mapper;
+std::string g_rootPath;
 
 int main()
 {
+	char buffer[MAX_PATH];
+	char* strLastSlash = NULL;
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	buffer[MAX_PATH - 1] = 0;
+
+	strLastSlash = strrchr(buffer, '\\');
+	if (strLastSlash)
+	{
+		*(strLastSlash) = '\0';
+	}
+	strLastSlash = strrchr(buffer, '\\');
+	if (strLastSlash)
+	{
+		*(strLastSlash) = '\0';
+	}
+	srSetRootPath(buffer);
+
 	SoftRenderApp app;
 
 	app.RegisterTask(new SrModelViewerApp);
@@ -30,25 +48,6 @@ int main()
 
 	return 0;
 }
-//
-// SoftRenderApp* g_app;
-//
-// void initOfflineSystem()
-// {
-// 	g_app = new SoftRenderApp();
-// 	g_app->RegisterTask(new SrModelViewerApp);
-// 	g_app->Init();
-// }
-//
-// void renderToBuffer()
-// {
-// 	g_app->Update();
-// }
-//
-// void shutDown()
-// {
-// 	g_app->Destroy();
-// }
 
 
 

@@ -13,20 +13,16 @@
 #ifndef pathutil_h__
 #define pathutil_h__
 
+extern std::string g_rootPath;
+
+inline void srSetRootPath(const char* root)
+{
+	g_rootPath = root;
+}
+
 inline void getMediaPath(std::string& origin)
 {
-	char buffer[MAX_PATH];
-	char* strLastSlash = NULL;
-	GetModuleFileName( NULL, buffer, MAX_PATH );
-	buffer[MAX_PATH - 1] = 0;
-
-	strLastSlash = strrchr( buffer, '\\' );
-	if (strLastSlash)
-	{
-		*(strLastSlash + 1) = '\0';
-	}
-
-	origin = buffer + origin;
+	origin = g_rootPath + "\\" + origin;
 }
 
 #endif // pathutil_h__
