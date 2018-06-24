@@ -18,3 +18,46 @@ An SoftRenderer for experiment &amp; learn.
 ### 时间安排
 * 2018年夏季
 * 2018年秋季
+
+### 部署
+* windows
+
+首先安装node.js
+
+配置npm到国内镜像
+
+```
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+```
+
+安装node-gyp
+
+```
+cnpm install -g node-gyp
+```
+
+安装windows-tool-chain
+
+```
+cnpm install -g --production windows-build-tools
+```
+
+将toolchain下载得到的python.exe的目录配置到path里，我的在C:\Users\gameKnife\.windows-build-tools\python27这个位置
+
+```
+set PATH=%PATH%;C:\path\to\python
+```
+
+npm环境初始化
+
+```
+cnpm install
+```
+
+使用node-gyp配置工程
+
+编译native库
+
+编译js库
+
+运行
