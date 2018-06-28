@@ -25,7 +25,8 @@ SrFragmentBuffer* fBuffer = NULL;						/// fragment Buffer
 SrRasterizer::SrRasterizer(void)
 {	
 	m_MemSBuffer = NULL;
-	m_BackSBuffer = NULL;
+	m_BackS1Buffer = NULL;
+	m_BackS2Buffer = NULL;
 }
 
 /**
@@ -38,7 +39,8 @@ void SrRasterizer::Init(SrSoftRenderer* renderer)
 	gEnv->context->fBuffer = fBuffer;
 
 	m_MemSBuffer = gEnv->resourceMgr->CreateRenderTexture( "$MemoryScreenBuffer" ,g_context->width, g_context->height, 4 );
-	m_BackSBuffer = gEnv->resourceMgr->CreateRenderTexture( "$BackupScreenBuffer" ,g_context->width, g_context->height, 4 );
+	m_BackS1Buffer = gEnv->resourceMgr->CreateRenderTexture( "$BackupScreen1Buffer" ,g_context->width, g_context->height, 4 );
+	m_BackS2Buffer = gEnv->resourceMgr->CreateRenderTexture("$BackupScreen2Buffer", g_context->width, g_context->height, 4);
 
 	m_rasTaskDispatcher = new SrRasTaskDispatcher;
 	m_rasTaskDispatcher->Init();
@@ -148,7 +150,18 @@ void SrRasterizer::Flush()
 
 	// Fragment Buffer 和 OutBaffer的Clear
 	uint32* memBuffer = (uint32*)m_MemSBuffer->getBuffer();
-	uint32* backBuffer = (uint32*)m_BackSBuffer->getBuffer();
+
+
+
+	uint32* aaBufferWrite = (uint32*)m_BackS1Buffer->getBuffer();
+	uint32* aaBufferRead = (uint32*)m_BackS2Buffer->getBuffer();
+
+	if (gEnv->timer->getFramecount() % 2 == 0)
+	{
+		aaBufferWrite = (uint32*)m_BackS2Buffer->getBuffer();
+		aaBufferRead = (uint32*)m_BackS1Buffer->getBuffer();
+	}
+
 	//uint32* gpuBuffer = (uint32*)m_renderer->getBuffer();
 	uint32* outBuffer = memBuffer;// (uint32*)m_renderer->getBuffer();
 	SrFragment* fragBuffer = fBuffer->fBuffer;
@@ -159,12 +172,11 @@ void SrRasterizer::Flush()
 	// 如果开启Jit AA，先写到memBuffer上
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 	{
-		outBuffer = memBuffer;		
+		outBuffer = aaBufferWrite;
 	}
 
 	// clear the OutBuffer
 	// 使用 SR_GREYSCALE_CLEARCOLOR 来清空缓存
-	if (g_context->IsFeatureEnable(eRFeature_MThreadRendering))
 	{
 		// 多线程清空
 		int quadsize = g_context->width * g_context->height;
@@ -187,16 +199,6 @@ void SrRasterizer::Flush()
 		// 执行任务队列
 		m_rasTaskDispatcher->FlushCoop();
 		m_rasTaskDispatcher->Wait();
-	}
-	else
-	{
-		// 单线程清空
-		int size = g_context->width * g_context->height;
-
-		// 清空outBuffer
-		memset(outBuffer, SR_GREYSCALE_CLEARCOLOR, 4 * size);
-		// 清空fragBuffer
-		memset(fragBuffer, 0, sizeof(SrFragment) * size);
 	}
 	gEnv->profiler->setEnd(ePe_ClearTime);
 
@@ -345,18 +347,15 @@ void SrRasterizer::Flush()
 	// jit AA
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 	{
+		int quadsize = g_context->width * g_context->height / 4;
 
-
-
-		//int quadsize = g_context->width * g_context->height / 4;
-
-		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( 0,				quadsize,		memBuffer, backBuffer, gpuBuffer ) );
-		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	memBuffer, backBuffer, gpuBuffer ) );
-		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	memBuffer, backBuffer, gpuBuffer ) );
-		// m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	memBuffer, backBuffer, gpuBuffer ) );
-  //
-		// m_rasTaskDispatcher->FlushCoop();
-		// m_rasTaskDispatcher->Wait();
+		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( 0,				quadsize,		aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	aaBufferWrite, aaBufferRead, memBuffer) );
+  
+		 m_rasTaskDispatcher->FlushCoop();
+		 m_rasTaskDispatcher->Wait();
 
 		//memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);
 	}

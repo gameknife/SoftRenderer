@@ -18,8 +18,9 @@
 class SrTimer
 {
 public:
-	SrTimer():m_time(0)
-		,m_elapsedTime(0)
+	SrTimer(): m_time(0)
+		, m_elapsedTime(0)
+		, m_frameCount(0)
 	{
 
 	}
@@ -40,6 +41,7 @@ public:
 		float newTime = timeGetTime() / 1000.f;
 		m_elapsedTime = newTime - m_time;
 		m_time = newTime;
+		m_frameCount++;
 	}
 
 	void Stop()
@@ -65,9 +67,15 @@ public:
 		return (float)(now.QuadPart)/m_freq.QuadPart;
 	}
 
+	int getFramecount()
+	{
+		return m_frameCount;
+	}
+
 private:
 	float m_time;
 	float m_elapsedTime;
+	int m_frameCount;
 
 	// high precision
 	LARGE_INTEGER m_freq;

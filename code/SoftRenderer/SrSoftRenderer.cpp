@@ -226,7 +226,7 @@ uint32 SrSoftRenderer::Tex2D( float2& texcoord, const SrTexture* texture  ) cons
 			ret = texture->Get( texcoord, eSF_Nearest );
 		}
 	}	
-
+	
 	return ret;
 }
 

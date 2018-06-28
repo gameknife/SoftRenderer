@@ -36,7 +36,9 @@ int main()
 	app.RegisterTask(new SrModelViewerApp);
 	app.Init();
 	app.Update();
-
+	app.Update();
+	app.Update();
+	app.Update();
 
 	// if (gEnv->output == false)
 	// {

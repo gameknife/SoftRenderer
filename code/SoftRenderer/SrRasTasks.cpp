@@ -22,8 +22,9 @@ void SrRasTask_Pixel::Execute()
 	for ( uint32 i = m_indexStart; i < m_indexEnd; ++i)
 	{
 		assert(  m_indexBuffer[i] >=0 &&  m_indexBuffer[i] < g_context->width * g_context->height );
-		SrFragment* in = m_gBuffer + m_indexBuffer[i];
-		uint32* out = m_oBuffer + m_indexBuffer[i];
+		int index = m_indexBuffer[i];
+		SrFragment* in = m_gBuffer + index;
+		uint32* out = m_oBuffer + index;
 		assert( in->primitive );
 		//assert( in->primitive->material );
 		assert( in->primitive->shader );

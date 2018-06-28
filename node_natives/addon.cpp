@@ -5,6 +5,7 @@
 #include "SoftRenderApp.h"
 #include "SrSponzaApp.h"
 #include "SrModelViewerApp.h"
+#include "SrProfiler.h"
 
 #include "mmgr.h"
 
@@ -32,6 +33,11 @@ NAN_METHOD(rotate) {
 NAN_METHOD(helloworld) {
     info.GetReturnValue().Set(Nan::New("world").ToLocalChecked());
     s_counter++;
+}
+
+NAN_METHOD(getprofiledata) {
+	char* str = gEnv->profiler->getProfileData();
+	info.GetReturnValue().Set(Nan::New(str).ToLocalChecked());
 }
 
 // function to simply return a static value from c++
@@ -87,6 +93,8 @@ NAN_MODULE_INIT(Init) {
 	   GetFunction(New<FunctionTemplate>(renderToBuffer)).ToLocalChecked());
    Nan::Set(target, New<String>("shutdownrender").ToLocalChecked(),
 	   GetFunction(New<FunctionTemplate>(shutDown)).ToLocalChecked());
+   Nan::Set(target, New<String>("getprofiledata").ToLocalChecked(),
+	   GetFunction(New<FunctionTemplate>(getprofiledata)).ToLocalChecked());
 }
 
 NODE_MODULE(addon, Init)

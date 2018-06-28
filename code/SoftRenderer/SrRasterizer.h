@@ -148,8 +148,9 @@ public:
 
 	std::vector<float4> m_rendDynamicVertex;
 
-	SrTexture* m_MemSBuffer;								///< 动态纹理，用于缓存jitAA开启时的当前帧
-	SrTexture* m_BackSBuffer;								///< 动态纹理，用于缓存jitAA开启时的上一帧
+	SrTexture* m_MemSBuffer;								///< 动态纹理，当前帧
+	SrTexture* m_BackS1Buffer;								///< 动态纹理，用于缓存jitAA开启时的上一帧
+	SrTexture* m_BackS2Buffer;								///< 动态纹理，用于缓存jitAA开启时的上一帧
 
 	SrRasTaskDispatcher* m_rasTaskDispatcher;				///< Task分发器，用于任务动态调度
 	class SrSoftRenderer* m_renderer;

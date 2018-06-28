@@ -13,7 +13,7 @@
 
 #include "prerequisite.h"
 
-#define AVGTIME_COUNT 60
+#define AVGTIME_COUNT 300
 
 enum EProfilerElement
 {
@@ -74,6 +74,7 @@ struct IProfiler
 {
 	virtual ~IProfiler() {}
 
+	virtual char* getProfileData() = 0;
 	virtual void Update() =0;
 
 	virtual void setBegin( EProfilerElement element ) =0;
@@ -155,6 +156,7 @@ public:
 	~SrProfiler();
 
 	void Update();
+	char* getProfileData();
 
 	void setBegin( EProfilerElement element );
 	void setEnd( EProfilerElement element );
@@ -168,6 +170,7 @@ public:
 	void setGPUEnd( EProfilerElement element );
 
 private:
+	char m_buffer[512];
 	std::vector<SrProfilerElement> m_profileElements;
 };
 

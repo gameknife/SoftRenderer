@@ -95,8 +95,8 @@ SrModelViewerApp::~SrModelViewerApp(void)
 void SrModelViewerApp::OnInit()
 {
 	// 打开渲染特性
-	//g_context->OpenFeature(eRFeature_MThreadRendering);
-	//g_context->OpenFeature(eRFeature_JitAA);
+	g_context->OpenFeature(eRFeature_MThreadRendering);
+	g_context->OpenFeature(eRFeature_JitAA);
 	g_context->OpenFeature(eRFeature_LinearFiltering);
 
 	// 创建场景
@@ -165,8 +165,8 @@ void SrModelViewerApp::OnUpdate()
 {
 	selectEnt(m_curr_ent);
 
-	//float3 move(0.1f,0,0);
-	//m_ents[m_curr_ent]->MoveLocal(move);
+	float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
+	m_ents[m_curr_ent]->RotateLocal(move);
 	
 	m_scene->Update();
 
