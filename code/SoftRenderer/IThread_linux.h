@@ -43,7 +43,7 @@ class IThread
          pthread_join(m_thread_handle, NULL);
      }
  
- 	bool Wait(DWORD timeoutMillis) const
+ 	bool Wait(uint32 timeoutMillis) const
      {
          pthread_join(m_thread_handle, NULL);
          return true;
@@ -57,7 +57,7 @@ class IThread
  	virtual int Run() = 0;
  
  	void Terminate(
- 		DWORD exitCode = 0)
+ 		uint32 exitCode = 0)
      {
 #ifndef OS_ANDROID
          pthread_cancel(m_thread_handle);
@@ -73,13 +73,7 @@ class IThread
          
          if (pThis)
          {
-             try
-             {
-                 result = pThis->Run();
-             }
-             catch(...)
-             {
-             }
+        	 result = pThis->Run();
          }
          
          return NULL;

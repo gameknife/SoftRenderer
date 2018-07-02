@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -16,7 +16,7 @@
 struct SrFragmentBuffer;
 
 /**
- *@brief äÖÈ¾Æ÷
+ *@brief ï¿½ï¿½È¾ï¿½ï¿½
  */
 class SrSoftRenderer : public IRenderer
 {
@@ -29,52 +29,52 @@ public:
 
 	virtual const char* getName();
 
-	// Æô¶¯£¬¹Ø±Õº¯Êý
+	// ï¿½ï¿½ï¿½ï¿½Ø±Õºï¿½ï¿½ï¿½
 	bool InitRenderer(int width, int height, int bpp);
 	bool ShutdownRenderer();
 	bool Resize(uint32 width, uint32 height);
 	virtual uint32 getWidth();
 	virtual uint32 getHeight();
 
-	// Ö¡¿ØÖÆº¯Êý
+	// Ö¡ï¿½ï¿½ï¿½Æºï¿½ï¿½ï¿½
 	void BeginFrame();
 	void EndFrame();
 
-	// Ó²¼þClear
+	// Ó²ï¿½ï¿½Clear
 	bool HwClear();
 
-	// »ñÈ¡ScreenBufferº¯Êý
+	// ï¿½ï¿½È¡ScreenBufferï¿½ï¿½ï¿½ï¿½
 	virtual const uint8* getBuffer();
 	virtual int getBufferLength();
 
-	// ÎÆÀíÍ¨µÀÉèÖÃ
+	// ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool SetTextureStage( const SrTexture* texture, int stage );
 	void ClearTextureStage();
 	
-	// äÖÈ¾µ÷ÓÃ
+	// ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
 	bool DrawPrimitive( SrPrimitve* primitive );
 	bool DrawLine(const float3& from, const float3& to);
-	bool DrawScreenText(const char* str, int x,int y, uint32 size, DWORD color = SR_UICOLOR_HIGHLIGHT);
+	bool DrawScreenText(const char* str, int x,int y, uint32 size, uint32 color = SR_UICOLOR_HIGHLIGHT);
 
-	// ShaderÉèÖÃ
+	// Shaderï¿½ï¿½ï¿½ï¿½
 	virtual bool SetShader( const SrShader* shader );
 	virtual bool SetShaderConstant( uint32 slot, const float* constantStart, uint32 vec4Count );
 
-	virtual uint32 Tex2D( float2& texcoord, const SrTexture* texture ) const;
+	virtual uint32 Tex2D( const float2& texcoord, const SrTexture* texture ) const;
 
 private:
-	// ½»»»Ó²¼þÖ¡»º³å
+	// ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½Ö¡ï¿½ï¿½ï¿½ï¿½
 	bool Swap();
-	// ´´½¨Ó²¼þbufferº¯Êý
+	// ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½bufferï¿½ï¿½ï¿½ï¿½
 	bool CreateHwBuffer();
-	// ÅúÁ¿»æÖÆÎÄ×Ö
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void FlushText();
 
 	virtual SrVertexBuffer* AllocateNormalizedVertexBuffer( uint32 count, bool fastmode = false );
 
 	virtual bool InnerInitShaders();
 
-	// ¹âÕ¤´¦ÀíÆ÷
+	// ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	SrRasterizer* m_rasterizer;
 
 	uint32 m_renderState;

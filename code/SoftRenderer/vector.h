@@ -1,11 +1,11 @@
 /**
   @file vector.h
   
-  @brief SoftRendererÊıÑ§¿â£ºÏòÁ¿Àà
+  @brief SoftRendererï¿½ï¿½Ñ§ï¿½â£ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -39,7 +39,7 @@ public:
 	}
 };
 /**
-	*@brief float2 ¶şÎ¬ÏòÁ¿Àà£¬Ìá¹©¶şÎ¬ÏòÁ¿µÄ»ù±¾ÔËËã²Ù×÷¡£
+	*@brief float2 ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ï¿½á¹©ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 struct float2
 {
@@ -176,28 +176,28 @@ public:
 		x = nx;
 		y = ny;
 	}
-	inline float2& reflect( float2& i, float2& n)
+	inline float2& reflect( const float2& i, const float2& n)
 	{
-		*this= i - n * (i.dot(n)*2.f);
+		*this= i - n * (float2::dot(i, n)*2.f);
 		return *this;
 	}
-	inline float dot( float2& rhs )
+	inline const float dot( const float2& rhs )
 	{
 		return x * rhs.x + y * rhs.y;
 	}
-	static inline float dot( float2& lhs, float2& rhs )
+	static inline const float dot( const float2& lhs, const float2& rhs )
 	{
 		return lhs.x * rhs.x + lhs.y * rhs.y;
 	}
 };
 
 /**
-	*@brief float3 ÈıÎ¬ÏòÁ¿Àà£¬Ìá¹©ÈıÎ¬ÏòÁ¿µÄ»ù±¾ÔËËã²Ù×÷¡£
-	*@remark Ìá¹©ÀàËÆ HLSL µÄÈ¡ÖµºÍ¸³Öµ·½Ê½£¬¿ÉÊ¹ÓÃv.xyÖ±½ÓÈ¡³öÇ°Á½Î»
+	*@brief float3 ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ï¿½á¹©ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	*@remark ï¿½á¹©ï¿½ï¿½ï¿½ï¿½ HLSL ï¿½ï¿½È¡Öµï¿½Í¸ï¿½Öµï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½v.xyÖ±ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½Î»
 
-	ÖØÔØÔËËã·û: * ÎªÏòÁ¿³Ë·¨£¬µÃÊıÎªĞÂÏòÁ¿
-			   % ÎªÏòÁ¿²æ³Ì£¬µÃÊıÎªĞÂÏòÁ¿
-			   µã»ı²»×÷ÔËËã·ûÖØÔØ£¬Ê¹ÓÃfloat3::dot»òÕß.dotÀ´ÇóÈ¡µã»ı
+	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: * Îªï¿½ï¿½ï¿½ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			   % Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì£ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½Ê¹ï¿½ï¿½float3::dotï¿½ï¿½ï¿½ï¿½.dotï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½
 */
 SR_ALIGN struct float3
 {
@@ -207,7 +207,7 @@ public:
 		float m[3];
 		struct { float x , y , z; };
 		struct { float r , g , b; };
-		struct { float2 xy; float z; };
+		struct { float2 xy; float vz;};
 #ifdef SR_USE_SIMD
 		__m128 m128;
 #endif
@@ -229,7 +229,7 @@ public:
 	}
 
 	/**
-	 *@brief float3µÄ¿ì½İ½¨Á¢·½Ê½ float3( float2(x,y),z );
+	 *@brief float3ï¿½Ä¿ï¿½İ½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ float3( float2(x,y),z );
 	 *@return  
 	 *@param const float2 pxy 
 	 *@param const float pz 
@@ -456,9 +456,9 @@ public:
 		return (*this);
 	}
 
-	inline float3& reflect( float3& i, float3& n)
+	inline float3& reflect( const float3& i, const float3& n)
 	{
-		*this= i - n * (i.dot(n)*2.f);
+		*this= i - n * (float3::dot(i,n)*2.f);
 		return *this;
 	}
 
@@ -484,13 +484,13 @@ public:
 
 
 /**
-	*@brief float4 ËÄÎ¬ÏòÁ¿Àà£¬Ìá¹©ËÄÎ¬ÏòÁ¿µÄ»ù±¾ÔËËã²Ù×÷¡£
-	*@remark ËÄÎ¬ÏòÁ¿ÀàÖ÷ÒªÓÃÓÚ ¸¡µãcolorµÄ²Ù×÷£¬´æ´¢·½Ê½Îªa,r,g,b
-	ÔÚmath_defÖĞÓĞfloat4 colorºÍdword colorµÄ×ª»»º¯Êı
+	*@brief float4 ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ï¿½á¹©ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	*@remark ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½colorï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ´¢ï¿½ï¿½Ê½Îªa,r,g,b
+	ï¿½ï¿½math_defï¿½ï¿½ï¿½ï¿½float4 colorï¿½ï¿½dword colorï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	ÖØÔØÔËËã·û: * ÎªÏòÁ¿³Ë·¨£¬µÃÊıÎªĞÂÏòÁ¿
-	% ÎªÏòÁ¿²æ³Ì£¬µÃÊıÎªĞÂÏòÁ¿
-	µã»ı²»×÷ÔËËã·ûÖØÔØ£¬Ê¹ÓÃfloat3::dot»òÕß.dotÀ´ÇóÈ¡µã»ı
+	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: * Îªï¿½ï¿½ï¿½ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	% Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì£ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½Ê¹ï¿½ï¿½float3::dotï¿½ï¿½ï¿½ï¿½.dotï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½
 */
 SR_ALIGN struct float4
 {
@@ -784,16 +784,16 @@ public:
 	}
 };
 
-// ÌØ»¯µÄÏòÁ¿²åÖµ
+// ï¿½Ø»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 
-// ¿ìËÙÏßĞÔ²åÖµ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Öµ
 template<class T>
 inline T SrFastLerp(const T& a, const T& b, float ratio, float inv_ratio)
 {
 	return (a * inv_ratio + b * ratio);
 }
 
-// ¿ìËÙÏßĞÔ²åÖµ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Öµ
 template<class T>
 inline T SrLerp(const T& a, const T& b, float ratio)
 {
@@ -801,7 +801,7 @@ inline T SrLerp(const T& a, const T& b, float ratio)
 	return c;
 }
 
-// Í¸ÊÓ½ÃÕı²åÖµ
+// Í¸ï¿½Ó½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 template<class T>
 inline T SrWLerp(const T& a, const T& b, float ratio, float wa, float wb)
 {
@@ -809,7 +809,7 @@ inline T SrWLerp(const T& a, const T& b, float ratio, float wa, float wb)
 	return c;
 }
 
-// ÌØ»¯µÄ¸¡µãÏòÁ¿pow²Ù×÷
+// ï¿½Ø»ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½powï¿½ï¿½ï¿½ï¿½
 static inline float4 pow( const float4& f, float pow)
 {
 	float4 ret;
@@ -822,7 +822,7 @@ static inline float4 pow( const float4& f, float pow)
 	return ret;
 }
 
-// ÌØ»¯µÄ¸¡µãÏòÁ¿pow²Ù×÷
+// ï¿½Ø»ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½powï¿½ï¿½ï¿½ï¿½
 static inline float3 pow( const float3& f, float pow)
 {
 	float3 ret;

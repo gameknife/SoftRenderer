@@ -1,11 +1,11 @@
 /**
   @file IRenderer.h
   
-  @brief ¹«¹²µÄäÖÈ¾½á¹¹ÉùÃ÷
+  @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¾ï¿½á¹¹ï¿½ï¿½ï¿½ï¿½
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -49,7 +49,7 @@ enum ERendererType
 class IRenderer
 {
 public:
-	IRenderer::IRenderer( ERendererType type ):m_rendererType(type)
+	IRenderer( ERendererType type ):m_rendererType(type)
 	{
 		m_matrixStack.assign( eMd_Count, float44::CreateIdentity() );
 		m_frameCount = 0;
@@ -61,35 +61,35 @@ public:
 
 	virtual const char* getName() =0;
 
-	// Æô¶¯£¬¹Ø±Õº¯Êý
+	// ï¿½ï¿½ï¿½ï¿½Ø±Õºï¿½ï¿½ï¿½
 	virtual bool Resize(uint32 width, uint32 height)=0;
 	virtual uint32 getWidth() =0;
 	virtual uint32 getHeight() =0;
 
-	// Ö¡¿ØÖÆº¯Êý
+	// Ö¡ï¿½ï¿½ï¿½Æºï¿½ï¿½ï¿½
 	virtual void BeginFrame()=0;
 	virtual void EndFrame()=0;
 
-	// Ó²¼þClear
+	// Ó²ï¿½ï¿½Clear
 	virtual bool HwClear()=0;
 
-	// »ñÈ¡ScreenBufferº¯Êý
+	// ï¿½ï¿½È¡ScreenBufferï¿½ï¿½ï¿½ï¿½
 	virtual const uint8* getBuffer() = 0;
 	virtual int getBufferLength() = 0;
 
-	// ÎÆÀíÍ¨µÀÉèÖÃ
+	// ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	virtual bool SetTextureStage( const SrTexture* texture, int stage )=0;
 	virtual void ClearTextureStage()=0;
 
 	virtual bool UpdateVertexBuffer(SrVertexBuffer* target) {return true;}
 	virtual bool UpdateIndexBuffer(SrIndexBuffer* target) {return true;}
 
-	// äÖÈ¾µ÷ÓÃ
+	// ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
 	virtual bool DrawPrimitive( SrPrimitve* primitive )=0;
 	virtual bool DrawLine(const float3& from, const float3& to)=0;
-	virtual bool DrawScreenText(const char* str, int x,int y, uint32 size, DWORD color = SR_UICOLOR_HIGHLIGHT) =0;
+	virtual bool DrawScreenText(const char* str, int x,int y, uint32 size, uint32 color = SR_UICOLOR_HIGHLIGHT) =0;
 
-	// ShaderÉèÖÃ
+	// Shaderï¿½ï¿½ï¿½ï¿½
 	virtual bool SetShader(const SrShader* shader) =0;
 	virtual bool SetShaderConstant( uint32 slot, const float* constantStart, uint32 vec4Count ) =0;
 

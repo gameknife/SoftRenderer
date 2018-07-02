@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -57,15 +57,15 @@ void SrSkinSimShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const
 	SrFresnelNormal_Vert2Frag* out = (SrFresnelNormal_Vert2Frag*)vOut;
 
 
-	// pos´¦Àíµ½Í¶Ó°¿Õ¼ä
+	// posï¿½ï¿½ï¿½ï¿½Í¶Ó°ï¿½Õ¼ï¿½
 	out->pos = context->matrixs[eMd_WorldViewProj] * in->pos;
-	// pos´¦Àíµ½ÊÀ½ç¿Õ¼ä£¬±£´æ
+	// posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£¬ï¿½ï¿½ï¿½ï¿½
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
-	// normal,tangent´¦Àíµ½ÊÀ½ç¿Õ¼ä
+	// normal,tangentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	out->normal_ty = float4( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 
-	// ÔÝÊ±°Ñpos´æÈëtangent£¬¹©geometry½×¶Î¼ÆËãtangent
+	// ï¿½ï¿½Ê±ï¿½ï¿½posï¿½ï¿½ï¿½ï¿½tangentï¿½ï¿½ï¿½ï¿½geometryï¿½×¶Î¼ï¿½ï¿½ï¿½tangent
 	out->tangent.xyz = in->pos.xyz;// * out->pos.w;
 	//out->texcoord2 = in->texcoord * out->pos.w;
 }
@@ -76,17 +76,17 @@ void SrSkinSimShader::ProcessRasterize( void* rOut, const void* rInRef0, const v
 	const SrFresnelNormal_Vert2Frag* verB = static_cast<const SrFresnelNormal_Vert2Frag*>(rInRef1);
 	SrFresnelNormal_Vert2Frag* verO = static_cast<SrFresnelNormal_Vert2Frag*>(rOut);
 
-	// ÏßÐÔ²åÖµproject space pos
+	// ï¿½ï¿½ï¿½Ô²ï¿½Öµproject space pos
 	float inv_ratio = 1.f - ratio;
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ýw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// ï¿½Ñ¾ï¿½ï¿½ï¿½w
+	// Ö±ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½channel
 	verO->normal_ty = SrFastLerp( verA->normal_ty, verB->normal_ty, ratio, inv_ratio );
 	verO->worldpos_tx = SrFastLerp( verA->worldpos_tx, verB->worldpos_tx, ratio, inv_ratio );
 	verO->tangent = SrFastLerp( verA->tangent, verB->tangent, ratio, inv_ratio );
 
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕý³£Öµ
+	// ï¿½ï¿½ï¿½ï¿½scanlineÉ¨ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Í¸ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	if (final)
 	{
 		verO->normal_ty /= verO->pos.w;
@@ -96,13 +96,13 @@ void SrSkinSimShader::ProcessRasterize( void* rOut, const void* rInRef0, const v
 }
 
 /**
- *@brief SkinÄ£ÄâPixel Shader
+ *@brief SkinÄ£ï¿½ï¿½Pixel Shader
  *@return void 
  *@param uint32 * pOut 
  *@param const void * pIn 
  *@param const SrShaderContext * context 
- *@remark Ê¹ÓÃnvLamb£¬ÀûÓÃNdotLÇóÈ¡´Î±íÃæÉ¢ÉäµÄÄ£Äâ´©Í¸Öµ£¬´Ó´Î±íÃæÑÕÉ«Í¼ÉÏ²ÉÑù¶ÔÓ¦µÄÑÕÉ«£¬×÷Îª¹âÕÕµÄ²¹³ä¡£
- Í¬Ê±£¬ÀûÓÃNdotE£¬ÇóÈ¡±ßÔµµÄÇ¿¶È£¬³ËÒÔ»·¾³ÑÕÉ«ÒÔ±íÏÖÆ¤·ôµÄÍ¨Í¸¸Ð¡£
+ *@remark Ê¹ï¿½ï¿½nvLambï¿½ï¿½ï¿½ï¿½ï¿½ï¿½NdotLï¿½ï¿½È¡ï¿½Î±ï¿½ï¿½ï¿½É¢ï¿½ï¿½ï¿½Ä£ï¿½â´©Í¸Öµï¿½ï¿½ï¿½Ó´Î±ï¿½ï¿½ï¿½ï¿½ï¿½É«Í¼ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ÕµÄ²ï¿½ï¿½ä¡£
+ Í¬Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½NdotEï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ôµï¿½ï¿½Ç¿ï¿½È£ï¿½ï¿½ï¿½ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½Ô±ï¿½ï¿½ï¿½Æ¤ï¿½ï¿½ï¿½Í¨Í¸ï¿½Ð¡ï¿½
  */
 void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const
 {
@@ -110,58 +110,59 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	// ²ÉÑùdiffuseÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½É«
 	float2 tc0(in->worldpos_tx.w, in->normal_ty.w);
 
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 
-	// ²ÉÑù´Î±íÃæÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½É«
 	col = context->Tex2D( tc0, 4 );
 	float4 matSSS = uint32_2_float4(col);
 
-	// diffuseÑÕÉ« ×÷ srgb
+	// diffuseï¿½ï¿½É« ï¿½ï¿½ srgb
 	matDiff = matDiff * matDiff;
 
-	// ·¨ÏßÈÅ¶¯´¦Àí
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 normalDir = in->normal_ty.xyz;
 	normalDir.normalize();
 	float3 tangentDir = in->tangent.xyz;
 	tangentDir.normalize();
 	float3 binormalDir = tangentDir % normalDir;
 
-	// ÀûÓÃÊÀ½ç¿Õ¼äµÄ ÇÐÏß£¬·¨Ïß£¬¸±·¨Ïß ¹¹Ôì´ÓÇÐÏß¿Õ¼äµ½ÊÀ½ç¿Õ¼äµÄ×ª»»¾ØÕó
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¿Õ¼äµ½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float33 tangent2world( tangentDir, binormalDir, normalDir );
 
-	// ²ÉÑùnormal
+	// ï¿½ï¿½ï¿½ï¿½normal
 	uint32 nor = context->Tex2D( tc0, 1 );
 	float4 norf = uint32_2_float4(nor);
 
-	// ½«0-1´¦Àíµ½-1µ½1¿Õ¼ä
+	// ï¿½ï¿½0-1ï¿½ï¿½ï¿½ï¿½-1ï¿½ï¿½1ï¿½Õ¼ï¿½
 	float3 normalTangent = norf.xyz;
 	normalTangent = (normalTangent - float3(0.5f)) * 2.f;
 
-	// ½«²ÉÑùµ½µÄÇÐÏß¿Õ¼ä·¨Ïß×ª»»µ½ÊÀ½ç¿Õ¼ä
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¿Õ¼ä·¨ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	normalDir = tangent2world * normalTangent;
 	normalDir.normalize();
 	
-	// ÊÓÏß·½Ïò¼ÆËã
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - in->worldpos_tx.xyz;
 	viewWS.normalize();
 
-	// ÊÓÏß·´Éä·½Ïò
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ä·½ï¿½ï¿½
 	float3 viewReflWS;
 	viewReflWS.reflect(viewWS, normalDir);
 
-	// ²ÉÑù·´ÉäÎÆÀí
-	uint32 refl = context->Tex2D( (viewReflWS.xy * 0.5f + float2(0.5f, 0.5f)), 3 );
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	float2 calcTexcoord = viewReflWS.xy * 0.5f + float2(0.5f, 0.5f);
+	uint32 refl = context->Tex2D( calcTexcoord, 3 );
 	float4 reflf = uint32_2_float4(refl);
 
-	// È¡µÃÈ«¾ÖÌì¹â£¬²¢ÀûÓÃnormal×÷¿ìËÙÌì¹âÄ£Äâ
+	// È¡ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½normalï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
 	float4 specularAcc(0.f);
 
-	// µ÷ÓÃshading libµÄÆ¤·ô¹âÕÕ¼ÆËãº¯Êý£¬¼ÆËãdiffuseºÍspecularµÄ¹âÕÕÀÛ»ý
+	// ï¿½ï¿½ï¿½ï¿½shading libï¿½ï¿½Æ¤ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ãº¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½specularï¿½Ä¹ï¿½ï¿½ï¿½ï¿½Û»ï¿½
 	CalcLightsSkin(context, in->worldpos_tx.xyz, normalDir, viewWS, matSSS, diffuseAcc, specularAcc);
 
 	
@@ -169,23 +170,23 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	//float fresnel = GetFresnel(NdotE, cBuffer->fresnelBia, cBuffer->fresnelPower, cBuffer->fresnelScale);
 	float rim = GetFresnel(NdotE, 0.01f, 5.f, 20.f);
 
-	// ¹âÕÕ·½³Ì1£º²ÄÖÊ¹ÌÓÐÉ« * Âþ·´ÉäºÍ»·¾³µÄ¹âÕÕ¾Û¼¯
+	// ï¿½ï¿½ï¿½Õ·ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½É« * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½Õ¾Û¼ï¿½
 	specularAcc += (reflf * diffuseAcc) * rim;
 
 	// rim light
 	//specularAcc += ( float4( 1.f, 1.f, 0.95686f, 0.847f ) * diffuseAcc ) * rim;
 
 	diffuseAcc = diffuseAcc * matDiff * cBuffer->difColor;
-	// ¹âÕÕ·½³Ì2£º²ÄÖÊ·´ÉäÉ« * ¾µÃæ·´Éä¹âÕÕ¾Û¼¯
+	// ï¿½ï¿½ï¿½Õ·ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½Ê·ï¿½ï¿½ï¿½É« * ï¿½ï¿½ï¿½æ·´ï¿½ï¿½ï¿½ï¿½Õ¾Û¼ï¿½
 	diffuseAcc += (cBuffer->spcColor * matDiff.a) * (specularAcc) ;
 
-	// ×îÖÕÉ«²Ê½Ø¶Ïµ½0-1
+	// ï¿½ï¿½ï¿½ï¿½É«ï¿½Ê½Ø¶Ïµï¿½0-1
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 
-	// srgb»¹Ô­
+	// srgbï¿½ï¿½Ô­
 	diffuseAcc.sqrt();
 
-	// float4 µ½ uint32µÄÊä³ö
+	// float4 ï¿½ï¿½ uint32ï¿½ï¿½ï¿½ï¿½ï¿½
 	*out = float4_2_uint32(diffuseAcc);
 }
 
@@ -218,15 +219,15 @@ void SrFresnelNormalShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2,
 	SrVertexP3N3T2* in = (SrVertexP3N3T2*)vInRef0;
 	SrFresnelNormal_Vert2Frag* out = (SrFresnelNormal_Vert2Frag*)vOut;
 
-	// pos´¦Àíµ½Í¶Ó°¿Õ¼ä
+	// posï¿½ï¿½ï¿½ï¿½Í¶Ó°ï¿½Õ¼ï¿½
 	out->pos = context->matrixs[eMd_WorldViewProj] * in->pos;
-	// pos´¦Àíµ½ÊÀ½ç¿Õ¼ä£¬±£´æ
+	// posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£¬ï¿½ï¿½ï¿½ï¿½
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
-	// normal,tangent´¦Àíµ½ÊÀ½ç¿Õ¼ä
+	// normal,tangentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	out->normal_ty = float4( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 
-	// ÔÝÊ±°Ñpos´æÈëtangent£¬¹©geometry½×¶Î¼ÆËãtangent
+	// ï¿½ï¿½Ê±ï¿½ï¿½posï¿½ï¿½ï¿½ï¿½tangentï¿½ï¿½ï¿½ï¿½geometryï¿½×¶Î¼ï¿½ï¿½ï¿½tangent
 	out->tangent.xyz = in->pos.xyz;// * out->pos.w;
 	//out->texcoord2 = in->texcoord * out->pos.w;
 }
@@ -237,17 +238,17 @@ void SrFresnelNormalShader::ProcessRasterize( void* rOut, const void* rInRef0, c
 	const SrFresnelNormal_Vert2Frag* verB = static_cast<const SrFresnelNormal_Vert2Frag*>(rInRef1);
 	SrFresnelNormal_Vert2Frag* verO = static_cast<SrFresnelNormal_Vert2Frag*>(rOut);
 
-	// ÏßÐÔ²åÖµproject space pos
+	// ï¿½ï¿½ï¿½Ô²ï¿½Öµproject space pos
 	float inv_ratio = 1.f - ratio;
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ýw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// ï¿½Ñ¾ï¿½ï¿½ï¿½w
+	// Ö±ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½channel
 	verO->normal_ty = SrFastLerp( verA->normal_ty, verB->normal_ty, ratio, inv_ratio );
 	verO->worldpos_tx = SrFastLerp( verA->worldpos_tx, verB->worldpos_tx, ratio, inv_ratio );
 	verO->tangent = SrFastLerp( verA->tangent, verB->tangent, ratio, inv_ratio );
 
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕý³£Öµ
+	// ï¿½ï¿½ï¿½ï¿½scanlineÉ¨ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Í¸ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	if (final)
 	{
 		verO->normal_ty /= verO->pos.w;
@@ -262,25 +263,25 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	// ²ÉÑùdiffuseÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½É«
 	float2 tc0(in->worldpos_tx.w, in->normal_ty.w);
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 
-	// diffuse ×÷ srgb
+	// diffuse ï¿½ï¿½ srgb
 	matDiff = matDiff * matDiff;
 
-	// ·¨ÏßÈÅ¶¯´¦Àí
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 normalDir = in->normal_ty.xyz;
 	normalDir.normalize();
 	float3 tangentDir = in->tangent.xyz;
 	tangentDir.normalize();
 	float3 binormalDir = tangentDir % normalDir;
 
-	// ÀûÓÃÊÀ½ç¿Õ¼äµÄ ÇÐÏß£¬·¨Ïß£¬¸±·¨Ïß ¹¹Ôì´ÓÇÐÏß¿Õ¼äµ½ÊÀ½ç¿Õ¼äµÄ×ª»»¾ØÕó
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¿Õ¼äµ½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float33 tangent2world( tangentDir, binormalDir, normalDir );
 
-	// ²ÉÑùnormal
+	// ï¿½ï¿½ï¿½ï¿½normal
 	uint32 nor = context->Tex2D( tc0, 1 );
 	float4 norf = uint32_2_float4(nor);
 
@@ -288,20 +289,21 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	normalTangent = (normalTangent - float3(0.5f)) * 2.f;
 	//normalTangent.y *= -1;
 
-	// ½«²ÉÑùµ½µÄÇÐÏß¿Õ¼ä·¨Ïß×ª»»µ½ÊÀ½ç¿Õ¼ä
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¿Õ¼ä·¨ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	normalDir = tangent2world * normalTangent;
 	normalDir.normalize();
 
-	// ÊÓÏß·½Ïò¼ÆËã
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - in->worldpos_tx.xyz;
 	viewWS.normalize();
 
-	// ÊÓÏß·´Éä·½Ïò
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ä·½ï¿½ï¿½
 	float3 viewReflWS;
 	viewReflWS.reflect(viewWS, normalDir);
 
-	// ²ÉÑù·´ÉäÎÆÀí
-	uint32 refl = context->Tex2D( (viewReflWS.xy * 0.5f + float2(0.5f, 0.5f)), 3 );
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	float2 calcTexcoord = viewReflWS.xy * 0.5f + float2(0.5f, 0.5f);
+	uint32 refl = context->Tex2D( calcTexcoord, 3 );
 	float4 reflf = uint32_2_float4(refl) * 0.25f;
 
 
@@ -314,12 +316,12 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	float fresnel = GetFresnel(NdotE, cBuffer->fresnelBia, cBuffer->fresnelPower, cBuffer->fresnelScale);
 
 	specularAcc += reflf * diffuseAcc;
-	// ½Ø¶Ïµ½0-1
+	// ï¿½Ø¶Ïµï¿½0-1
 	diffuseAcc = diffuseAcc * matDiff * cBuffer->difColor;
 	diffuseAcc += ((cBuffer->spcColor) * specularAcc) * fresnel;
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 
-	// srgb»¹Ô­
+	// srgbï¿½ï¿½Ô­
 	diffuseAcc.sqrt();
 
 	*out = float4_2_uint32(diffuseAcc);
@@ -330,12 +332,12 @@ void SRFASTCALL SrHairShader::ProcessVertex( void* vOut, void* vOut1, void* vOut
 	SrVertexP3N3T2* in = (SrVertexP3N3T2*)vInRef0;
 	SrFresnelNormal_Vert2Frag* out = (SrFresnelNormal_Vert2Frag*)vOut;
 
-	// pos´¦Àíµ½Í¶Ó°¿Õ¼ä
+	// posï¿½ï¿½ï¿½ï¿½Í¶Ó°ï¿½Õ¼ï¿½
 	out->pos = context->matrixs[eMd_WorldViewProj] * in->pos;
-	// pos´¦Àíµ½ÊÀ½ç¿Õ¼ä£¬±£´æ
+	// posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£¬ï¿½ï¿½ï¿½ï¿½
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
-	// normal,tangent´¦Àíµ½ÊÀ½ç¿Õ¼ä
+	// normal,tangentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	out->normal_ty = float4((context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 }
 
@@ -345,17 +347,17 @@ void SRFASTCALL SrHairShader::ProcessRasterize( void* rOut, const void* rInRef0,
 	const SrFresnelNormal_Vert2Frag* verB = static_cast<const SrFresnelNormal_Vert2Frag*>(rInRef1);
 	SrFresnelNormal_Vert2Frag* verO = static_cast<SrFresnelNormal_Vert2Frag*>(rOut);
 
-	// ÏßÐÔ²åÖµproject space pos
+	// ï¿½ï¿½ï¿½Ô²ï¿½Öµproject space pos
 	float inv_ratio = 1.f - ratio;
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ýw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// ï¿½Ñ¾ï¿½ï¿½ï¿½w
+	// Ö±ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½channel
 	verO->normal_ty = SrFastLerp( verA->normal_ty, verB->normal_ty, ratio, inv_ratio );
 	verO->worldpos_tx = SrFastLerp( verA->worldpos_tx, verB->worldpos_tx, ratio, inv_ratio );
 	verO->tangent = SrFastLerp( verA->tangent, verB->tangent, ratio, inv_ratio );
 
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕý³£Öµ
+	// ï¿½ï¿½ï¿½ï¿½scanlineÉ¨ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Í¸ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	if (final)
 	{
 		verO->normal_ty /= verO->pos.w;
@@ -370,15 +372,15 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	// ²ÉÑùdiffuseÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½É«
 	float2 tc0( in->worldpos_tx.w, in->normal_ty.w );
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 
-	// diffuse ×÷ srgb
+	// diffuse ï¿½ï¿½ srgb
 	matDiff = matDiff * matDiff;
 
-	// ·¨ÏßÈÅ¶¯´¦Àí
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 normalDir = in->normal_ty.xyz;
 	normalDir.normalize();
 
@@ -386,7 +388,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 	// 	return;
 
 
-	// ÊÓÏß·½Ïò¼ÆËã
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - in->worldpos_tx.xyz;
 	viewWS.normalize();
 
@@ -395,7 +397,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 
 	CalcLightsKajiya_Kay(context, in->worldpos_tx.xyz, normalDir, in->tangent.xyz, viewWS, diffuseAcc, specularAcc);
 
-	// ½Ø¶Ïµ½0-1
+	// ï¿½Ø¶Ïµï¿½0-1
 
 	uint32 colspec = context->Tex2D( tc0, 1 );
 	float4 matSpec = uint32_2_float4(colspec);
@@ -405,7 +407,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec;
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 
-	// srgb»¹Ô­
+	// srgbï¿½ï¿½Ô­
 	diffuseAcc.sqrt();
 
 	*out = float4_2_uint32(diffuseAcc);

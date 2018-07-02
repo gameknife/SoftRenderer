@@ -5,7 +5,6 @@
       "./*.cpp",
       "../code/SoftRenderer/*.cpp"
     ],
-    "include_dirs" : ["<!(node -e \"require('nan')\")","../code/SoftRenderer/"],
-    "libraries": [ "winmm.lib" ]
+    "include_dirs" : ["<!(node -e \"require('nan')\")","../code/SoftRenderer/"]
   }]
 }

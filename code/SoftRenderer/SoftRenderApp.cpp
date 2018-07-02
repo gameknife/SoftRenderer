@@ -26,7 +26,7 @@ SoftRenderApp::~SoftRenderApp(void)
 {
 }
 
-BOOL SoftRenderApp::Init()
+bool SoftRenderApp::Init()
 {
 	m_curr_task = 0;
 
@@ -39,7 +39,7 @@ BOOL SoftRenderApp::Init()
 	const int createWidth = 854;
 	const int createHeight = 480;
 
-	// ´´½¨×ÊÔ´¹ÜÀíÆ÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	GtLogInfo("Creating ResourceManger...");
 	gEnv->resourceMgr = new SrResourceManager;
 	GtLog("- Loading Shader List...");
@@ -47,7 +47,7 @@ BOOL SoftRenderApp::Init()
 	GtLog("- Creating Default Procedura Medias...");
 	gEnv->resourceMgr->InitDefaultMedia();
 
-	// ´´½¨RenderÉÏÏÂÎÄ
+	// ï¿½ï¿½ï¿½ï¿½Renderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	GtLogInfo("Creating Render Context...");
 	g_context = new SrRendContext(createWidth, createHeight, 32);
 	gEnv->context = g_context;
@@ -82,7 +82,7 @@ BOOL SoftRenderApp::Init()
 		m_tasks[m_curr_task]->OnInit();
 	}
 
-	return TRUE;
+	return true;
 }
 
 static Quat g_rot = Quat::CreateIdentity();

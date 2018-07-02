@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -29,11 +29,11 @@ public:
 	SrScene(void);
 	~SrScene(void);
 
-	// ÊµÌåaccess
+	// Êµï¿½ï¿½access
 	SrEntity* CreateEntity(const char* name, const char* meshFilename, 
 		const char* matFilename, 
-		float3& pos = float3(0,0,0), 
-		Quat& rot = Quat::CreateIdentity(),
+		float3& pos, 
+		Quat& rot,
 		SrEntity* ent = NULL);
 
 	SrEntity* GetEntity(const char* name);
@@ -41,7 +41,7 @@ public:
 	void RemoveEntity(SrEntity* target);
 	void RemoveEntity(const char* name);
 
-	// Ïà»úaccess
+	// ï¿½ï¿½ï¿½access
 	SrCamera* CreateCamera(const char* name);
 	SrCamera* GetCamera(const char* name);
 
@@ -52,7 +52,7 @@ public:
 	void RenderVisbility(SrCamera* cam);
 
 
-	// µÆ¹â
+	// ï¿½Æ¹ï¿½
 	SrLight* AddLight();
 	void RemoveLight(SrLight* tgt);
 	void ClearLight();

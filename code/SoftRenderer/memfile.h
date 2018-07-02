@@ -1,11 +1,11 @@
 /**
   @file IMemFile.h
   
-  @brief 内存文件封装，用于文件读取
+  @brief 锟节达拷锟侥硷拷锟斤拷装锟斤拷锟斤拷锟斤拷锟侥硷拷锟斤拷取
 
   @author yikaiming
 
-  更改日志 history
+  锟斤拷锟斤拷锟斤拷志 history
   ver:1.0
    
  */
@@ -76,7 +76,7 @@
 			m_unicode = false;
 
 			FILE* pFile = NULL;
-			fopen_s( &pFile, diskPath, "rb");
+			pFile = fopen( diskPath, "rb");
 
 			if (pFile)
 			{

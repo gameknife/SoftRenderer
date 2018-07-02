@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -23,13 +23,13 @@ struct SrRendContext
 			bpp = obpp / 8;
 			viewport = SrViewport(0.f,0.f,(float)width,(float)height,1.f,1000.f);
 
-			SYSTEM_INFO siSysInfo;
-			GetSystemInfo(&siSysInfo); 
+			//SYSTEM_INFO siSysInfo;
+			//GetSystemInfo(&siSysInfo); 
 
-			processorNum = siSysInfo.dwNumberOfProcessors;
+			processorNum = 4;//siSysInfo.dwNumberOfProcessors;
 	}
 
-	// äÖÈ¾ÌØÐÔÏà¹Ø
+	// ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void OpenFeature( ERenderFeature feature )
 	{
 		features |= feature;
@@ -38,18 +38,18 @@ struct SrRendContext
 	{
 		features &= ~feature;
 	}
-	BOOL IsFeatureEnable( ERenderFeature feature )
+	bool IsFeatureEnable( ERenderFeature feature )
 	{
 		return features & feature;
 	}
 	
-	// ÏêÏ¸²ÎÊý
-	int width;							///< äÖÈ¾Æ÷¿í¶È
-	int height;							///< äÖÈ¾Æ÷¸ß¶È
-	SrViewport viewport;				///< 3Î¬ÊÓ¿Ú
-	int bpp;							///< ÏñËØÎ»¿í£¬µ¥Î»byte
-	uint32 features;					///< äÖÈ¾ÌØÐÔ
-	int processorNum;					///< ´¦ÀíÆ÷¸öÊý
+	// ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½
+	int width;							///< ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½ï¿½
+	int height;							///< ï¿½ï¿½È¾ï¿½ï¿½ï¿½ß¶ï¿½
+	SrViewport viewport;				///< 3Î¬ï¿½Ó¿ï¿½
+	int bpp;							///< ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Î»byte
+	uint32 features;					///< ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
+	int processorNum;					///< ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	SrFragmentBuffer* fBuffer;			///< FragBuffer
 };

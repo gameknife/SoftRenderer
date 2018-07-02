@@ -150,7 +150,7 @@ class IEvent
            void* lpEventAttributes,
            bool manualReset,
            bool initialState,
-           const TCHAR* &name) {
+           const char* &name) {
         pthread_mutex_init(&m_count_mutex, NULL);
         pthread_cond_init(&m_event_handle, NULL);
         m_state = initialState;
@@ -164,9 +164,9 @@ class IEvent
         pthread_cond_destroy(&m_event_handle);
     }
     
-	HANDLE GetEvent() const
+	uint64 GetEvent() const
     {
-        return (HANDLE)(&m_event_handle);
+        return reinterpret_cast<uint64>(&m_event_handle);
     }
     
 	void Wait()
@@ -192,7 +192,7 @@ class IEvent
     }
     
 	bool Wait(
-              DWORD milliseconds)
+              uint32 milliseconds)
     {
         int rc = 0;
         struct timespec abstime;
@@ -259,7 +259,7 @@ class IEvent
     
     private :
     
-	HANDLE m_hEvent;
+	uint32 m_hEvent;
     
     pthread_cond_t m_event_handle;
     pthread_mutex_t m_count_mutex;
@@ -282,7 +282,7 @@ class CManualResetEvent : public IEvent
                                bool initialState = false);
     
 	explicit CManualResetEvent(
-                               const TCHAR* &name,
+                               const char* &name,
                                bool initialState = false);
     
     private :
@@ -300,7 +300,7 @@ inline CManualResetEvent::CManualResetEvent(
 }
 
 inline CManualResetEvent::CManualResetEvent(
-                                            const TCHAR* &name, 
+                                            const char* &name, 
                                             bool initialState /* = false */)
 :  IEvent(0, true, initialState, name)
 {

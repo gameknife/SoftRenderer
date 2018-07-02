@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -18,10 +18,6 @@ typedef std::map<std::string, SrResource*> SrResourceLibrary;
 
 class SrResourceManager : public IResourceManager
 {
-public:
-	
-	typedef std::vector<HMODULE> SrSwShaderHandles;
-
 public:
 	SrResourceManager(void);
 	virtual ~SrResourceManager(void);
@@ -43,7 +39,7 @@ public:
 	virtual void				LoadShaderList();
 
 // render resource move here
-	// BufferÉêÇë
+	// Bufferï¿½ï¿½ï¿½ï¿½
 	virtual SrVertexBuffer* AllocateVertexBuffer(uint32 elementSize, uint32 count, bool fastmode = false);
 	virtual bool DeleteVertexBuffer(SrVertexBuffer* target);
 	virtual SrIndexBuffer*	AllocateIndexBuffer(uint32 count);

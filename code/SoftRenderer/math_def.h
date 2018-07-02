@@ -1,11 +1,11 @@
 /**
   @file math_def.h
   
-  @brief ÊýÑ§¿âÍ·ÎÄ¼þ
+  @brief ï¿½ï¿½Ñ§ï¿½ï¿½Í·ï¿½Ä¼ï¿½
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -15,18 +15,19 @@
 
 //#define assert( x )  
 
-// ¶¨Òå³£Á¿
+// ï¿½ï¿½ï¿½å³£ï¿½ï¿½
 #define SR_PI 3.1415926f
 #define SR_EQUAL_PRECISION 0.001f
 
 
 
-// ¶¨Òå³£ÓÃ³¤¶È£¬Î»²Ù×÷µ¥Î»
+// ï¿½ï¿½ï¿½å³£ï¿½Ã³ï¿½ï¿½È£ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»
+typedef unsigned long long uint64;
 typedef unsigned int uint32;
 typedef unsigned short uint16;
 typedef unsigned char uint8;
 
-// ÒýÈëÊýÑ§º¯Êý
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ§ï¿½ï¿½ï¿½ï¿½
 #include <math.h>
 
 // namespace srmath
@@ -34,9 +35,9 @@ typedef unsigned char uint8;
 static inline float isqrtf(float x) {return 1.f/sqrtf(x);}
 static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = float(sin(angle));	*pCos = float(cos(angle));	}
 
-// ÊýÑ§½á¹¹ÖÃÇ°ÉùÃ÷
+// ï¿½ï¿½Ñ§ï¿½á¹¹ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½
 
-// ÒÀ´ÎÒýÈëvector, quaternion, matrixÊµÏÖ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vector, quaternion, matrixÊµï¿½ï¿½
 
 #ifdef SR_USE_SIMD
 // SSE3 including
@@ -46,7 +47,7 @@ static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = flo
 #endif
 
 
-// É«²ÊÐòÁÐ
+// É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 #define SR_COLOR_RGBA
 
 
@@ -56,16 +57,16 @@ static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = flo
 
 
 
-// ³£ÓÃÊýÑ§º¯Êý
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ§ï¿½ï¿½ï¿½ï¿½
 
 /**
- @breif Ä£°æ½Ø¶Ï
+ @breif Ä£ï¿½ï¿½Ø¶ï¿½
  */
 template<typename T>
 static inline T Clamp( const T& p , const T& min , const T& max ) { if( p < min ) return min; if( p > max ) return max; return p; }
 
 /**
- @breif float4½Ø¶Ï
+ @breif float4ï¿½Ø¶ï¿½
  */
 static inline float4 Clamp(  const float4& p , float min, float max )
 {
@@ -86,7 +87,7 @@ static inline float4 Clamp(  const float4& p , float min, float max )
 }
 
 /**
- @breif  ½»»»
+ @breif  ï¿½ï¿½ï¿½ï¿½
  */
 template<typename T> void SWAP(T& x, T& y)
 {
@@ -96,7 +97,7 @@ template<typename T> void SWAP(T& x, T& y)
 }
 
 /**
- @breif ÏàµÈÅÐ¶Ï
+ @breif ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
  */
 static inline bool Equal(float x, float y, float evsilon = SR_EQUAL_PRECISION)
 {
@@ -108,7 +109,7 @@ static inline bool Equal(float x, float y, float evsilon = SR_EQUAL_PRECISION)
 }
 
 /**
- @breif Smooth Hermite²åÖµ
+ @breif Smooth Hermiteï¿½ï¿½Öµ
  */
 static inline float SmoothStep(float mini, float maxi, float x)
 {
@@ -117,7 +118,7 @@ static inline float SmoothStep(float mini, float maxi, float x)
 }
 
 /**
- @breif Smooth Hermite²åÖµ
+ @breif Smooth Hermiteï¿½ï¿½Öµ
  */
 static inline float SmoothStep(float maxi, float x)
 {
@@ -126,7 +127,7 @@ static inline float SmoothStep(float maxi, float x)
 }
 
 /**
- @breif ARGB char[4] µ½ DWORD ARGB
+ @breif ARGB char[4] ï¿½ï¿½ DWORD ARGB
  */
 static inline uint32 uint8ARGB_2_uint32( const uint8 * const ch )
 {
@@ -138,7 +139,7 @@ static inline uint32 uint8ARGB_2_uint32( const uint8 * const ch )
 }
 
 /**
- @breif ARGB char[4] µ½ DWORD ARGB
+ @breif ARGB char[4] ï¿½ï¿½ DWORD ARGB
  */
 static inline uint32 uint32RGB_2_uint32ABGR( const uint32 rgb )
 {
@@ -151,7 +152,7 @@ static inline uint32 uint32RGB_2_uint32ABGR( const uint32 rgb )
 }
 
 /**
- @breif bmp32 - BGRA µ½ DWORD ARGB
+ @breif bmp32 - BGRA ï¿½ï¿½ DWORD ARGB
  */
 static inline uint32 uint8BGRA_2_uint32( const uint8 * const ch )
 {
@@ -163,7 +164,7 @@ static inline uint32 uint8BGRA_2_uint32( const uint8 * const ch )
 }
 
 /**
- @breif bmp24 - BGR µ½ DWORD ARGB
+ @breif bmp24 - BGR ï¿½ï¿½ DWORD ARGB
  */
 static inline uint32 uint8BGR_2_uint32( const uint8 * const ch )
 {
@@ -175,7 +176,7 @@ static inline uint32 uint8BGR_2_uint32( const uint8 * const ch )
 }
 
 /**
- @breif float4 argb µ½ DWORD ARGB
+ @breif float4 argb ï¿½ï¿½ DWORD ARGB
  */
 static inline uint32 float4_2_uint32( const float4& f )
 {
@@ -216,7 +217,7 @@ static inline uint32 float4_2_uint32( const float4& f )
 }
 
 /**
- @breif DWORD ARGB µ½ float4 argb
+ @breif DWORD ARGB ï¿½ï¿½ float4 argb
  */
 static inline float4 uint32_2_float4( uint32 p )
 {
@@ -229,9 +230,9 @@ static inline float4 uint32_2_float4( uint32 p )
 	__m128i dword4 = _mm_set_epi32( ( p & 0xFF ) >> 0, ( p & 0xFF00 ) >> 8, ( p & 0xFF0000 ) >> 16,( p & 0xFF000000 ) >> 24 );
 #endif
 
-	// ×ª»»µ½SP
+	// ×ªï¿½ï¿½ï¿½ï¿½SP
 	ret.m128 = _mm_cvtepi32_ps(dword4);
-	// ³Ë255
+	// ï¿½ï¿½255
 	ret.m128 = _mm_div_ps(ret.m128, _mm_set_ps1(255.f));
 	return ret;
 #else
@@ -252,7 +253,7 @@ static inline float4 uint32_2_float4( uint32 p )
 }
 
 /**
- @breif DWORD ARGB Ö±½Ó»ìºÏ
+ @breif DWORD ARGB Ö±ï¿½Ó»ï¿½ï¿½
  */
 static inline uint32 SrColorMerge( uint32& color1, uint32& color2, bool avg )
 {
@@ -279,14 +280,14 @@ static inline uint32 SrColorMerge( uint32& color1, uint32& color2, bool avg )
 }
 
 /**
- @breif DWORD ARGB Ê¹ÓÃ floatÖµ µ÷ºÍ
+ @breif DWORD ARGB Ê¹ï¿½ï¿½ floatÖµ ï¿½ï¿½ï¿½ï¿½
  */
 static inline uint32 SrColorMulFloat( uint32& color1, float ratio )
 {
 #ifdef SR_USE_SIMD
 
 	// SSE4
-	// unpack Ò»¸öu8 u8 u8 u8µ½i32 i32 i32 i23
+	// unpack Ò»ï¿½ï¿½u8 u8 u8 u8ï¿½ï¿½i32 i32 i32 i23
 	//__m128i dword128 = _mm_cvtepu8_epi32(_mm_set1_epi32(color1));
 
 	// SSE2 comptible
@@ -295,7 +296,7 @@ static inline uint32 SrColorMulFloat( uint32& color1, float ratio )
 	__m128 float_4 = _mm_mul_ps( _mm_cvtepi32_ps(dword128), _mm_set_ps1(ratio));
 	dword128 = _mm_cvttps_epi32(float_4);
 
-	// pack ¿ÉÓÅ»¯
+	// pack ï¿½ï¿½ï¿½Å»ï¿½
 	uint32* dword4 = (uint32*)(&dword128);
 	uint32 ret = ( dword4[0] << 0 )
 		| ( dword4[1] << 8 )

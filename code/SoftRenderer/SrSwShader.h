@@ -1,11 +1,11 @@
 /**
   @file shading.h
 
-  @brief ×ÅÉ«ÓÃÍ¼ÐÎËã·¨
+  @brief ï¿½ï¿½É«ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ã·¨
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -18,9 +18,9 @@
 #include "SrShader.h"
 
 /**
- *@brief ShadingMode»ùÀà
- *@remark ShaderÀà£¬º­¸ÇÎïÌåµÄ×ÅÉ«²ßÂÔ¡£ÆäÖÐVS,RS,PSÃ¿ÖÖ×ÅÉ«±ØÐëÊµÏÖ
-   PATCH SHADERÎª¹âÕ¤»¯Ç°¶Ô¶ÀÁ¢Èý½ÇÃæÆ¬µÄ´¦Àí»ú»á£¬ÐèÒª´¦ÀíÕâÒ»½×¶ÎµÄ×ÅÉ«²ßÂÔ¿ÉÒÔÑ¡ÔñÊµÏÖ¡£
+ *@brief ShadingModeï¿½ï¿½ï¿½ï¿½
+ *@remark Shaderï¿½à£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½Ô¡ï¿½ï¿½ï¿½ï¿½ï¿½VS,RS,PSÃ¿ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½
+   PATCH SHADERÎªï¿½ï¿½Õ¤ï¿½ï¿½Ç°ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½á£¬ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½×¶Îµï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½Ô¿ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½Êµï¿½Ö¡ï¿½
  */
 class SrSwShader : public SrResource
 {
@@ -29,7 +29,7 @@ public:
 	virtual ~SrSwShader(void) {}
 
 	/**
-	 *@brief Patch Shader, ÔÚ¹âÕ¤»¯Ç°£¬¶ÔÈý½ÇÃæÈý¸ö¶¥µã½øÐÐÖØÐÂÔËËãµÄ×ÅÉ«Æ÷¡£¼Ì³ÐµÄ×ÅÉ«²ßÂÔ°´ÐèÊµÏÖ¡£
+	 *@brief Patch Shader, ï¿½Ú¹ï¿½Õ¤ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Ì³Ðµï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½Ô°ï¿½ï¿½ï¿½Êµï¿½Ö¡ï¿½
 	 *@return void 
 	 *@param void * vOut 
 	 *@param void * vOut1 
@@ -49,36 +49,36 @@ public:
 };
 
 /**
- *@brief ÇÐÏßµÄ¼ÆËãº¯Êý
- *@return float4 ·µ»ØµÄÇÐÏß
- *@param const float3 & position1 Õâ¸ö¶¥µãµÄÄ£ÐÍ¿Õ¼äÎ»ÖÃ
- *@param const float3 & position2 Í¬ÔÚÈý½ÇÐÎµÄµÚÒ»¸ö¶¥µã
- *@param const float3 & position3 Í¬ÔÚÈý½ÇÐÎµÄµÚ¶þ¸ö¶¥µã
- *@param float2 uv1 Õâ¸ö¶¥µãµÄuv
+ *@brief ï¿½ï¿½ï¿½ßµÄ¼ï¿½ï¿½ãº¯ï¿½ï¿½
+ *@return float4 ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param const float3 & position1 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½Í¿Õ¼ï¿½Î»ï¿½ï¿½
+ *@param const float3 & position2 Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎµÄµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param const float3 & position3 Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎµÄµÚ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param float2 uv1 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uv
  *@param float2 uv2 ..
  *@param float2 uv3 ..
  */
 static inline float4 CalculateTangentSpaceVector(const float3& position1, const float3& position2, const float3& position3,
 	float2& uv1, float2& uv2, float2& uv3)
 {
-	// ¼ÆËã³öÈý½ÇÐÎµÄÁ½±ß
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 side0 = position1 - position2;
 	float3 side1 = position3 - position1;
-	// ²å³ËµÃ³ö·¨Ïß
+	// ï¿½ï¿½ËµÃ³ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 normal = side1 % side0;
 	normal.normalize();
-	// µÃ³ötangent·½Ïò
+	// ï¿½Ã³ï¿½tangentï¿½ï¿½ï¿½ï¿½
 	float deltaV0 = uv1.y - uv2.y;
 	float deltaV1 = uv3.y - uv1.y;
 	float3 tangent = side0 * deltaV1- side1 * deltaV0;
 	tangent.normalize();
-	// µÃ³öbinormal·½Ïò
+	// ï¿½Ã³ï¿½binormalï¿½ï¿½ï¿½ï¿½
 	float deltaU0 = uv1.x - uv2.x;
 	float deltaU1 = uv3.x - uv1.x;
 	float3 binormal = side0 * deltaU1 - side1 * deltaU0;
 	binormal.normalize();
 
-	// ÖØÐÂ¼ÆËãnormal£¬Èç¹ûºÍ³õÊ¼normalÏà·´£¬ÔòxyÔö³¤·½Ïò²»Ò»ÖÂ£¬ÐèÒª¾ÀÕý
+	// ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½normalï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í³ï¿½Ê¼normalï¿½à·´ï¿½ï¿½ï¿½ï¿½xyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Â£ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½
 	float3 tangentCross = tangent % binormal;
 	float flip = 1.f;
 	if ( float3::dot(tangentCross,normal) < 0.0f)
@@ -92,18 +92,18 @@ static inline float4 CalculateTangentSpaceVector(const float3& position1, const 
 }
 
 /**
- *@brief Blinn-Phong¹âÕÕÄ£ÐÍ
+ *@brief Blinn-Phongï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
  *@return void 
- *@param float3 normalDir ·¨Ïß·½Ïò
- *@param float3 lightDir ¹âÕÕ·½Ïò
- *@param float3 viewDir ÊÓÏß·½Ïò
- *@param float power ¹âÔó¶È
- *@param float & diffuse Êä³öµÄdiffuse
- *@param float & specular Êä³öµÄspecular
+ *@param float3 normalDir ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½
+ *@param float3 lightDir ï¿½ï¿½ï¿½Õ·ï¿½ï¿½ï¿½
+ *@param float3 viewDir ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½
+ *@param float power ï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param float & diffuse ï¿½ï¿½ï¿½ï¿½ï¿½diffuse
+ *@param float & specular ï¿½ï¿½ï¿½ï¿½ï¿½specular
  */
 static inline void BlinnBRDF( float3& normalDir, float3& lightDir, float3& viewDir, float power, float& diffuse, float& specular )
 {
-	// LambertÂþ·´Éä
+	// Lambertï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float NdotL = float3::dot( normalDir, lightDir );
 	diffuse = Clamp( NdotL, 0.f, 1.f );
 
@@ -115,11 +115,11 @@ static inline void BlinnBRDF( float3& normalDir, float3& lightDir, float3& viewD
 
 static inline void Kajiya_Kay_BRDF( float3& normalDir, float3& tangentDir, float3& lightDir, float3& viewDir, float power, float& diffuse, float& specular )
 {
-	// Kajiya_KayÂþ·´Éä
+	// Kajiya_Kayï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	//float TdotL = float3::dot( tangentDir, lightDir );
 	//diffuse = sqrt(1.f - TdotL * TdotL );
 
-	// Half-LambertÂþ·´Éä
+	// Half-Lambertï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float NdotL = float3::dot( normalDir, lightDir );
 	diffuse = Clamp( NdotL * 0.5f + 0.5f, 0.f, 1.f );
 
@@ -131,18 +131,18 @@ static inline void Kajiya_Kay_BRDF( float3& normalDir, float3& tangentDir, float
 }
 
 /**
- *@brief Phong¹âÕÕÄ£ÐÍ
+ *@brief Phongï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
  *@return void 
- *@param float3 normalDir ·¨Ïß·½Ïò
- *@param float3 lightDir ¹âÕÕ·½Ïò
- *@param float3 viewDir ÊÓÏß·½Ïò
- *@param float power ¹âÔó¶È
- *@param float & diffuse Êä³öµÄdiffuse
- *@param float & specular Êä³öµÄspecular
+ *@param float3 normalDir ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½
+ *@param float3 lightDir ï¿½ï¿½ï¿½Õ·ï¿½ï¿½ï¿½
+ *@param float3 viewDir ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½
+ *@param float power ï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param float & diffuse ï¿½ï¿½ï¿½ï¿½ï¿½diffuse
+ *@param float & specular ï¿½ï¿½ï¿½ï¿½ï¿½specular
  */
 static inline void PhongBRDF( float3& normalDir, float3& lightDir, float3& viewDir, float power, float& diffuse, float& specular )
 {
-	// LambertÂþ·´Éä
+	// Lambertï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float NdotL = float3::dot( normalDir, lightDir );
 	diffuse = Clamp( NdotL, 0.f, 1.f );
 
@@ -153,7 +153,7 @@ static inline void PhongBRDF( float3& normalDir, float3& lightDir, float3& viewD
 }
 
 /**
- *@brief ¿ìËÙ·ÆÄù¶ûËã·¨
+ *@brief ï¿½ï¿½ï¿½Ù·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã·¨
  *@return float 
  *@param float NdotE 
  *@param float bias 
@@ -166,7 +166,7 @@ static inline float GetFresnel(float NdotE, float bias, float power, float scale
 }
 
 /**
- *@brief nvµÄ¿ìËÙ´Î±íÃæÉøÍ¸Ä£Äâ
+ *@brief nvï¿½Ä¿ï¿½ï¿½Ù´Î±ï¿½ï¿½ï¿½ï¿½ï¿½Í¸Ä£ï¿½ï¿½
  *@return void 
  *@param float NdotL 
  *@param float RollOff 
@@ -178,19 +178,19 @@ static inline void nvLambSkin(float NdotL,
 	) 
 {
 	subSurface = SmoothStep(-RollOff,1.0f,NdotL) - SmoothStep(1.0f,NdotL);
-	subSurface = max(0.0f,subSurface);
+	subSurface = fmax(0.0f,subSurface);
 }
 
 
 /**
- *@brief Ò»°ã¹âÔ´µÄ¶à¹âÔ´¹âÕÕÔËËã
+ *@brief Ò»ï¿½ï¿½ï¿½Ô´ï¿½Ä¶ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  *@return void 
- *@param const SrShaderContext * context ÉÏÏÂÎÄ
- *@param float3 worldPos ÔªËØµÄÊÀ½ç¿Õ¼ä×ø±ê
- *@param float3 normalDir ÔªËØµÄÊÀ½ç¿Õ¼ä·¨ÏòÁ¿
- *@param float3 viewWS ÔªËØµÄÊÀ½ç¿Õ¼äÊÓÏß
- *@param float4 & diffuseAcc ·µ»ØµÄÂþ·´Éä¾Û¼¯
- *@param float4 & specularAcc ·µ»ØµÄ¾µÃæ·´Éä¾Û¼¯
+ *@param const SrShaderContext * context ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param float3 worldPos Ôªï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param float3 normalDir Ôªï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä·¨ï¿½ï¿½ï¿½ï¿½
+ *@param float3 viewWS Ôªï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½
+ *@param float4 & diffuseAcc ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Û¼ï¿½
+ *@param float4 & specularAcc ï¿½ï¿½ï¿½ØµÄ¾ï¿½ï¿½æ·´ï¿½ï¿½Û¼ï¿½
  */
 static inline void CalcLights( const SrShaderContext* context, float3& worldPos, float3& normalDir, float3& viewWS, float4 &diffuseAcc, float4 &specularAcc )
 {
@@ -198,18 +198,18 @@ static inline void CalcLights( const SrShaderContext* context, float3& worldPos,
 
 	for (uint32 i=0; i < context->lightList.size(); ++i)
 	{
-		// µã¹âÔ´£¬È¡µÃ¹âÕÕ·½Ïò
+		// ï¿½ï¿½ï¿½Ô´ï¿½ï¿½È¡ï¿½Ã¹ï¿½ï¿½Õ·ï¿½ï¿½ï¿½
 		SrLight* lt = context->lightList[i];
 		float3 lightPosWS = lt->worldPos;
 		float3 lightDirWS = lightPosWS - worldPos;
 		lightDirWS.normalize();
 
-		// ¹âÕÕ¼ÆËã
+		// ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½
 		float diffuse;
 		float specular;
 		BlinnBRDF(normalDir, lightDirWS, viewWS, cBuffer->glossness, diffuse, specular);
 
-		// ÀÛ¼Óµ½¾Û¼¯
+		// ï¿½Û¼Óµï¿½ï¿½Û¼ï¿½
 		diffuseAcc += (lt->diffuseColor * diffuse);
 		specularAcc += (lt->specularColor * specular);
 	}
@@ -223,25 +223,25 @@ static inline void CalcLightsKajiya_Kay( const SrShaderContext* context, float3&
 
 	for (uint32 i=0; i < context->lightList.size(); ++i)
 	{
-		// µã¹âÔ´£¬È¡µÃ¹âÕÕ·½Ïò
+		// ï¿½ï¿½ï¿½Ô´ï¿½ï¿½È¡ï¿½Ã¹ï¿½ï¿½Õ·ï¿½ï¿½ï¿½
 		SrLight* lt = context->lightList[i];
 		float3 lightPosWS = lt->worldPos;
 		float3 lightDirWS = lightPosWS - worldPos;
 		lightDirWS.normalize();
 
-		// ¹âÕÕ¼ÆËã
+		// ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½
 		float diffuse;
 		float specular;
 		Kajiya_Kay_BRDF(normalDir, tangentDir, lightDirWS, viewWS, cBuffer->glossness, diffuse, specular);
 
-		// ÀÛ¼Óµ½¾Û¼¯
+		// ï¿½Û¼Óµï¿½ï¿½Û¼ï¿½
 		diffuseAcc += (lt->diffuseColor * diffuse);
 		specularAcc += (lt->specularColor * specular);
 	}
 }
 
 /**
- *@brief Õë¶Ô¶à¹âÔ´µÄÆ¤·ô¹âÕÕÔËËã
+ *@brief ï¿½ï¿½Ô¶ï¿½ï¿½Ô´ï¿½ï¿½Æ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  *@return void 
  *@param const SrShaderContext * context 
  *@param float3 worldPos 
@@ -262,7 +262,7 @@ static inline void CalcLightsSkin( const SrShaderContext* context, float3& world
 		float3 lightDirWS = lightPosWS - worldPos;
 		lightDirWS.normalize();
 
-		// ¹âÕÕ¼ÆËã
+		// ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½
 		float diffuse;
 		float specular;
 		float subSurface;

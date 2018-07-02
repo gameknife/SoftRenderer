@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -41,7 +41,7 @@ SrSoftRenderer::~SrSoftRenderer(void)
 
 bool SrSoftRenderer::InitRenderer(int width, int height, int bpp )
 {
-	// ´´½¨¹âÕ¤»¯´¦ÀíÆ÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_rasterizer = new SrRasterizer;
 	m_rasterizer->Init(this);
 
@@ -212,7 +212,7 @@ bool SrSoftRenderer::SetShaderConstant( uint32 slot, const float* constantStart,
 	return true;
 }
 
-uint32 SrSoftRenderer::Tex2D( float2& texcoord, const SrTexture* texture  ) const
+uint32 SrSoftRenderer::Tex2D( const float2& texcoord, const SrTexture* texture  ) const
 {
 	uint32 ret = 0x00000000;
 	if (texture)

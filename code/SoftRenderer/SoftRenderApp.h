@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  更改日志 history
+  锟斤拷锟斤拷锟斤拷志 history
   ver:1.0
    
  */
@@ -20,7 +20,7 @@ class SoftRenderApp
 public:
 	SoftRenderApp(void);
 	virtual ~SoftRenderApp(void);
-	BOOL Init();
+	bool Init();
 	void Destroy();
 	void Run();
 

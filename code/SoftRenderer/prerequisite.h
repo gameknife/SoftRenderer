@@ -1,11 +1,11 @@
 /**
   @file prerequisite.h
   
-  @brief Ç°Ìá£¬ËùÓĞÍ·ÎÄ¼ş¾ùÒıÈë´ËÎÄ¼ş
+  @brief å‰æï¼Œæ‰€æœ‰å¤´æ–‡ä»¶å‡å¼•å…¥æ­¤æ–‡ä»¶
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -52,13 +52,13 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-// È«¾Ö¿ª¹Ø
+// å…¨å±€å¼€å…³
 
-// ¹âÕ¤»¯Í¬²½_ĞŞÕı¶àÏß³Ì¹âÕ¤»¯¿ÉÄÜÔì³ÉµÄZ³åÍ»
+// å…‰æ …åŒ–åŒæ­¥_ä¿®æ­£å¤šçº¿ç¨‹å…‰æ …åŒ–å¯èƒ½é€ æˆçš„Zå†²çª
 #define RASTERIZER_SYNC
-// ¹Ì¶¨º¯Êı¹âÕ¤»¯µ÷ÓÃ
+// å›ºå®šå‡½æ•°å…‰æ …åŒ–è°ƒç”¨
 //#define FIXED_FUNCTION_RASTERIZOR
-// SIMD¼ÓËÙ
+// SIMDåŠ é€Ÿ
 //#define SR_USE_SIMD
 
 // Windows Header Files:
@@ -69,6 +69,14 @@
 #ifdef SR_USE_SIMD
 #include <future>
 #endif
+
+/////////////////////////////
+// mm_malloc for mac
+#ifndef OS_WIN32
+#define _mm_malloc(a,b) malloc(a)
+#define _mm_free(a) free(a)
+#endif
+//
 
 //////////////////////////////////////////////////////////////////////////
 // stl
@@ -81,7 +89,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 // assert
-#if defined( SR_PROFILE ) && defined ( NDEBUG )	// µ±ÔÚRELEASEÄ£Ê½ÏÂ£¬¿ªÆôSR_PROFILEÊ±£¬´ò¿ªassert
+#if defined( SR_PROFILE ) && defined ( NDEBUG )	// å½“åœ¨RELEASEæ¨¡å¼ä¸‹ï¼Œå¼€å¯SR_PROFILEæ—¶ï¼Œæ‰“å¼€assert
 #undef NDEBUG
 #include <assert.h>
 #define NDEBUG
@@ -89,14 +97,18 @@
 #include <assert.h>
 #endif
 
-// ÄÚ´æ¶ÔÆë
+// å†…å­˜å¯¹é½
+#ifdef OS_WIN32
 #define SR_ALIGN _CRT_ALIGN(16)
+#else
+#define SR_ALIGN
+#endif
 
-// fastcallÉùÃ÷
+// fastcallå£°æ˜
 #define SRFASTCALL __fastcall
 
 //////////////////////////////////////////////////////////////////////////
-// ¹¤¾ß°ü
+// å·¥å…·åŒ…
 #include "math_def.h"
 #include "pathutil.h"
 #include "timer.h"
@@ -108,21 +120,21 @@
 extern std::string g_rootPath;
 
 //////////////////////////////////////////////////////////////////////////
-// äÖÈ¾¹æ¸ñÅäÖÃ
+// æ¸²æŸ“è§„æ ¼é…ç½®
 #define SR_MAX_TEXTURE_STAGE_NUM 16
 #define FBUFFER_CHANNEL_SIZE 4
 #define SR_GREYSCALE_CLEARCOLOR 0x1
 #define SR_SHADER_CONSTANTS_NUM 8
 
-// Èí¼ş¹âÕ¤»¯·Ö¿é²ßÂÔ
-// ´Ëblock´óĞ¡¾ö¶¨ÁËÃ¿´ÎÏß³ÌTASK·Ö·¢µÄtask¸öÊı
-// ĞèÒª¶à´Î²âÊÔµÃµ½Ò»¸ö½ÏºÃµÄÖµ
-#define VERTEX_TASK_BLOCK 64			///< VertexShaderÈÎÎñ·Ö¿é´óĞ¡
-#define PIXEL_TASK_BLOCK 64				///< PixelShaderÈÎÎñ·Ö¿é´óĞ¡
-#define RASTERIZE_TASK_BLOCK 512		///< RasterizeÈÎÎñ·Ö¿é´óĞ¡
+// è½¯ä»¶å…‰æ …åŒ–åˆ†å—ç­–ç•¥
+// æ­¤blockå¤§å°å†³å®šäº†æ¯æ¬¡çº¿ç¨‹TASKåˆ†å‘çš„taskä¸ªæ•°
+// éœ€è¦å¤šæ¬¡æµ‹è¯•å¾—åˆ°ä¸€ä¸ªè¾ƒå¥½çš„å€¼
+#define VERTEX_TASK_BLOCK 64			///< VertexShaderä»»åŠ¡åˆ†å—å¤§å°
+#define PIXEL_TASK_BLOCK 64				///< PixelShaderä»»åŠ¡åˆ†å—å¤§å°
+#define RASTERIZE_TASK_BLOCK 512		///< Rasterizeä»»åŠ¡åˆ†å—å¤§å°
 
 //////////////////////////////////////////////////////////////////////////
-// UIÏÔÊ¾É«²Ê
+// UIæ˜¾ç¤ºè‰²å½©
 #define SR_UICOLOR_HIGHLIGHT 0xffffff
 #define SR_UICOLOR_MAIN		 0xaf7333
 #define SR_UICOLOR_NORMAL    0xcccccc
@@ -148,7 +160,7 @@ inline void* _mm_malloc_16byte(size_t sz, size_t align)
 	if(NULL == pSystemPointer)   {
 		return NULL;
 	}
-	size_t offset = 16 - (((unsigned int)pSystemPointer ) % 16);
+	size_t offset = 16 - (((uint64)pSystemPointer ) % 16);
 
 	m_align_pt_mapper[pSystemPointer + offset] = pSystemPointer;
 
@@ -164,7 +176,7 @@ inline void _mm_free_16byte(void* p)
 #define _mm_free_custom _mm_free_16byte
 
 //////////////////////////////////////////////////////////////////////////
-// ÖÃÇ°ÉùÃ÷
+// ç½®å‰å£°æ˜
 class IRenderer;
 struct SrRendPrimitve;
 class IProfiler;
@@ -182,13 +194,12 @@ struct ILogger;
 struct SrRendContext;
 
 typedef std::vector<SrShader*> SrShaderList;
-typedef std::vector<HMODULE> SrHandleList;
 
 //////////////////////////////////////////////////////////////////////////
-// È«¾Ö»·¾³
+// å…¨å±€ç¯å¢ƒ
 
 /**
- *@brief È«¾Ö»·¾³£¬ÓÃÓÚÈ«¾Ö»·¾³È¡µÃÖ÷ÒªÄ£¿éÖ¸Õë
+ *@brief å…¨å±€ç¯å¢ƒï¼Œç”¨äºå…¨å±€ç¯å¢ƒå–å¾—ä¸»è¦æ¨¡å—æŒ‡é’ˆ
  */
 struct GlobalEnvironment
 {
@@ -264,10 +275,10 @@ inline void GtLogError( const char* format, ... )
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Ã¶¾Ù
+// æšä¸¾
 
 /**
- *@brief VB¸ñÊ½, ÔİÊ±Ö»Ê¹ÓÃP3N3T2
+ *@brief VBæ ¼å¼, æš‚æ—¶åªä½¿ç”¨P3N3T2
  */
 enum ESrVertDecl
 {
@@ -281,7 +292,7 @@ enum ESrVertDecl
 };
 
 /**
- *@brief ¾ØÕó×é
+ *@brief çŸ©é˜µç»„
  */
 enum EMatrixDefine
 {
@@ -295,7 +306,7 @@ enum EMatrixDefine
 };
 
 /**
- *@brief ¹âÕ¤»¯·½Ê½
+ *@brief å…‰æ …åŒ–æ–¹å¼
  */
 enum ERasterizeMode
 {
@@ -305,16 +316,16 @@ enum ERasterizeMode
 };
 
 /**
- *@brief ²ÉÑùÂË¾µ
+ *@brief é‡‡æ ·æ»¤é•œ
  */
 enum ESamplerFilter
 {
-	eSF_Nearest,		///< ÁÙ½üµã²ÉÑù
-	eSF_Linear,			///< Ë«ÏßĞÔ¹ıÂË
+	eSF_Nearest,		///< ä¸´è¿‘ç‚¹é‡‡æ ·
+	eSF_Linear,			///< åŒçº¿æ€§è¿‡æ»¤
 };
 
 /**
- *@brief äÖÈ¾Æ÷×´Ì¬
+ *@brief æ¸²æŸ“å™¨çŠ¶æ€
  */
 enum ERenderingState
 {
@@ -324,19 +335,19 @@ enum ERenderingState
 };
 
 /**
- *@brief äÖÈ¾ÌØĞÔ
+ *@brief æ¸²æŸ“ç‰¹æ€§
  */
 enum ERenderFeature
 {
-	eRFeature_JitAA = 1<<0,						///< ¶¶¶¯¿¹¾â³İ
-	eRFeature_MThreadRendering = 1<<1,			///< ¶àÏß³ÌäÖÈ¾
-	eRFeature_LinearFiltering = 1<<2,			///< Ë«ÏßĞÔ²ÉÑù
-	eRFeature_DotCoverageRendering = 1<<3,		///< Dot¿Õ¶´äÖÈ¾
-	eRFeature_InterlaceRendering = 1<<4,		///< Dot¿Õ¶´äÖÈ¾
+	eRFeature_JitAA = 1<<0,						///< æŠ–åŠ¨æŠ—é”¯é½¿
+	eRFeature_MThreadRendering = 1<<1,			///< å¤šçº¿ç¨‹æ¸²æŸ“
+	eRFeature_LinearFiltering = 1<<2,			///< åŒçº¿æ€§é‡‡æ ·
+	eRFeature_DotCoverageRendering = 1<<3,		///< Dotç©ºæ´æ¸²æŸ“
+	eRFeature_InterlaceRendering = 1<<4,		///< Dotç©ºæ´æ¸²æŸ“
 };
 
 /**
- *@brief ×ÊÔ´ÀàĞÍ
+ *@brief èµ„æºç±»å‹
  */
 enum EResourceType
 {
@@ -363,10 +374,10 @@ enum EShaderConstantsSlot
 	eSC_ShaderConstantCount = SR_SHADER_CONSTANTS_NUM * 2,
 };
 //////////////////////////////////////////////////////////////////////////
-// ¹«¹²äÖÈ¾½á¹¹¶¨Òå
+// å…¬å…±æ¸²æŸ“ç»“æ„å®šä¹‰
 
 /**
- *@brief Í¨ÓÃobjÄ£ĞÍµÄ¶¥µã¸ñÊ½
+ *@brief é€šç”¨objæ¨¡å‹çš„é¡¶ç‚¹æ ¼å¼
  */
 SR_ALIGN struct SrVertexP3N3T2
 {
@@ -378,7 +389,7 @@ SR_ALIGN struct SrVertexP3N3T2
 };
 
 /**
- *@brief äÖÈ¾¶¥µã, DrawPrimitveÊ±ÀûÓÃPrimitive¹¹ÔìĞÂ¶¥µã
+ *@brief æ¸²æŸ“é¡¶ç‚¹, DrawPrimitveæ—¶åˆ©ç”¨Primitiveæ„é€ æ–°é¡¶ç‚¹
  */
 SR_ALIGN struct SrRendVertex
 {
@@ -393,7 +404,7 @@ SR_ALIGN struct SrRendVertex
 };
 
 /**
- *@brief ÏñËØbufferµÄ½á¹¹¶¨Òå
+ *@brief åƒç´ bufferçš„ç»“æ„å®šä¹‰
  */
 SR_ALIGN struct SrFragment
 {
@@ -408,25 +419,25 @@ SR_ALIGN struct SrFragment
 			float4 preserve;
 		};
 	};	
-	///< 4 x float4 µÄÊı¾İ·¶Î§
-	SrRendPrimitve*	primitive;	///< primitiveË÷Òı
+	///< 4 x float4 çš„æ•°æ®èŒƒå›´
+	SrRendPrimitve*	primitive;	///< primitiveç´¢å¼•
 };
 
 struct SrFragmentBufferSync
 {
 	SrFragmentBufferSync() {
-		InitializeCriticalSection(&cs);
+		//InitializeCriticalSection(&cs);
 		//InitializeSRWLock(&srwLock);
 	}
 	~SrFragmentBufferSync() {
-		DeleteCriticalSection(&cs);
+		//DeleteCriticalSection(&cs);
 	}
-	CRITICAL_SECTION cs;
+	//CRITICAL_SECTION cs;
 	//SRWLOCK srwLock;
 };
 
 /**
- *@brief ÀàĞÍÎŞ¹ØµÄVertexBuffer½á¹¹ 
+ *@brief ç±»å‹æ— å…³çš„VertexBufferç»“æ„ 
  */
 SR_ALIGN struct SrVertexBuffer
 {
@@ -451,7 +462,7 @@ SR_ALIGN struct SrVertexBuffer
 };
 
 /**
- *@brief ÊÓ¿Ú½á¹¹
+ *@brief è§†å£ç»“æ„
  */
 SR_ALIGN struct SrViewport
 {
@@ -471,7 +482,7 @@ SR_ALIGN struct SrViewport
 };
 
 /**
- *@brief IndexBuffer½á¹¹
+ *@brief IndexBufferç»“æ„
  */
 SR_ALIGN struct SrIndexBuffer
 {
@@ -515,7 +526,7 @@ SR_ALIGN struct SrIndexBuffer
 };
 
 /**
- *@brief ¼¸ºÎÌå½á¹¹
+ *@brief å‡ ä½•ä½“ç»“æ„
  */
 SR_ALIGN struct SrPrimitve
 {
@@ -524,13 +535,13 @@ SR_ALIGN struct SrPrimitve
 
 	SrVertexBuffer*		cachedVb;
 
-	SrMaterial*			material;	///< ²ÄÖÊ
+	SrMaterial*			material;	///< æè´¨
 
 	bool				skined;
 };
 
 /**
- *@brief µÆ¹â½á¹¹
+ *@brief ç¯å…‰ç»“æ„
  */
 SR_ALIGN struct SrLight
 {
@@ -548,17 +559,17 @@ SR_ALIGN struct SrLight
 
 
 //////////////////////////////////////////////////////////////////////////
-// ½á¹¹¶ÓÁĞ¶¨Òå
-typedef std::vector<SrPrimitve> SrPrimitives;					///< ¼¸ºÎÌå¶ÓÁĞ
-typedef std::vector<SrLight*> SrLightList;						///< µÆ¹â¶ÓÁĞ
-typedef std::vector<float44> SrMatrixArray;						///< ¾ØÕó¶ÓÁĞ
-typedef std::vector<const SrTexture*> SrBitmapArray;			///< ÎÆÀí·ÃÎÊ¶ÓÁĞ
-typedef std::vector<SrVertexBuffer*> SrVertexBufferArray;		///< VB¶ÓÁĞ
-typedef std::vector<SrIndexBuffer*> SrIndexBufferArray;			///< IB¶ÓÁĞ
+// ç»“æ„é˜Ÿåˆ—å®šä¹‰
+typedef std::vector<SrPrimitve> SrPrimitives;					///< å‡ ä½•ä½“é˜Ÿåˆ—
+typedef std::vector<SrLight*> SrLightList;						///< ç¯å…‰é˜Ÿåˆ—
+typedef std::vector<float44> SrMatrixArray;						///< çŸ©é˜µé˜Ÿåˆ—
+typedef std::vector<const SrTexture*> SrBitmapArray;			///< çº¹ç†è®¿é—®é˜Ÿåˆ—
+typedef std::vector<SrVertexBuffer*> SrVertexBufferArray;		///< VBé˜Ÿåˆ—
+typedef std::vector<SrIndexBuffer*> SrIndexBufferArray;			///< IBé˜Ÿåˆ—
 
 /**
- *@brief Í¨ÓÃConstant Buffer
- *@remark cBuffer×î´óÖ»Ö§³Ö8¸öfloat4, ¼´32¸ö¸¡µãÊı£¬¶¨ÒåµÄÊ±ºò×¢Òâ´óĞ¡¡£
+ *@brief é€šç”¨Constant Buffer
+ *@remark cBufferæœ€å¤§åªæ”¯æŒ8ä¸ªfloat4, å³32ä¸ªæµ®ç‚¹æ•°ï¼Œå®šä¹‰çš„æ—¶å€™æ³¨æ„å¤§å°ã€‚
  */
 struct SrPixelShader_Constants
 {
@@ -592,7 +603,7 @@ struct IResourceManager
 	virtual void				InitDefaultMedia() =0;
 	virtual SrDefaultMediaPack*	getDefaultMediaPack() =0;
 
-	// BufferÉêÇë
+	// Bufferç”³è¯·
 	virtual SrVertexBuffer* AllocateVertexBuffer(uint32 elementSize, uint32 count, bool fastmode = false) =0;
 	virtual bool DeleteVertexBuffer(SrVertexBuffer* target) =0;
 	virtual SrIndexBuffer*	AllocateIndexBuffer(uint32 count) =0;

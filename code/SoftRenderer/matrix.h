@@ -1,11 +1,11 @@
 /**
   @file matrix.h
   
-  @brief SoftRendererÊıÑ§¿â£º¾ØÕóÀà
+  @brief SoftRendererï¿½ï¿½Ñ§ï¿½â£ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -17,7 +17,7 @@
 #define SR_MATRIX44_INDEX( c , r ) ( c * 4 + r )
 
 /**
-	*@brief float33 ÈıÎ¬¾ØÕóÀà£¬Ìá¹©ÈıÎ¬¾ØÕóµÄ»ù±¾ÔËËã²Ù×÷¡£
+	*@brief float33 ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ï¿½á¹©ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 SR_ALIGN struct float33
 {
@@ -169,7 +169,7 @@ public:
 
 
 /**
-	*@brief float44 ËÄÎ¬¾ØÕóÀà£¬Ìá¹©ËÄÎ¬¾ØÕóµÄ»ù±¾ÔËËã²Ù×÷£¬¼°Ò»Ğ©ÌØÊâ¾ØÕóµÄ¹¹Ôì¡£
+	*@brief float44 ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ï¿½á¹©ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ğ©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½ì¡£
 */
 SR_ALIGN struct float44
 {
@@ -223,7 +223,7 @@ public:
 	}
 
 	/**
-	 *@brief È¡ÔªËØ
+	 *@brief È¡Ôªï¿½ï¿½
 	 *@return float * 
 	 *@param const int p 
 	 */
@@ -233,7 +233,7 @@ public:
 	}
 
 	/**
-	 *@brief ¾ØÕó³Ë·¨
+	 *@brief ï¿½ï¿½ï¿½ï¿½Ë·ï¿½
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -246,7 +246,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ¾ØÕó¼Ó·¨
+	 *@brief ï¿½ï¿½ï¿½ï¿½Ó·ï¿½
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -259,7 +259,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ¾ØÕó³Ë·¨
+	 *@brief ï¿½ï¿½ï¿½ï¿½Ë·ï¿½
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -288,7 +288,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ¾ØÕóÏà¼Ó
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -302,7 +302,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ¾ØÕóÏà¼õ
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -316,7 +316,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ¾ØÕóÏà³Ë
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -341,7 +341,7 @@ public:
 	}
 	
 	/**
-	 *@brief ±ä»»4Î¬ÏòÁ¿
+	 *@brief ï¿½ä»»4Î¬ï¿½ï¿½ï¿½ï¿½
 	 *@return float4 
 	 *@param const float4 & p 
 	 */
@@ -354,7 +354,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief Ğı×ª3Î¬ÏòÁ¿
+	 *@brief ï¿½ï¿½×ª3Î¬ï¿½ï¿½ï¿½ï¿½
 	 *@return float3 
 	 *@param const float3 & p 
 	 */
@@ -366,7 +366,7 @@ public:
 		return tmp;
 	}		
 	/**
-	 *@brief ¾ØÕóÏàËÆÅĞ¶Ï
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½
 	 *@return bool 
 	 *@param const float44 & p 
 	 */
@@ -382,7 +382,7 @@ public:
 		return true;
 	}
 	/**
-	 *@brief ¾ØÕóÏàËÆÅĞ¶Ï
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½
 	 *@return bool 
 	 *@param const float44 & p 
 	 */
@@ -398,7 +398,7 @@ public:
 		return false;
 	}
 	/**
-	 *@brief ÀûÓÃËÄÎ¬¾ØÕó±ä»»ÏòÁ¿
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ä»»ï¿½ï¿½ï¿½ï¿½
 	 *@return float3 
 	 *@param const float3 & p 
 	 */
@@ -410,7 +410,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ÀûÓÃËÄÎ¬¾ØÕóĞı×ªÏòÁ¿
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½
 	 *@return float3 
 	 *@param const float3 & p 
 	 */
@@ -434,7 +434,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ×óÊÖÏµµÄÊÓÍ¼¾ØÕó¹¹Ôì
+	 *@brief ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 & 
 	 *@param float3 & from 
 	 *@param float3 & to 
@@ -457,7 +457,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ÓÒÊÖÏµµÄÊÓÍ¼¾ØÕó¹¹Ôì
+	 *@brief ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 & 
 	 *@param const float3 & from 
 	 *@param const float3 & to 
@@ -479,7 +479,7 @@ public:
 		return *this;
 	}
  	/**
- 	 *@brief ×óÊÖÏµµÄÍ¸ÊÓ¾ØÕó¹¹Ôì
+ 	 *@brief ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Í¸ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½
  	 *@return float44 & 
  	 *@param float fovy 
  	 *@param float aspect 
@@ -507,7 +507,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ÓÒÊÖÏµµÄÍ¸ÊÓ¾ØÕó¹¹Ôì
+	 *@brief ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Í¸ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 & 
 	 *@param float fovy 
 	 *@param float aspect 
@@ -528,7 +528,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief Çó×ªÖÃ
+	 *@brief ï¿½ï¿½×ªï¿½ï¿½
 	 *@return void 
 	 */
 	inline void Transpose()
@@ -536,7 +536,7 @@ public:
 		Transpose(*this);
 	}
 	/**
-	 *@brief ¾ØÕóÇó×ªÖÃ
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
 	 *@return void 
 	 *@param const float44 & M 
 	 */
@@ -560,9 +560,9 @@ public:
 	}
 
 	/**
-	 *@brief ¾ØÕóÇóÄæ
+	 *@brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return void 
-	 *@remark ¶ÔÓÚÕı½»¾ØÕó£¬Ö±½ÓÊ¹ÓÃTRANSPOSEÇóÄæ£¬·Ç³£¿ìËÙ
+	 *@remark ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Ê¹ï¿½ï¿½TRANSPOSEï¿½ï¿½ï¿½æ£¬ï¿½Ç³ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	inline void Inverse()
 	{
@@ -640,13 +640,13 @@ public:
 
 
 	/**
-	 *@brief ÀûÓÃscale, rotation, position¹¹ÔìĞÂµÄÊÀ½ç¾ØÕó
+	 *@brief ï¿½ï¿½ï¿½ï¿½scale, rotation, positionï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *@return void 
 	 *@param const float3 & s 
 	 *@param const Quat & q 
 	 *@param const float3 & t 
 	 */
-	void float44::Set( const float3& s, const Quat& q, const float3& t ) {
+	void Set( const float3& s, const Quat& q, const float3& t ) {
 		float vxvx=q.v.x*q.v.x;					float vzvz=q.v.z*q.v.z;					float vyvy=q.v.y*q.v.y; 
 		float vxvy=q.v.x*q.v.y;					float vxvz=q.v.x*q.v.z;					float vyvz=q.v.y*q.v.z; 
 		float svx=q.w*q.v.x;					float svy=q.w*q.v.y;					float svz=q.w*q.v.z;
@@ -656,10 +656,10 @@ public:
 	}
 
 	/**
-	 *@brief È¡µÃĞĞÓÅÏÈµÄ¾ØÕóµÄÎ»ÒÆÖµ
+	 *@brief È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÈµÄ¾ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Öµ
 	 *@return float3 
 	 */
-	float3 float44::GetTranslate() const
+	float3 GetTranslate() const
 	{
 #ifdef SR_USE_SIMD
 		return float3(m30, m31, m32);
@@ -670,19 +670,19 @@ public:
 	}
 
 	/**
-	 *@brief ¾²Ì¬º¯Êı£º¹¹Ôìµ¥Î»¾ØÕó
+	 *@brief ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ìµ¥Î»ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 
 	 */
-	static float44 float44::CreateIdentity()
+	static float44 CreateIdentity()
 	{
 		return float44( 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 1 , 0, 0 , 0 , 0 , 1 );
 	}
 
 	/**
-	 *@brief ¾²Ì¬º¯Êı£º¹¹Ôì0¾ØÕó
+	 *@brief ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½
 	 *@return float44 
 	 */
-	static float44 float44::CreateZero()
+	static float44 CreateZero()
 	{
 		return float44( 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 );
 	}
