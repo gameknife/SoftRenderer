@@ -213,8 +213,10 @@ struct GlobalEnvironment
 
 	bool					output = false;
 };
-extern GlobalEnvironment* gEnv;
 
+extern "C" {
+	GlobalEnvironment* gEnv;
+}
 
 #include "SrLogger.h"
 //	 Simple logs of data with low verbosity.

@@ -7,7 +7,7 @@
     "start": "webpack && electron .",
     "build": "webpack",
     "build&run": "webpack && electron .",
-    "nbuild": "cd ./node_natives && node-gyp build --target=1.7.15 --arch=x64 --dist-url=https://atom.io/download/electron"
+    "nbuild": "cd ./node_natives && node-gyp rebuild --target=1.7.15 --arch=x64 --dist-url=https://atom.io/download/electron"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
