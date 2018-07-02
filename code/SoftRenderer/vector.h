@@ -208,7 +208,9 @@ public:
 		struct { float x , y , z; };
 		struct { float r , g , b; };
 		struct { float2 xy; float z; };
+#ifdef SR_USE_SIMD
 		__m128 m128;
+#endif
 	};
 
 	float3()

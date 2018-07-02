@@ -104,39 +104,9 @@ void SrModelViewerApp::OnInit()
 	gEnv->sceneMgr = m_scene;
 
 	m_curr_ent = 0;
-
-	// ´´½¨SPONZA
-	
-	std::string dir = "\\media\\modelviewer\\";
-	getMediaPath(dir);
-
-	//m_ent = m_scene->CreateEntity("model1", "media\\head.obj", "media\\head.mtl");
-	std::vector<std::string> result;
-	enum_all_files_in_folder( dir.c_str(), result ,false );
-
-	for ( int i=0; i < result.size(); ++i )
-	{
-		//if ( result[i] )
-		{
-			char file[MAX_PATH];
-			strcpy( file, result[i].c_str());
-
-			char* ext = strrchr( file, '.' );
-			if (ext && !stricmp( ext, ".obj" ))
-			{
-				*ext = 0;
-
-				std::string filename = "media\\modelviewer\\";
-				std::string objfile = filename + file + ".obj";
-				std::string mtlfile = filename + file + ".mtl";
-				m_ent = m_scene->CreateEntity(file, objfile.c_str(), mtlfile.c_str());
-				m_ents.push_back( m_ent );
-				m_ent->SetScale(float3(40,40,40));
-			}
-		}
-
-	}
-
+	m_ent = m_scene->CreateEntity("object", "\\media\\modelviewer\\teapot.obj", "\\media\\modelviewer\\teapot.mtl");
+	m_ents.push_back(m_ent);
+	m_ent->SetScale(float3(40, 40, 40));
 	
 	//SwitchSSAO();
 

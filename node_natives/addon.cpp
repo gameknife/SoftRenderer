@@ -49,7 +49,7 @@ SoftRenderApp* g_app;
 
 NAN_METHOD(initOfflineSystem) {
 	g_app = new SoftRenderApp();
-	g_app->RegisterTask(new SrModelViewerApp);
+	g_app->RegisterTask(new SrSponzaApp);
 	g_app->Init();
 }
 

@@ -13,6 +13,44 @@
 #ifndef prerequisite_h__
 #define prerequisite_h__
 
+
+
+#if defined(__GNUG__)
+# define COMPILER_GCC
+#elif defined(_MSC_VER)
+# define COMPILER_MSVC
+ // i don't care about your debug symbol issues...
+# pragma warning(disable:4786)
+#else
+# error "Could not determine compiler"
+#endif
+
+ //////////////////////////////////////////////////////////////////////////
+ // OS Judge
+ // Determine OS: after this, one of the following symbols will be
+ // defined: OS_LINUX, OS_WIN32, OS_NETBSD.
+#if defined( __SYMBIAN32__ ) 
+#   define OS_SYMBIAN
+#elif defined( __WIN32__ ) || defined( _WIN32 )
+#   define OS_WIN32
+#elif defined( __APPLE_CC__)
+#   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 40000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000
+#       define OS_IOS
+#   else
+#       define OS_IOS
+#       define OS_APPLE
+#   endif
+#elif defined(__ANDROID__)
+#	define OS_ANDROID
+#else
+#	error "Could not determine OS"
+#endif
+
+#if defined (OS_ANDROID) || defined( OS_IOS ) || defined( OS_APPLE )
+#	define OS_LINUX
+#endif
+
+
 //////////////////////////////////////////////////////////////////////////
 // 全局开关
 
@@ -24,19 +62,18 @@
 //#define SR_USE_SIMD
 
 // Windows Header Files:
+#ifdef OS_WIN32
 #include <windows.h>
+#endif
 
+#ifdef SR_USE_SIMD
 #include <future>
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // stl
 #include <iostream>
-// 修改版本的vector以支持内存对齐
-#if _MSC_VER <= 1600
-#include "myvector"
-#else
 #include <vector>
-#endif
 #include <map>
 #include <string>
 #include <stack>
@@ -63,9 +100,10 @@
 #include "math_def.h"
 #include "pathutil.h"
 #include "timer.h"
-#include "thread.h"
 #include "memfile.h"
-#include "event.h"
+
+#include "IEvent.h"
+#include "IThread.h"
 
 extern std::string g_rootPath;
 

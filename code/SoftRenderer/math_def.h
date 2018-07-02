@@ -201,10 +201,10 @@ static inline uint32 float4_2_uint32( const float4& f )
 #else
 
 #ifdef SR_COLOR_RGBA
-	uint32 ret = ( ( ( uint8 )( f.x * 0xFF ) ) << 16 )
+	uint32 ret = ( ( ( uint8 )( f.x * 0xFF ) ) << 0 )
 		| ( ( ( uint8 )( f.y * 0xFF ) ) << 8 )
-		| ( ( ( uint8 )( f.z * 0xFF ) ) << 0 )
-		| ( ( uint8 )( f.w * 0xFF ) << 24 );
+		| ( ( ( uint8 )( f.z * 0xFF ) ) << 16 )
+		| ( ( uint8 )( 0xFF ) << 24 );
 #else
 	uint32 ret = ( ( ( uint8 )( f.x * 0xFF ) ) << 24 )
 		| ( ( ( uint8 )( f.y * 0xFF ) ) << 16 )
@@ -222,14 +222,6 @@ static inline float4 uint32_2_float4( uint32 p )
 {
 #ifdef SR_USE_SIMD
 	float4 ret;
-//	// SSE4, disabled
-// 	__m128i dword4 = _mm_cvtepu8_epi32(_mm_set1_epi32(p));
-// #ifdef SR_COLOR_RGBA
-// 	dword4 = _mm_shuffle_epi32(dword4, _MM_SHUFFLE(3,0,1,2));
-// #else
-// 	dword4 = _mm_shuffle_epi32(dword4, _MM_SHUFFLE(0,1,2,3));
-// #endif
-
 	// SSE2 comptible
 #ifdef SR_COLOR_RGBA
 	__m128i dword4 = _mm_set_epi32( ( p & 0xFF000000 ) >> 24, ( p & 0xFF ) >> 0, ( p & 0xFF00 ) >> 8, ( p & 0xFF0000 ) >> 16 );

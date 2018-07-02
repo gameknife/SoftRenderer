@@ -17,6 +17,7 @@
 class SrRasTaskDispatcher;
 class SrSoftRenderer;
 
+#ifdef SR_USE_SIMD
 inline void FastRasterize( SrRendVertex* out, SrRendVertex* a, SrRendVertex* b, float ratio, float inv_ratio )
 {
 	__m256 channel0_1_a = _mm256_loadu_ps(&(a->pos.x));
@@ -43,6 +44,7 @@ inline void FastFinalRasterize( SrRendVertex* out, float w )
 	_mm256_storeu_ps((float*)(&(out->pos)), channel0_1_a);
 	_mm256_storeu_ps((float*)(&(out->channel2)), channel0_1_b);
 }
+#endif
 
 inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false )
 {

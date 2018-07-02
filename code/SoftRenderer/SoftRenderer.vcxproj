@@ -275,7 +275,10 @@
   <ItemGroup>
     <ClInclude Include="AdvanceShaders.h" />
     <ClInclude Include="BasicShaders.h" />
-    <ClInclude Include="event.h" />
+    <ClInclude Include="IEvent.h" />
+    <ClInclude Include="IThread.h" />
+    <ClInclude Include="IThread_linux.h" />
+    <ClInclude Include="IThread_win32.h" />
     <ClInclude Include="math_def.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="memfile.h" />
@@ -315,7 +318,6 @@
     <ClInclude Include="sr_intrinsic_hack.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="thread.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="vector.h" />
   </ItemGroup>

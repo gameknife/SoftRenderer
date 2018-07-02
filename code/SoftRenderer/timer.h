@@ -13,8 +13,23 @@
 #ifndef timer_h__
 #define timer_h__
 
+#ifdef OS_WIN32
 #include <MMSystem.h>
+#else
+#include <mach/mach_time.h>
 
+inline unsigned long timeGetTime()
+{
+	uint64_t time = mach_absolute_time();
+
+	mach_timebase_info_data_t m_sTimeBaseInfo;
+	mach_timebase_info(&m_sTimeBaseInfo);
+	uint64_t millis = (time * (m_sTimeBaseInfo.numer / m_sTimeBaseInfo.denom)) / 1000000.0;
+	return static_cast<unsigned long>(millis);
+	return 0;
+
+}
+#endif
 class SrTimer
 {
 public:
@@ -33,7 +48,7 @@ public:
 	{
 		m_time = timeGetTime() / 1000.f;
 		m_elapsedTime = 0;
-		QueryPerformanceFrequency(&m_freq); // 获取cpu时钟周期   
+		//QueryPerformanceFrequency(&m_freq); // 获取cpu时钟周期   
 	}
 
 	void Update()
@@ -62,9 +77,11 @@ public:
 
 	float getRealTime()
 	{
-		LARGE_INTEGER now;
-		QueryPerformanceCounter(&now); // 获取cpu时钟计数
-		return (float)(now.QuadPart)/m_freq.QuadPart;
+		// LARGE_INTEGER now;
+		// QueryPerformanceCounter(&now); // 获取cpu时钟计数
+		// return (float)(now.QuadPart)/m_freq.QuadPart;
+
+		return getTime();
 	}
 
 	int getFramecount()
@@ -78,7 +95,7 @@ private:
 	int m_frameCount;
 
 	// high precision
-	LARGE_INTEGER m_freq;
+	//LARGE_INTEGER m_freq;
 };
 
 #endif

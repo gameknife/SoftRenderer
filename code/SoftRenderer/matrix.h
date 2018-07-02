@@ -179,7 +179,9 @@ public:
 		float _m[4][4];
 		float m[16];
 		SR_ALIGN struct{ float m00; float m01; float m02; float m03; float m10; float m11; float m12; float m13; float m20; float m21; float m22; float m23; float m30; float m31; float m32; float m33;	};
+#ifdef SR_USE_SIMD
 		struct{__m128 row0, row1, row2, row3;};
+#endif
 		struct{float3 row0_float3, row1_float3, row2_float3, row3_float3;};
 		struct{float4 row0_float4, row1_float4, row2_float4, row3_float4;};
 	};

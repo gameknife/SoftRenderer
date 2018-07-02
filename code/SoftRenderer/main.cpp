@@ -39,13 +39,6 @@ int main()
 	app.Update();
 	app.Update();
 	app.Update();
-
-	// if (gEnv->output == false)
-	// {
-	// 	app->WriteToFile("testbmp.bmp");
-	// 	gEnv->output = true;
-	// }
-
 	app.Destroy();
 
 	return 0;

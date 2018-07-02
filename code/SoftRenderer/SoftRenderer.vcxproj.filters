@@ -38,8 +38,11 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{9ae0fe04-50ae-4def-b753-6e4ded74d757}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{57ce5263-f786-4361-b700-50549d5c72c3}</UniqueIdentifier>
+    <Filter Include="util\math">
+      <UniqueIdentifier>{d56a226d-e8c9-442e-a61d-1d99326d8b3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\thread">
+      <UniqueIdentifier>{f72cd164-11d9-4a1c-964f-feea842df8b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -127,31 +130,7 @@
     <ClInclude Include="BasicShaders.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="event.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="math_def.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="matrix.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="memfile.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="mmgr.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="nommgr.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="pathutil.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="quaternion.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="sr_intrinsic_hack.h">
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="SrFragmentBuffer.h">
@@ -169,14 +148,44 @@
     <ClInclude Include="SrSoftRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="thread.h">
-      <Filter>Renderer</Filter>
+    <ClInclude Include="memfile.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="mmgr.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="nommgr.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="pathutil.h">
+      <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="timer.h">
-      <Filter>Renderer</Filter>
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="math_def.h">
+      <Filter>util\math</Filter>
+    </ClInclude>
+    <ClInclude Include="quaternion.h">
+      <Filter>util\math</Filter>
     </ClInclude>
     <ClInclude Include="vector.h">
-      <Filter>Renderer</Filter>
+      <Filter>util\math</Filter>
+    </ClInclude>
+    <ClInclude Include="sr_intrinsic_hack.h">
+      <Filter>util\math</Filter>
+    </ClInclude>
+    <ClInclude Include="IEvent.h">
+      <Filter>util\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="IThread.h">
+      <Filter>util\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="IThread_linux.h">
+      <Filter>util\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="IThread_win32.h">
+      <Filter>util\thread</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -243,12 +252,6 @@
     <ClCompile Include="BasicShaders.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="memfile.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="mmgr.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="SrFragmentBuffer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -269,6 +272,12 @@
     </ClCompile>
     <ClCompile Include="SrSoftRenderer.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="memfile.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="mmgr.cpp">
+      <Filter>util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
