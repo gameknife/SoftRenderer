@@ -9,9 +9,14 @@
 
 #include "mmgr.h"
 
-GlobalEnvironment* gEnv = NULL;
-SrLogger* g_logger = NULL;
-SrRendContext* g_context = NULL;
+extern "C"
+{
+	EXPORT_API_PUBLIC GlobalEnvironment* gEnv = NULL;
+	EXPORT_API_PUBLIC SrLogger* g_logger = NULL;
+	EXPORT_API_PUBLIC SrRendContext* g_context = NULL;
+}
+
+
 
 typedef IRenderer* (*fnLoadRenderer)(GlobalEnvironment* pgEnv);
 typedef void (*fnFreeRenderer)();
@@ -29,7 +34,7 @@ bool SoftRenderApp::Init()
 {
 	m_curr_task = 0;
 
-	gEnv = new GlobalEnvironment;
+	gEnv = new GlobalEnvironment();
 	gEnv->logger = new SrLogger();
 
 	GtLogInfo("///////////////////////////////////\n");

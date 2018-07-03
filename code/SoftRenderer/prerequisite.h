@@ -97,6 +97,13 @@
 #include <assert.h>
 #endif
 
+#ifdef OS_WIN32
+#define EXPORT_API_PUBLIC  
+#else
+#define EXPORT_API_PUBLIC __attribute__((visibility ("default")))
+#endif
+
+
 // 内存对齐
 #ifdef OS_WIN32
 #define SR_ALIGN _CRT_ALIGN(16)
