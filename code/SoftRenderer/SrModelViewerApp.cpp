@@ -5,81 +5,6 @@
 #include "SrMaterial.h"
 #include "SrCamera.h"
 
-#include <tchar.h>
-#include <io.h>
-
-inline bool is_end_with_slash( const TCHAR* filename )
-{
-	size_t len = _tcslen(filename);
-	if (filename[len-1] == _T('\\') || filename[len-1] == _T('/'))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-inline void enum_all_files_in_folder( const TCHAR* root_path,std::vector<std::string>& result,bool inc_sub_folders/*=false*/ )
-{
-
-	if(!root_path)
-	{
-		return;
-	}
-
-	//Òª²éÕÒµÄÄ¿Â¼
-	std::string str = root_path;
-	if (!is_end_with_slash(root_path))
-	{
-		str += _T("/");
-	}
-	std::stack<std::string> path_buf;
-	path_buf.push(str);
-
-	while(path_buf.size())
-	{
-		//È¡³öÀ´Õ»¶¥item
-		std::string path = path_buf.top();
-		path_buf.pop();
-		size_t k=path_buf.size();
-
-		std::string find_path = path + _T("*.*");
-
-		_tfinddata_t file;
-		intptr_t longf = _tfindfirst(find_path.c_str(), &file);
-
-		if(longf !=-1)
-		{
-			std::string tempName;
-			while(_tfindnext(longf, &file ) != -1)
-			{
-				tempName = _T("");
-				tempName = file.name;
-				if (tempName == _T("..") || tempName == _T("."))
-				{
-					continue;
-				}
-				if (file.attrib == _A_SUBDIR)
-				{
-					if (inc_sub_folders)
-					{
-						tempName += _T("\\");
-						tempName = path + tempName;
-						path_buf.push(tempName);
-					}
-				}
-				else
-				{
-					result.push_back(tempName);
-				}
-			}
-		}
-		_findclose(longf);
-	}
-}
-
 SrModelViewerApp::SrModelViewerApp(void)
 {
 	m_ssao = false;
@@ -94,12 +19,12 @@ SrModelViewerApp::~SrModelViewerApp(void)
 
 void SrModelViewerApp::OnInit()
 {
-	// ´ò¿ªäÖÈ¾ÌØÐÔ
+	// ï¿½ï¿½ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
 	g_context->OpenFeature(eRFeature_MThreadRendering);
 	g_context->OpenFeature(eRFeature_JitAA);
 	g_context->OpenFeature(eRFeature_LinearFiltering);
 
-	// ´´½¨³¡¾°
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 
@@ -114,7 +39,7 @@ void SrModelViewerApp::OnInit()
 	
 	//SwitchSSAO();
 
-	// ´´½¨Ïà»ú
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_camera = m_scene->CreateCamera("cam0");
 	m_camera->setPos(float3(0,0,-15));
 	m_camera->setFov(68.0f);
@@ -123,7 +48,7 @@ void SrModelViewerApp::OnInit()
 	m_camdist = 15.0f;
 	updateCam();
 
-	// Ìí¼ÓÒ»¸öÖ÷¹â
+	// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
@@ -144,34 +69,22 @@ void SrModelViewerApp::OnUpdate()
 	
 	m_scene->Update();
 
-	// dotCovarageÇ¿ÖÆ¹Ø±ÕJITAA
+	// dotCovarageÇ¿ï¿½Æ¹Ø±ï¿½JITAA
 	if ( g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) )
 	{
 		g_context->CloseFeature(eRFeature_JitAA);
 	}
 
-	// ÐÅÏ¢Êä³ö
+	// ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½
 	char buffer[255];
 	int keyL = 15;
 	int startxL = 70;
 	int starty = 4 * g_context->height / 5;
-
-	gEnv->renderer->DrawScreenText( "[Press P]", keyL, starty, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "Switch Shade Mode: %d", m_shade_mode );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-	gEnv->renderer->DrawScreenText( "[Press K]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "DotCoverage: %s", g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) ? "on" : "off" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-	gEnv->renderer->DrawScreenText( "[CamCtrl]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "WASD Move Cam | Mouse L+Drag Rotate Cam" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
 }
 
 void SrModelViewerApp::OnDestroy()
 {
-	// É¾³ý³¡¾°
+	// É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_ents.clear();
 	m_ent = NULL;
 	delete m_scene;

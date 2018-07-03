@@ -29,13 +29,14 @@ void SrLogger::Log( const char* line )
 {
 	uint32 length = strlen(line);
 	
-	// »º´æ×°²»ÏÂÁË£¬Ð´ÈëÎÄ¼þ
+	// ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½ï¿½Ë£ï¿½Ð´ï¿½ï¿½ï¿½Ä¼ï¿½
 	//if (m_size + length + 2 > LOG_FILE_SZIE)
 	{
 		FlushToFile();
 	}
 	
-	// ×°Èë»º´æ
+	#ifdef OS_WIN32
+	// ×°ï¿½ë»ºï¿½ï¿½
 	{
 		SYSTEMTIME time;
 		GetSystemTime(&time);
@@ -74,6 +75,8 @@ void SrLogger::Log( const char* line )
 	
 		SetConsoleTextAttribute(consolehwnd, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
 	}
+
+	#endif
 	
 }
 
@@ -93,7 +96,7 @@ void SrLogger::FlushToFile()
 	std::string path("log.txt");
 	getMediaPath( path );
 
-	fopen_s( &pFile, path.c_str(), "ab");
+	pFile = fopen( path.c_str(), "ab");
 
 	fwrite( m_data, 1, m_size, pFile );
 

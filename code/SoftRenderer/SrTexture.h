@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -44,7 +44,7 @@ public:
 		gEnv->renderer->SetTextureStage( this, stage);
 	}
 
-	uint32 Get( int2& p ) const
+	uint32 Get( const int2& p ) const
 	{
 		uint32 ret = 0;
 		uint8* data = m_data;
@@ -71,7 +71,7 @@ public:
 	{
 		uint32 final = 0x00000000;
 
-		// ÔÚÕâÀï×÷warp
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½warp
 		float u = p.x - floor(p.x);
 		float v = p.y - floor(p.y);
 
@@ -79,7 +79,7 @@ public:
 		{
 		case eSF_Nearest:
 			{
-				// ÁÙ½üµã²ÉÑù
+				// ï¿½Ù½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				u *= (m_width);
 				v *= (m_height);
 
@@ -98,22 +98,22 @@ public:
 
 			break;
 		case eSF_Linear:
-			// Ë«ÏßÐÔÄÚ²å
+			// Ë«ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½
 		default:
 			{
-				// È¡µÃÎÆÀí¿Õ¼äµÄµØÖ·
+				// È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½Äµï¿½Ö·
 				u *= (m_width - 1);
 				v *= (m_height - 1);
 
-				// È¡Õû
+				// È¡ï¿½ï¿½
 				int x = (int)( u );
 				int y = (int)( v );
 
-				// ¼ÆËã×ÓÏñËØÆ«ÒÆ
+				// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½
 				float du = u - x;
 				float dv = v - y;
 
-				// È¡µÃµØÖ·Î»ÖÃ£¬È·±£ÔÚÎÆÀí²ÉÑù·¶Î§ÄÚ
+				// È¡ï¿½Ãµï¿½Ö·Î»ï¿½Ã£ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î§ï¿½ï¿½
 				int left = (x) % m_width;
 				int right = (x + 1) % m_width;
 				int up = (y) % m_height;
@@ -124,13 +124,13 @@ public:
 				assert( up >= 0 && up < m_height );
 				assert( down >= 0 && down < m_height );
 
-				// ²ÉÑù4¸öÑÕÉ«
+				// ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½É«
 				uint32 lt = Get( int2(left,up) );
 				uint32 t = Get( int2(right,up) );
 				uint32 l = Get( int2(left,down) );
 				uint32 rb =  Get( int2(right,down) );
 
-				// Ê¹ÓÃËÄ¸öÑÕÉ«ºÍ×ÓÏñËØÆ«ÒÆÀ´µ÷ºÍ×îÖÕÑÕÉ«
+				// Ê¹ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«
 				final = SrColorMulFloat(lt,((1.f-du)*(1.f-dv))) + SrColorMulFloat(t , (du*(1.f - dv))) + SrColorMulFloat(l , ((1.f-du)*dv)) + SrColorMulFloat(rb , (du*dv));
 			}
 		}

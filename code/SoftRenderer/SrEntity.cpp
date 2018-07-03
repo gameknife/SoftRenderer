@@ -34,26 +34,26 @@ float44 SrEntity::getWorldMatrix()
 	return m_worldMatrix;
 }
 
-void SrEntity::SetPos( float3& pos )
+void SrEntity::SetPos( const float3& pos )
 {
 	m_pos = pos;
 	m_dirty = true;
 }
 
-void SrEntity::SetRotation( Quat& rot )
+void SrEntity::SetRotation( const Quat& rot )
 {
 	m_rot = rot;
 	m_dirty = true;
 }
 
-void SrEntity::MoveLocal( float3& trans )
+void SrEntity::MoveLocal( const float3& trans )
 {
 	m_pos += (m_rot * trans);
 
 	m_dirty = true;
 }
 
-void SrEntity::RotateLocal( float3& angle )
+void SrEntity::RotateLocal( const float3& angle )
 {
 	Quat rotX = Quat::CreateRotationX(angle.x);
 	Quat rotY = Quat::CreateRotationY(angle.y);
@@ -113,7 +113,7 @@ uint32 SrEntity::getMaterialCount()
 	return ret;
 }
 
-void SrEntity::SetScale( float3& scale )
+void SrEntity::SetScale( const float3& scale )
 {
 	m_scale = scale;
 

@@ -440,14 +440,14 @@ public:
 	 *@param float3 & to 
 	 *@param float3 & up 
 	 */
-	float44 &LookatLH( float3 &from , float3 &to , float3 &up )
+	float44 &LookatLH( const float3 &from , const float3 &to , const float3 &up )
 	{
 		*this = CreateIdentity();
 
 		float3 front = ( to - from ).normalize();
 		float3 right = ( up % front ).normalize();
 		float3 tup = ( front % right ).normalize();
-		float3 tfrom = float3( from.dot( right ), from.dot( tup ) , from.dot( front ) );
+		float3 tfrom = float3( float3::dot( from, right ), float3::dot( from, tup ) , float3::dot( from, front ) );
 
 		_m[0][0] = right.x; _m[1][0] = right.y; _m[2][0] = right.z;
 		_m[0][1] = tup.x; _m[1][1] = tup.y; _m[2][1] = tup.z;

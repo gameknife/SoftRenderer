@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -31,8 +31,8 @@ public:
 	bool LoadGeometryFromOBJ( const char* strMeshData, SrPrimitives& primitives );
 	bool LoadMaterialFromMTL( const char* strFileData);
 private:
-	WORD AddVertex( uint32 hash, SrVertexP3N3T2* pVertex );
-	bool IsMatIDExist( DWORD matID );
+	uint16 AddVertex( uint32 hash, SrVertexP3N3T2* pVertex );
+	bool IsMatIDExist( uint32 matID );
 	void DeleteCache();
 	void ClearData();
 	void CreateMeshInternal(SrPrimitives& primitives );

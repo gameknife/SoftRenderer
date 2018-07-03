@@ -17,7 +17,7 @@ SrObjLoader::~SrObjLoader(void)
 
 
 //////////////////////////////////////////////////////////////////////////
-bool SrObjLoader::IsMatIDExist( DWORD matID )
+bool SrObjLoader::IsMatIDExist( uint32 matID )
 {
 	int num = m_Attributes.size();
 	for(int i=0; i < num; i++)
@@ -31,12 +31,12 @@ bool SrObjLoader::IsMatIDExist( DWORD matID )
 	return false;
 }
 //--------------------------------------------------------------------------------------
-WORD SrObjLoader::AddVertex( uint32 hash, SrVertexP3N3T2* pVertex )
+uint16 SrObjLoader::AddVertex( uint32 hash, SrVertexP3N3T2* pVertex )
 {
 	// If this vertex doesn't already exist in the Vertices list, create a new entry.
 	// Add the index of the vertex to the Indices list.
 	bool bFoundInList = false;
-	WORD index = 0;
+	uint16 index = 0;
 
 	// Since it's very slow to check every element in the vertex list, a hashtable stores
 	// vertex indices according to the vertex position's index as reported by the OBJ file
@@ -134,13 +134,13 @@ void SrObjLoader::DeleteCache()
 bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& primitives )
 {
 	// Find the file
-	// ÕÒÎÄ¼þ
+	// ï¿½ï¿½ï¿½Ä¼ï¿½
 
 	// File input
 	char strCommand[256] = {0};
 	std::stringstream InFile( pMeshData );
 	if( !InFile )
-		return S_FALSE;
+		return false;
 
 	bool flushFace = false;
 	std::string currMtlName;
@@ -161,17 +161,17 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 		}
 		else if( 0 == strcmp( strCommand, "g" ) )
 		{
-			// ÎïÌå
+			// ï¿½ï¿½ï¿½ï¿½
 			flushFace = true;
 		}
 		else if( 0 == strcmp( strCommand, "usemtl" ) )
 		{
-			// ÎïÌå²ÄÖÊ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			InFile >> currMtlName;
 		}
 		else if( 0 == strcmp( strCommand, "mtllib" ) )
 		{
-			// ÎïÌå²ÄÖÊ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		}
 		else if( 0 == strcmp( strCommand, "v" ) )
 		{
@@ -190,14 +190,14 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 
 			Positions.push_back( float4( x, y, z, 1 ) );
 
-			// for3DsMax, ¼ÓÈëµãÁÐ£¬Ëæºó·½±ã×ßÃæµÄÊ±ºò£¬ÊäÈënormalºÍtc
+			// for3DsMax, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ó·½±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½normalï¿½ï¿½tc
 		}
 		else if( 0 == strcmp( strCommand, "vt" ) )
 		{
 			// Vertex TexCoord
 			float u, v;
 			InFile >> u >> v;
-			// for3DsMax, ¼ÓÈëµãÁÐ£¬Ëæºó·½±ã×ßÃæµÄÊ±ºò£¬ÊäÈënormalºÍtc
+			// for3DsMax, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ó·½±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½normalï¿½ï¿½tc
 			TexCoords.push_back( float2( u, 1-v ) );
 		}
 		else if( 0 == strcmp( strCommand, "vn")  )
@@ -270,7 +270,7 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 		primitives.back().material = gEnv->resourceMgr->LoadMaterial(currMtlName.c_str());				
 	}
 	
-	return S_OK;
+	return true;
 }
 
 void SrObjLoader::ClearData()
@@ -418,13 +418,13 @@ struct SrMatLoadingParam
 bool SrObjLoader::LoadMaterialFromMTL( const char* strFileData )
 {
 	// Find the file
-	// ÕÒÎÄ¼þ
+	// ï¿½ï¿½ï¿½Ä¼ï¿½
 
 	// File input
 	char strCommand[256] = {0};
 	std::stringstream InFile( strFileData );
 	if( !InFile )
-		return S_FALSE;
+		return false;
 
 	SrMatLoadingParam param;
 
@@ -517,7 +517,7 @@ bool SrObjLoader::LoadMaterialFromMTL( const char* strFileData )
 	// create material
 	param.CreateMat();
 
-	return S_OK;
+	return true;
 }
 
 
