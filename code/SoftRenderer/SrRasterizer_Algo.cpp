@@ -749,16 +749,16 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 		assert(address < g_context->width * g_context->height && address >=0 );
 
 #ifdef RASTERIZER_SYNC
-		LPCRITICAL_SECTION csptr = fBuffer->GetSyncMark(address);
-		EnterCriticalSection( csptr );
+		//LPCRITICAL_SECTION csptr = fBuffer->GetSyncMark(address);
+		//EnterCriticalSection( csptr );
 
 		if ( z > fBuffer->zBuffer[address] )
 		{
-			LeaveCriticalSection(csptr); 
+			//LeaveCriticalSection(csptr); 
 			return;
 		}
 		fBuffer->zBuffer[address] = z;
-		LeaveCriticalSection(csptr); 
+		//LeaveCriticalSection(csptr); 
 #else
 		if ( z > fBuffer->zBuffer[address] )
 		{
@@ -805,16 +805,16 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 		assert(address < g_context->width * g_context->height && address >=0 );
 
 #ifdef RASTERIZER_SYNC
-		LPCRITICAL_SECTION csptr = fBuffer->GetSyncMark(address);
-		EnterCriticalSection( csptr );
+		//LPCRITICAL_SECTION csptr = fBuffer->GetSyncMark(address);
+		//EnterCriticalSection( csptr );
 
 		if ( z > fBuffer->zBuffer[address] )
 		{
-			LeaveCriticalSection(csptr); 
+			//LeaveCriticalSection(csptr); 
 			return;
 		}
 		fBuffer->zBuffer[address] = z;
-		LeaveCriticalSection(csptr); 
+		//LeaveCriticalSection(csptr); 
 #else
 		if ( z > fBuffer->zBuffer[address] )
 		{

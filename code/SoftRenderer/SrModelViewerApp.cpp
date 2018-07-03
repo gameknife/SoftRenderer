@@ -104,7 +104,11 @@ void SrModelViewerApp::OnInit()
 	gEnv->sceneMgr = m_scene;
 
 	m_curr_ent = 0;
-	m_ent = m_scene->CreateEntity("object", "\\media\\modelviewer\\teapot.obj", "\\media\\modelviewer\\teapot.mtl");
+
+	float3 poszero = float3(0, 0, 0);
+	Quat rotidtt = Quat::CreateIdentity();
+
+	m_ent = m_scene->CreateEntity("object", "\\media\\modelviewer\\teapot.obj", "\\media\\modelviewer\\teapot.mtl", poszero, rotidtt);
 	m_ents.push_back(m_ent);
 	m_ent->SetScale(float3(40, 40, 40));
 	

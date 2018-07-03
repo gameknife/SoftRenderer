@@ -26,8 +26,12 @@ void SrSponzaApp::OnInit()
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 
+
+	float3 poszero = float3(0, 0, 0);
+	Quat rotidtt = Quat::CreateIdentity();
+
 	// ´´½¨SPONZA
-	m_ent = m_scene->CreateEntity("model1", "media\\sponza.obj", "media\\sponza.mtl");
+	m_ent = m_scene->CreateEntity("model1", "media\\sponza.obj", "media\\sponza.mtl", poszero, rotidtt);
 
 	//m_ent = m_scene->CreateEntity("model1", "media\\prophet\\prophet.obj", "media\\prophet\\prophet.mtl");
 	m_ent->SetScale(float3(2,2,2));

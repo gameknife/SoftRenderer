@@ -72,10 +72,10 @@
 
 /////////////////////////////
 // mm_malloc for mac
-#ifndef OS_WIN32
+//#ifndef OS_WIN32
 #define _mm_malloc(a,b) malloc(a)
 #define _mm_free(a) free(a)
-#endif
+//#endif
 //
 
 //////////////////////////////////////////////////////////////////////////
@@ -214,9 +214,7 @@ struct GlobalEnvironment
 	bool					output = false;
 };
 
-extern "C" {
-	GlobalEnvironment* gEnv;
-}
+extern GlobalEnvironment* gEnv;
 
 #include "SrLogger.h"
 //	 Simple logs of data with low verbosity.

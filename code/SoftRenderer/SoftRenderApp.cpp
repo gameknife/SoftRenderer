@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "SoftRenderApp.h"
 #include "resource.h"
-#include <MMSystem.h>
 #include "SrMesh.h"
 #include "SrProfiler.h"
 #include "SrShader.h"

@@ -22,10 +22,10 @@ public:
 	SrFragmentBuffer(int width, int height, SrSoftRenderer* renderer);
 	~SrFragmentBuffer(void);
 
-	LPCRITICAL_SECTION GetSyncMark(uint32 address)
-	{
-		return &(fragBufferSync[address].cs);
-	}
+	// LPCRITICAL_SECTION GetSyncMark(uint32 address)
+	// {
+	// 	return &(fragBufferSync[address].cs);
+	// }
 
 	inline float3 GetNormal(float2& texcoord) const;
 	float3 GetWorldPos(float2& texcoord) const

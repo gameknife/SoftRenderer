@@ -292,7 +292,7 @@ bool SrSoftRenderer::InnerInitShaders()
 	return true;
 }
 
-bool SrSoftRenderer::DrawScreenText( const char* str, int x,int y, uint32 size, DWORD color /*= SR_UICOLOR_HIGHLIGHT*/ )
+bool SrSoftRenderer::DrawScreenText( const char* str, int x,int y, uint32 size, uint32 color /*= SR_UICOLOR_HIGHLIGHT*/ )
 {
 	SrTextLine line;
 	line.text = std::string(str);
