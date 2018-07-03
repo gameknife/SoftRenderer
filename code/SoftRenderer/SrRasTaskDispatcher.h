@@ -83,6 +83,7 @@ public:
 
 	SrRasTask* RequestTask();
 
+	gkScopedLock<gkMutexLock> *m_resLock;
 	SrTaskThreadPool m_pool;			///< 处理任务的线程池，任务线程个数为CPU核心数-1
 	SrTaskStack m_taskStack;			///< 用于存放任务的栈，索取任务直接从栈顶取出，直至取完。
 	SrTaskList  m_taskList;				///< 用于存放任务数据的数组，负责任务的生存期。

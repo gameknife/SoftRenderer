@@ -4,8 +4,6 @@
 
 #include "mmgr.h"
 
-CRITICAL_SECTION g_taskCS;
-
 SrTaskThread::SrTaskThread( int tileId, SrRasTaskDispatcher* creator ):m_creator(creator),
 	m_threadId(tileId)
 {
@@ -52,6 +50,7 @@ int SrTaskThread::Run()
 
 SrRasTaskDispatcher::SrRasTaskDispatcher(void)
 {
+	
 }
 
 
@@ -68,13 +67,13 @@ SrRasTask* SrRasTaskDispatcher::RequestTask()
 {
 	SrRasTask* ret =  NULL;
 
-	EnterCriticalSection( &g_taskCS );
+	m_resLock->Lock();
 	if (!m_taskStack.empty())
 	{
 		ret = m_taskStack.top();
 		m_taskStack.pop();
 	}
-	LeaveCriticalSection( &g_taskCS );
+	m_resLock->UnLock();
 
 	return ret;
 }
@@ -99,7 +98,7 @@ void SrRasTaskDispatcher::Init()
 		(*it)->Start();
 	}
 
-	InitializeCriticalSection(&g_taskCS);
+	m_resLock = new gkScopedLock<gkMutexLock>(eLGID_Resource, (uint32)this);
 }
 
 /**
@@ -108,9 +107,7 @@ void SrRasTaskDispatcher::Init()
  */
 void SrRasTaskDispatcher::Destroy()
 {
-	//Wait();
-
-	DeleteCriticalSection(&g_taskCS);
+	SAFE_DELETE(m_resLock);
 
 	SrTaskThreadPool::iterator it = m_pool.begin();
 	for ( ; it != m_pool.end(); ++it)
