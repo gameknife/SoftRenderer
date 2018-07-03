@@ -1,11 +1,11 @@
 /**
   @file pathutil.h
   
-  @brief Â·¾¶¹¤¾ßº¯Êý
+  @brief Â·ï¿½ï¿½ï¿½ï¿½ï¿½ßºï¿½ï¿½ï¿½
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -22,7 +22,7 @@ inline void srSetRootPath(const char* root)
 
 inline void getMediaPath(std::string& origin)
 {
-	origin = g_rootPath + "\\" + origin;
+	origin = g_rootPath + "/" + origin;
 }
 
 #endif // pathutil_h__

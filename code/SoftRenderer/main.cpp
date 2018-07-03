@@ -12,6 +12,8 @@
 std::map<const void*, void*> m_align_pt_mapper;
 std::string g_rootPath;
 
+#ifdef OS_WIN32
+
 int main()
 {
 	char buffer[MAX_PATH];
@@ -44,5 +46,6 @@ int main()
 	return 0;
 }
 
+#endif
 
 

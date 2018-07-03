@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -20,10 +20,10 @@
 
 void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 {
-	// Èç¹ûÊÇÌá½»Èý½ÇÐÎ£¬ÏÈ½øÐÐÍ¸ÊÓ±ä»»
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á½»ï¿½ï¿½ï¿½ï¿½ï¿½Î£ï¿½ï¿½È½ï¿½ï¿½ï¿½Í¸ï¿½Ó±ä»»
 	if(!subtri)
 	{
-		// ccw,cw ±³ÏòÃæ²Ã¼ô
+		// ccw,cw ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¼ï¿½
 		if (calTri.primitive->shaderConstants.culling)
 		{
 			assert( abs(calTri.p[0].pos.w) > SR_EQUAL_PRECISION );
@@ -52,7 +52,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 		SrRendVertex tmp[3] = {calTri.p[0], calTri.p[1], calTri.p[2]};
 		calTri.primitive->shader->ProcessPatch( p[0], p[1], p[2], &(tmp[0]), &(tmp[1]), &(tmp[2]), &(calTri.primitive->shaderConstants) );
 
-		// ´ËÊ±µÄÈý½ÇÐÎ»¹ÔÚ²Ã¼ô¿Õ¼ä£¬ÐèÒªÍ¶Ó°µ½ÆÁÄ»¿Õ¼ä£¡
+		// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Ú²Ã¼ï¿½Õ¼ä£¬ï¿½ï¿½ÒªÍ¶Ó°ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Õ¼ä£¡
 		for(int i=0; i < 3; ++i)
 		{
 			SrRendVertex* p1 = p[i];
@@ -69,14 +69,14 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 // 			p1->channel4 *= p1->pos.w;
 // 			p1->channel5 *= p1->pos.w;
 
-			// ±ä»»µ½ÆÁÄ»¿Õ¼ä
+			// ï¿½ä»»ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Õ¼ï¿½
 			p1->pos.x = ((p1->pos.x * .5f + 0.5f) * g_context->width);
 			p1->pos.y = ((-p1->pos.y * .5f + 0.5f) * g_context->height);
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// ÅÅÐòÈý½ÇÐÎ£¬±äÎª
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î£ï¿½ï¿½ï¿½Îª
 	//  |
 	// \|/
 	//  y5
@@ -100,13 +100,13 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	{
 		SWAP(calTri.p[2], calTri.p[1]);
 	}
-	// ÅÅÐòÍê³É
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	//////////////////////////////////////////////////////////////////////////
 
 	if (Equal(calTri.p[0].pos.y, calTri.p[1].pos.y))
 	{
 
-		// Æ½¶¥Èý½Ç
+		// Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		// 1  ____0   0___1
 		// 	  \  |    |  /
@@ -134,7 +134,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	}
 	else if (Equal(calTri.p[2].pos.y, calTri.p[1].pos.y))
 	{
-		// Æ½µ×Èý½Ç
+		// Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		// 	     2   2
 		// 	    /|   |\
@@ -162,7 +162,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	}
 	else
 	{
-		// ÐèÒª·Ö¸î
+		// ï¿½ï¿½Òªï¿½Ö¸ï¿½
 		// 	     0
 		// 	    /|
 		// 	   / |
@@ -185,7 +185,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 #ifdef FIXED_FUNCTION_RASTERIZOR
 			FixedRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, false );
 #else
-			calTri.primitive->shader->ProcessRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, false );
+			calTri.primitive->shader->ProcessRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, NULL, false );
 #endif
 		}
 
@@ -234,7 +234,7 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 	for ( uint32 i = 0; i < count; ++i )
 	{
 		uint32 address = address_start + i;
-		// Èç¹û¿ªÆôÁËdotRendering
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½dotRendering
 		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 		{
 			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
@@ -251,7 +251,7 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 		assert( address >=0 && address < g_context->width * g_context->height );
 		SrFragment* thisBuffer = fBuffer->fBuffer + address;
 		{
-			// ztest ¿ÉÒÔÔÙ¹âÕ¤»¯Ö®Ç°×÷£¬ÕâÊ±¿ÉÒÔÔ¤ÅÐzÖµ£¬ÌáÇ°killµô£¬¼ÓËÙ
+			// ztest ï¿½ï¿½ï¿½ï¿½ï¿½Ù¹ï¿½Õ¤ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½zÖµï¿½ï¿½ï¿½ï¿½Ç°killï¿½ï¿½ï¿½ï¿½ï¿½
 			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
 		}
 	}
@@ -296,7 +296,7 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 	for ( uint32 i = 0; i < clipCount; ++i )
 	{
 		uint32 address = address_start + i;
-		// Èç¹û¿ªÆôÁËdotRendering
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½dotRendering
 		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 		{
 			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
@@ -314,7 +314,7 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 		assert( address >=0 && address < g_context->width * g_context->height );
 		SrFragment* thisBuffer = fBuffer->fBuffer + address;
 		{
-			// ztest ¿ÉÒÔÔÙ¹âÕ¤»¯Ö®Ç°×÷£¬ÕâÊ±¿ÉÒÔÔ¤ÅÐzÖµ£¬ÌáÇ°killµô£¬¼ÓËÙ
+			// ztest ï¿½ï¿½ï¿½ï¿½ï¿½Ù¹ï¿½Õ¤ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½zÖµï¿½ï¿½ï¿½ï¿½Ç°killï¿½ï¿½ï¿½ï¿½ï¿½
 			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
 		}
 	}
@@ -322,7 +322,7 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 
 void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 {
-	// ¸¡µãÊý ¹âÕ¤»¯º¯Êý
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	float dx_right,    
 		dx_left,     // the dx/dy ratio of the left edge of line
@@ -345,21 +345,21 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	float min_clip_x = g_context->viewport.x;
 	float max_clip_x = g_context->viewport.x + g_context->viewport.w;
 
-	// ¼ÆËãÉ¨ÃèÐÐÊý
+	// ï¿½ï¿½ï¿½ï¿½É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	height = y3-y1;
 	float sy1 = y1;
 
 	dx_left  = (x3-x1)/height;
 	dx_right = (x3-x2)/height;
 
-	// ÉèÖÃÆðÊ¼É¨Ãèµã
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼É¨ï¿½ï¿½ï¿½
 	xs = x1;
 	xe = x2;
 
-	// ¼ÇÂ¼Ã¿¸ùÉ¨ÃèÏß¼ÆËãratioÊ±µÄÆ«ÒÆÖµ
+	// ï¿½ï¿½Â¼Ã¿ï¿½ï¿½É¨ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ratioÊ±ï¿½ï¿½Æ«ï¿½ï¿½Öµ
 	float offsetY = 0;
 
-	// yÖá²Ã¼ô
+	// yï¿½ï¿½Ã¼ï¿½
 	if (y1 < min_clip_y)
 	{
 		// compute new xs and ys
@@ -375,9 +375,9 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	} // end if top is off screen
 	else
 	{
-		// È·±£ top-left Ìî³ä·¨Ôò
+		// È·ï¿½ï¿½ top-left ï¿½ï¿½ä·¨ï¿½ï¿½
 		iy1 = (int)(ceil(y1));
-		// ¼ÆËãÆ«ÒÆÖµ
+		// ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½Öµ
 		offsetY = iy1 - y1;
 
 		// bump xs and xe appropriately
@@ -416,8 +416,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 		for (loop_y=iy1; loop_y<=iy3; loop_y++)
 		{
 			// calc ratio
-			// È¡µÃ´ËÉ¨ÃèÏßÊ×Î²µÄ ²åÖµºó ¶¥µã
-			// Èç¹ûÐ±ÂÊ´óÓÚ1£¬ÔòÊ¹ÓÃºáÏò×ø±êÀ´¼ÆËãratio
+			// È¡ï¿½Ã´ï¿½É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î²ï¿½ï¿½ ï¿½ï¿½Öµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			// ï¿½ï¿½ï¿½Ð±ï¿½Ê´ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ratio
 			float dx = (float)height / float(x2 - x1);
 			float ratio = 1.f;
 
@@ -429,7 +429,7 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			}
 			else
 			{
-				// ´Ë ratioÈ«Îª ¾ø¶Ô¸¡µãÖµ£¬²»ÐèÒª×÷offset´¦Àí
+				// ï¿½ï¿½ ratioÈ«Îª ï¿½ï¿½ï¿½Ô¸ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½offsetï¿½ï¿½ï¿½ï¿½
 				if(abs(x2 - x3) > abs(x3 - x1))
 				{
 					ratio = 1.f - abs(xe - x3) / abs(x2 - x3);
@@ -448,15 +448,15 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 				FixedRasterize(  leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
 				FixedRasterize(  rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, NULL, false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, NULL, false );
 #endif
 			}
 
-			// É¨ÃèÏß
+			// É¨ï¿½ï¿½ï¿½ï¿½
 			Rasterize_ScanLine(loop_y, xs, xe, leftVert, rightVert, tri.primitive, eRm_Solid );
 			
-			// µ÷ÕûÊ¼Ä©µãµ½ÏÂÒ»¸ù
+			// ï¿½ï¿½ï¿½ï¿½Ê¼Ä©ï¿½ãµ½ï¿½ï¿½Ò»ï¿½ï¿½
 			xs+=dx_left;
 			xe+=dx_right;
 		}
@@ -464,7 +464,7 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	}
 	else
 	{
-		// XÖáÐèÒª²Ã¼ô
+		// Xï¿½ï¿½ï¿½ï¿½Òªï¿½Ã¼ï¿½
 		for (loop_y=iy1; loop_y<=iy3; loop_y++, xs+=dx_left, xe+=dx_right)
 		{
 			left  = xs;
@@ -487,8 +487,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			}
 
 			// calc ratio
-			// È¡µÃ´ËÉ¨ÃèÏßÊ×Î²µÄ ²åÖµºó ¶¥µã
-			// Èç¹ûÐ±ÂÊ´óÓÚ1£¬ÔòÊ¹ÓÃºáÏò×ø±êÀ´¼ÆËãratio
+			// È¡ï¿½Ã´ï¿½É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î²ï¿½ï¿½ ï¿½ï¿½Öµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			// ï¿½ï¿½ï¿½Ð±ï¿½Ê´ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ratio
 			float dx = (float)height / float(x2 - x1);
 			float ratio = 1.f;
 
@@ -518,13 +518,13 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 				FixedRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
 				FixedRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, NULL, false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, NULL, false );
 #endif
 
 			}
 
-			// É¨ÃèÏß
+			// É¨ï¿½ï¿½ï¿½ï¿½
 			Rasterize_ScanLine_Clipped(loop_y, xs, xe, left, right, leftVert, rightVert, tri.primitive, eRm_Solid );
 		} 
 
@@ -533,16 +533,16 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 
 void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 {
-	// ¸¡µãÊý ¹âÕ¤»¯º¯Êý
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	float dx_right,		// ÓÒ±ßµÄÐ±ÂÊ
-		dx_left,		// ×ó±ßµÄÐ±ÂÊ
-		xs,xe,			// ¿ªÊ¼£¬ºÍ½áÊøµÄ×ø±ê
-		height,			// ´æ´¢¸ß¶È
-		right,			// ´æ´¢²Ã¼ôµÄ×óÓÒ×ø±ê
+	float dx_right,		// ï¿½Ò±ßµï¿½Ð±ï¿½ï¿½
+		dx_left,		// ï¿½ï¿½ßµï¿½Ð±ï¿½ï¿½
+		xs,xe,			// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Í½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		height,			// ï¿½æ´¢ï¿½ß¶ï¿½
+		right,			// ï¿½æ´¢ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		left;
 
-	int iy1,iy3,loop_y; // É¨ÃèÏßÐÐÐò
+	int iy1,iy3,loop_y; // É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	float x1 = tri.p[2].pos.x;
 	float y1 = tri.p[2].pos.y;
@@ -556,29 +556,29 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 	float min_clip_x = g_context->viewport.x;
 	float max_clip_x = g_context->viewport.x + g_context->viewport.w;
 
-	// ¼ÆËã¸ß¶È£¬´æ´¢µ½sy1
+	// ï¿½ï¿½ï¿½ï¿½ß¶È£ï¿½ï¿½æ´¢ï¿½ï¿½sy1
 	height = y3-y1;
 	float sy1 = y1;
 
-	// ¼ÆËãÐ±ÂÊ
+	// ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½
 	dx_left  = (x2-x1)/height;
 	dx_right = (x3-x1)/height;
 
-	// ÉèÖÃÆðÊ¼µã
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
 	xs = x1;
 	xe = x1; 
 
-	// ¼ÇÂ¼Ã¿¸ùÉ¨ÃèÏß¼ÆËãratioÊ±µÄÆ«ÒÆÖµ
+	// ï¿½ï¿½Â¼Ã¿ï¿½ï¿½É¨ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ratioÊ±ï¿½ï¿½Æ«ï¿½ï¿½Öµ
 	float offsetY = 0;
 
-	// y ²Ã¼ô
+	// y ï¿½Ã¼ï¿½
 	if (y1 < min_clip_y)
 	{
-		// ÖØÐÂ¼ÆËãÆðÊ¼µã
+		// ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
 		xs = xs+dx_left*(-y1+min_clip_y);
 		xe = xe+dx_right*(-y1+min_clip_y);
 
-		// ÖØÖÃ
+		// ï¿½ï¿½ï¿½ï¿½
 		offsetY = ceil(y1) - y1;
 		y1 = min_clip_y;
 
@@ -618,9 +618,9 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 		for (loop_y = iy1; loop_y <= iy3; loop_y++)
 		{
 			// calc ratio
-			// È¡µÃ´ËÉ¨ÃèÏßÊ×Î²µÄ ²åÖµºó ¶¥µã
+			// È¡ï¿½Ã´ï¿½É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î²ï¿½ï¿½ ï¿½ï¿½Öµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-			// Èç¹ûÐ±ÂÊ´óÓÚ1£¬ÔòÊ¹ÓÃºáÏò×ø±êÀ´¼ÆËãratio
+			// ï¿½ï¿½ï¿½Ð±ï¿½Ê´ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ratio
 			float dx = (float)height / float(x3 - x2);
 			float ratio = 1.f;
 
@@ -650,8 +650,8 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
 				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, NULL, false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, NULL, false );
 #endif
 			}
 
@@ -689,9 +689,9 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 			}
 
 			// calc ratio
-			// È¡µÃ´ËÉ¨ÃèÏßÊ×Î²µÄ ²åÖµºó ¶¥µã
+			// È¡ï¿½Ã´ï¿½É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î²ï¿½ï¿½ ï¿½ï¿½Öµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-			// Èç¹ûÐ±ÂÊ´óÓÚ1£¬ÔòÊ¹ÓÃºáÏò×ø±êÀ´¼ÆËãratio
+			// ï¿½ï¿½ï¿½Ð±ï¿½Ê´ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ratio
 			float dx = (float)height / float(x3 - x2);
 			float ratio = 1.f;
 
@@ -721,8 +721,8 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
 				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, NULL, false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, NULL, false );
 #endif
 			}
 
@@ -741,7 +741,7 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 	{
 
 
-		// lerp z ×÷Ô¤ÅÐ
+		// lerp z ï¿½ï¿½Ô¤ï¿½ï¿½
 		float z = posA->z * (1.f - ratio) + posB->z * ratio;
 		z = (z - 1.f);
 
@@ -797,7 +797,7 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 // 			return;
 // 		}
 
-		// lerp z ×÷Ô¤ÅÐ
+		// lerp z ï¿½ï¿½Ô¤ï¿½ï¿½
 		float z = posA->z * (1.f - ratio) + posB->z * ratio;
 		z = (z - 1.f);
 

@@ -3,8 +3,8 @@ illum 4
 Kd 0.60 0.17 0.17
 Ka 0.59 0.59 0.59
 Tf 1.00 1.00 1.00
-map_Kd media\modelviewer\tex\white.bmp
-bump media\modelviewer\tex\fabric_ddn.bmp -bm 0.02
+map_Kd media/modelviewer/tex/white.bmp
+bump media/modelviewer/tex/fabric_ddn.bmp -bm 0.02
 
 alpha_test 0.01
 Ni 1.00

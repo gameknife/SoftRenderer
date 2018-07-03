@@ -17,12 +17,12 @@ SrSponzaApp::~SrSponzaApp(void)
 
 void SrSponzaApp::OnInit()
 {
-	// ´ò¿ªäÖÈ¾ÌØÐÔ
+	// ï¿½ï¿½ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
 	g_context->OpenFeature(eRFeature_MThreadRendering);
 	g_context->OpenFeature(eRFeature_JitAA);
 	g_context->OpenFeature(eRFeature_LinearFiltering);
 
-	// ´´½¨³¡¾°
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 
@@ -30,20 +30,20 @@ void SrSponzaApp::OnInit()
 	float3 poszero = float3(0, 0, 0);
 	Quat rotidtt = Quat::CreateIdentity();
 
-	// ´´½¨SPONZA
-	m_ent = m_scene->CreateEntity("model1", "media\\sponza.obj", "media\\sponza.mtl", poszero, rotidtt);
+	// ï¿½ï¿½ï¿½ï¿½SPONZA
+	m_ent = m_scene->CreateEntity("model1", "media/sponza.obj", "media/sponza.mtl", poszero, rotidtt);
 
 	//m_ent = m_scene->CreateEntity("model1", "media\\prophet\\prophet.obj", "media\\prophet\\prophet.mtl");
 	m_ent->SetScale(float3(2,2,2));
 	SwitchSSAO();
 
-	// ´´½¨Ïà»ú
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_camera = m_scene->CreateCamera("cam0");
 	m_camera->setPos(float3(0,10,-45));
 	m_camera->setFov(68.0f);
 	m_scene->PushCamera(m_camera);
 
-	// Ìí¼ÓÒ»¸öÖ÷¹â
+	// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
@@ -55,44 +55,22 @@ void SrSponzaApp::OnUpdate()
 {
 	m_scene->Update();
 
-	// dotCovarageÇ¿ÖÆ¹Ø±ÕJITAA
+	// dotCovarageÇ¿ï¿½Æ¹Ø±ï¿½JITAA
 	if ( g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) )
 	{
 		g_context->CloseFeature(eRFeature_JitAA);
 	}
-
-	// ÐÅÏ¢Êä³ö
-	char buffer[255];
-	int keyL = 15;
-	int startxL = 70;
-	int starty = 4 * g_context->height / 5;
-
-	gEnv->renderer->DrawScreenText( "[Press P]", keyL, starty, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "SSAO: %s", m_ssao ? "on" : "off" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-	gEnv->renderer->DrawScreenText( "[Press K]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "DotCoverage: %s", g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) ? "on" : "off" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-// 	gEnv->renderer->DrawScreenText( "[Press ~]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-// 	sprintf_s( buffer, "Renderer: %s", gEnv->renderer->m_rendererType == eRt_HardwareD3D9 ? "Hw_D3D9" : "Software" );
-// 	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-	gEnv->renderer->DrawScreenText( "[CamCtrl]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "WASD Move Cam | Mouse L+Drag Rotate Cam" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
 }
 
 void SrSponzaApp::OnDestroy()
 {
-	// É¾³ý³¡¾°
+	// É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	delete m_scene;
 }
 
 void SrSponzaApp::SwitchSSAO()
 {
-	// SSAOÇÐ»»
+	// SSAOï¿½Ð»ï¿½
 	if (m_ssao)
 	{
 		m_ssao = false;

@@ -248,7 +248,7 @@ SrSwShader* LoadShader(const char* shaderName)
 
 	for (uint32 i = 0; i < shaders.size(); ++i)
 	{
-		if (!stricmp(shaders[i]->getName(), shaderName))
+		if (!strcmp(shaders[i]->getName(), shaderName))
 		{
 			return shaders[i];
 		}
