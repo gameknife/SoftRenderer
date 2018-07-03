@@ -172,14 +172,21 @@ void SrRasTaskDispatcher::Wait()
 {
 	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
 	{
-		std::vector<HANDLE> handles;
+		// std::vector<HANDLE> handles;
+		// SrTaskThreadPool::iterator it = m_pool.begin();
+		// for ( ; it != m_pool.end(); ++it)
+		// {
+		// 	handles.push_back( (*it)->getWaitingHandle() );
+		// }
+  //
+		// ::WaitForMultipleObjects(handles.size(), &(handles[0]), TRUE, INFINITE);
+
+
 		SrTaskThreadPool::iterator it = m_pool.begin();
 		for ( ; it != m_pool.end(); ++it)
 		{
-			handles.push_back( (*it)->getWaitingHandle() );
+			(*it)->getWaitingEvent()->Wait();
 		}
-
-		::WaitForMultipleObjects(handles.size(), &(handles[0]), TRUE, INFINITE);
 	}
 
 	// destroy tasks

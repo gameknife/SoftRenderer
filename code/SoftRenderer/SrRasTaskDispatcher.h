@@ -44,10 +44,12 @@ public:
 		m_waitFlag->Set();
 	}
 
-	HANDLE getWaitingHandle()
+	IEvent* getWaitingEvent()
 	{
-		return m_runningFlag->GetEvent();
+		return m_runningFlag;
 	}
+
+
 
 private:
 	int m_threadId;
