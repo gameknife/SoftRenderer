@@ -98,7 +98,7 @@ void SrRasTaskDispatcher::Init()
 		(*it)->Start();
 	}
 
-	m_resLock = new gkScopedLock<gkMutexLock>(eLGID_Resource, (uint32)this);
+	m_resLock = new gkScopedLock<gkMutexLock>(eLGID_Resource, (uint64)this);
 }
 
 /**

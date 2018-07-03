@@ -65,7 +65,7 @@ enum ELockID
 #include "IThread_linux.h"
 #endif
 
-typedef std::map< uint32, void* > gkLockMap;
+typedef std::map< uint64, void* > gkLockMap;
 
 template <class T> struct gkLockManager
 {
@@ -82,7 +82,7 @@ template <class T> struct gkLockManager
 		m_locks.clear();
 	}
 
-	T* getLock( uint32 lockId )
+	T* getLock(uint64 lockId )
 	{
 		gkLockMap::iterator it = m_locks.find( lockId );
 		if (it != m_locks.end())
@@ -97,7 +97,7 @@ template <class T> struct gkLockManager
 		}
 	}
 
-	void deleteLock( uint32 lockId )
+	void deleteLock(uint64 lockId )
 	{
 		gkLockMap::iterator it = m_locks.find( lockId );
 		if (it != m_locks.end())
@@ -107,13 +107,13 @@ template <class T> struct gkLockManager
 		}
 	}
 
-	static std::map< uint32, gkLockManager<T> > s_lockManager;
+	static std::map< uint64, gkLockManager<T> > s_lockManager;
 };
-template<class T> std::map< uint32, gkLockManager<T> > gkLockManager<T>::s_lockManager;
+template<class T> std::map< uint64, gkLockManager<T> > gkLockManager<T>::s_lockManager;
 
 template <class T> struct gkScopedLock
 {
-	gkScopedLock(uint32 lockGroupId, uint32 lockId ): 
+	gkScopedLock(uint64 lockGroupId, uint64 lockId ):
 m_lockGroup( lockGroupId ),
 	m_lockID( lockId )
 {
@@ -141,13 +141,13 @@ bool TryLock() volatile
 }
 
 T* m_lock;
-uint32 m_lockGroup;
-uint32 m_lockID;
+uint64 m_lockGroup;
+uint64 m_lockID;
 };
 
 template <class T> struct gkAutoLock
 {
-	gkAutoLock(uint32 lockGroupId, uint32 lockId )
+	gkAutoLock(uint64 lockGroupId, uint64 lockId )
 	{
 		m_lock =  gkLockManager<T>::s_lockManager[lockGroupId].getLock( lockId );
 		m_lock->lock();
