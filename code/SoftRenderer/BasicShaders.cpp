@@ -69,17 +69,17 @@ void SrFlatShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const vo
 	SrFlatShading_Vert2Frag* out = (SrFlatShading_Vert2Frag*)vOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	// pos´¦Àíµ½ÊÀ½ç¿Õ¼ä£¬±£´æ
+	// posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£¬ï¿½ï¿½ï¿½ï¿½
 	float3 worldpos = (context->matrixs[eMd_World] * in->pos).xyz;
 
-	// pos´¦Àíµ½Í¶Ó°¿Õ¼ä
+	// posï¿½ï¿½ï¿½ï¿½Í¶Ó°ï¿½Õ¼ï¿½
 	out->pos = context->matrixs[eMd_WorldViewProj] * in->pos;
 
-	// Ö±½Ó½øÐÐ¹âÕÕ	// ×ª»»normalµ½ÊÀ½ç¿Õ¼ä
+	// Ö±ï¿½Ó½ï¿½ï¿½Ð¹ï¿½ï¿½ï¿½	// ×ªï¿½ï¿½normalï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	float3 normal = (context->matrixs[eMd_World].RotateVector3(in->normal));
 	normal.normalize();
 
-	// ÊÓÏß·½Ïò¼ÆËã
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - worldpos;
 	viewWS.normalize();
 	
@@ -88,7 +88,7 @@ void SrFlatShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const vo
 
 	CalcLights(context, worldpos, normal, viewWS, diffuseAcc, specularAcc);
 
-	// ´æÈëworldpos£¬¹©ps½×¶ÎÊ¹ÓÃ
+	// ï¿½ï¿½ï¿½ï¿½worldposï¿½ï¿½ï¿½ï¿½psï¿½×¶ï¿½Ê¹ï¿½ï¿½
 	out->diffuseAcc_tx = diffuseAcc * cBuffer->difColor;
 	out->specularAcc_ty = specularAcc;
 
@@ -103,15 +103,15 @@ void SrFlatShader::ProcessRasterize( void* rOut, const void* rInRef0, const void
 
 	float inv_ratio = 1.f - ratio;
 
-	// ÏßÐÔ²åÖµproject space pos
+	// ï¿½ï¿½ï¿½Ô²ï¿½Öµproject space pos
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ýw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// ï¿½Ñ¾ï¿½ï¿½ï¿½w
+	// Ö±ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½channel
 	verO->texcoord = SrFastLerp( verA->texcoord, verB->texcoord, ratio, inv_ratio );
 	verO->diffuseAcc_tx = verA->diffuseAcc_tx;
 	verO->specularAcc_ty = verA->specularAcc_ty;
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕý³£Öµ
+	// ï¿½ï¿½ï¿½ï¿½scanlineÉ¨ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Í¸ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	if (final)
 	{
 		verO->texcoord *= (1.f / verO->pos.w);
@@ -127,7 +127,7 @@ void SrFlatShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderCo
 
 	float2 texcoord = in->texcoord.xy;
 
-	// ²ÉÑùdiffuseÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½É«
 	uint32 col = context->Tex2D( texcoord, 0 );
 	float4 colf = uint32_2_float4(col);
 
@@ -137,10 +137,10 @@ void SrFlatShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderCo
 	colf = colf * in->diffuseAcc_tx;
 	colf += cBuffer->spcColor * in->specularAcc_ty;
 
-	// ½Ø¶Ïµ½0-1
+	// ï¿½Ø¶Ïµï¿½0-1
 	colf = Clamp(colf, 0.f, 1.f);	
 
-	// srgb»¹Ô­
+	// srgbï¿½ï¿½Ô­
 	colf.sqrt();
 
 	*pOut = float4_2_uint32(colf );
@@ -153,18 +153,18 @@ void SrGourandShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const
 	SrGourandShading_Vert2Frag* out = (SrGourandShading_Vert2Frag*)vOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	// pos´¦Àíµ½ÊÀ½ç¿Õ¼ä£¬±£´æ
+	// posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£¬ï¿½ï¿½ï¿½ï¿½
 	float3 worldpos = (context->matrixs[eMd_World] * in->pos).xyz;
 
-	// pos´¦Àíµ½Í¶Ó°¿Õ¼ä
+	// posï¿½ï¿½ï¿½ï¿½Í¶Ó°ï¿½Õ¼ï¿½
 	out->pos = context->matrixs[eMd_WorldViewProj] * in->pos;
 
-	// Ö±½Ó½øÐÐ¹âÕÕ
-	// ×ª»»normalµ½ÊÀ½ç¿Õ¼ä
+	// Ö±ï¿½Ó½ï¿½ï¿½Ð¹ï¿½ï¿½ï¿½
+	// ×ªï¿½ï¿½normalï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	float3 normal = (context->matrixs[eMd_World].RotateVector3(in->normal));
 	normal.normalize();
 
-	// ÊÓÏß·½Ïò¼ÆËã
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - worldpos;
 	viewWS.normalize();
 
@@ -174,7 +174,7 @@ void SrGourandShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const
 
 	CalcLights(context, worldpos, normal, viewWS, diffuseAcc, specularAcc);
 
-	// ´æÈëworldpos£¬¹©ps½×¶ÎÊ¹ÓÃ
+	// ï¿½ï¿½ï¿½ï¿½worldposï¿½ï¿½ï¿½ï¿½psï¿½×¶ï¿½Ê¹ï¿½ï¿½
 	out->diffuseAcc_tx = diffuseAcc * cBuffer->difColor;
 	out->specularAcc_ty = specularAcc;
 
@@ -187,16 +187,16 @@ void SrGourandShader::ProcessRasterize( void* rOut, const void* rInRef0, const v
 	const SrGourandShading_Vert2Frag* verB = static_cast<const SrGourandShading_Vert2Frag*>(rInRef1);
 	SrGourandShading_Vert2Frag* verO = static_cast<SrGourandShading_Vert2Frag*>(rOut);
 
-	// ÏßÐÔ²åÖµproject space pos
+	// ï¿½ï¿½ï¿½Ô²ï¿½Öµproject space pos
 	float inv_ratio = 1.f - ratio;
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ýw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// ï¿½Ñ¾ï¿½ï¿½ï¿½w
+	// Ö±ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½channel
 	verO->texcoord = SrFastLerp( verA->texcoord, verB->texcoord, ratio, inv_ratio );
 	verO->diffuseAcc_tx = SrFastLerp( verA->diffuseAcc_tx, verB->diffuseAcc_tx, ratio, inv_ratio );
 	verO->specularAcc_ty = SrFastLerp( verA->specularAcc_ty, verB->specularAcc_ty, ratio, inv_ratio );
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕý³£Öµ
+	// ï¿½ï¿½ï¿½ï¿½scanlineÉ¨ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Í¸ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	if (final)
 	{
 		verO->texcoord *= (1.f / verO->pos.w);
@@ -211,20 +211,20 @@ void SrGourandShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	// ²ÉÑùdiffuseÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½É«
 	uint32 col = context->Tex2D( in->texcoord.xy, 0 );
 	float4 colf = uint32_2_float4(col);
 
-	// diffuse ×÷ srgb
+	// diffuse ï¿½ï¿½ srgb
 	colf = colf * colf;
 
 	colf = colf * in->diffuseAcc_tx;
 	colf += cBuffer->spcColor * in->specularAcc_ty;
 
-	// ½Ø¶Ïµ½0-1
+	// ï¿½Ø¶Ïµï¿½0-1
 	colf = Clamp(colf, 0.f, 1.f);	
 
-	// srgb»¹Ô­
+	// srgbï¿½ï¿½Ô­
 	colf.sqrt();
 
 	*out = float4_2_uint32(colf );
@@ -236,12 +236,12 @@ void SrPhongShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const v
 	SrVertexP3N3T2* in = (SrVertexP3N3T2*)vInRef0;
 	SrPhongShading_Vert2Frag* out = (SrPhongShading_Vert2Frag*)vOut;
 
-	// pos´¦Àíµ½Í¶Ó°¿Õ¼ä
+	// posï¿½ï¿½ï¿½ï¿½Í¶Ó°ï¿½Õ¼ï¿½
 	out->pos = context->matrixs[eMd_WorldViewProj] * in->pos;
-	// pos´¦Àíµ½ÊÀ½ç¿Õ¼ä£¬±£´æ
+	// posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£¬ï¿½ï¿½ï¿½ï¿½
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
-	// normal,tangent´¦Àíµ½ÊÀ½ç¿Õ¼ä
+	// normal,tangentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	out->normal_ty = float4((context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 }
 
@@ -251,7 +251,7 @@ void SrPhongShader::ProcessRasterize( void* rOut, const void* rInRef0, const voi
 	const SrPhongShading_Vert2Frag* verB = static_cast<const SrPhongShading_Vert2Frag*>(rInRef1);
 	SrPhongShading_Vert2Frag* verO = static_cast<SrPhongShading_Vert2Frag*>(rOut);
 
-	// ÏßÐÔ²åÖµproject space pos
+	// ï¿½ï¿½ï¿½Ô²ï¿½Öµproject space pos
 	float inv_ratio = 1.f - ratio;
 
 #ifdef SR_USE_AVX
@@ -264,12 +264,12 @@ void SrPhongShader::ProcessRasterize( void* rOut, const void* rInRef0, const voi
 #else
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ýw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// ï¿½Ñ¾ï¿½ï¿½ï¿½w
+	// Ö±ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½channel
 	verO->normal_ty = SrFastLerp( verA->normal_ty, verB->normal_ty, ratio, inv_ratio );
 	verO->worldpos_tx = SrFastLerp( verA->worldpos_tx, verB->worldpos_tx, ratio, inv_ratio );
 
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕý³£Öµ
+	// ï¿½ï¿½ï¿½ï¿½scanlineÉ¨ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Í¸ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	if (final)
 	{
 		verO->normal_ty /= verO->pos.w;
@@ -284,15 +284,15 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	// ²ÉÑùdiffuseÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½É«
 	float2 tc0( in->worldpos_tx.w, in->normal_ty.w );
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 	float matSpec = matDiff.a;
-	// diffuse ×÷ srgb
+	// diffuse ï¿½ï¿½ srgb
 	matDiff = matDiff * matDiff;
 
-	// ·¨ÏßÈÅ¶¯´¦Àí
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 normalDir = in->normal_ty.xyz;
 	normalDir.normalize();
 
@@ -300,7 +300,7 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 // 	return;
 
 
-	// ÊÓÏß·½Ïò¼ÆËã
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - in->worldpos_tx.xyz;
 	viewWS.normalize();
 
@@ -310,14 +310,14 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 
 	CalcLights(context, in->worldpos_tx.xyz, normalDir, viewWS, diffuseAcc, specularAcc);
 	
-	// ½Ø¶Ïµ½0-1
+	// ï¿½Ø¶Ïµï¿½0-1
 
 	//diffuseAcc = (diffuseAcc + 0.5f) * matDiff;
 	diffuseAcc = diffuseAcc * matDiff * cBuffer->difColor;
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec;
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 	//diffuseAcc.a = 1.0f;
-	// srgb»¹Ô­
+	// srgbï¿½ï¿½Ô­
 	diffuseAcc.sqrt();
 
 	*out = float4_2_uint32(diffuseAcc);
@@ -354,15 +354,15 @@ void SrPhongWithNormalShader::ProcessVertex( void* vOut, void* vOut1, void* vOut
 	SrPhongShading_Vert2Frag* out = (SrPhongShading_Vert2Frag*)vOut;
 
 
-	// pos´¦Àíµ½Í¶Ó°¿Õ¼ä
+	// posï¿½ï¿½ï¿½ï¿½Í¶Ó°ï¿½Õ¼ï¿½
 	out->pos = context->matrixs[eMd_WorldViewProj] * in->pos;
-	// pos´¦Àíµ½ÊÀ½ç¿Õ¼ä£¬±£´æ
+	// posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä£¬ï¿½ï¿½ï¿½ï¿½
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
-	// normal,tangent´¦Àíµ½ÊÀ½ç¿Õ¼ä
+	// normal,tangentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	out->normal_ty = float4( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 
-	// ÔÝÊ±°Ñpos´æÈëtangent£¬¹©geometry½×¶Î¼ÆËãtangent
+	// ï¿½ï¿½Ê±ï¿½ï¿½posï¿½ï¿½ï¿½ï¿½tangentï¿½ï¿½ï¿½ï¿½geometryï¿½×¶Î¼ï¿½ï¿½ï¿½tangent
 	out->tangent.xyz = in->pos.xyz;// * out->pos.w;
 	//out->texcoord2 = in->texcoord * out->pos.w;
 }
@@ -373,7 +373,7 @@ void SrPhongWithNormalShader::ProcessRasterize( void* rOut, const void* rInRef0,
 	const SrPhongShading_Vert2Frag* verB = static_cast<const SrPhongShading_Vert2Frag*>(rInRef1);
 	SrPhongShading_Vert2Frag* verO = static_cast<SrPhongShading_Vert2Frag*>(rOut);
 
-	// ÏßÐÔ²åÖµproject space pos
+	// ï¿½ï¿½ï¿½Ô²ï¿½Öµproject space pos
 	float inv_ratio = 1.f - ratio;
 
 #ifdef SR_USE_AVX
@@ -386,13 +386,13 @@ void SrPhongWithNormalShader::ProcessRasterize( void* rOut, const void* rInRef0,
 #else
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ýw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// ï¿½Ñ¾ï¿½ï¿½ï¿½w
+	// Ö±ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½channel
 	verO->normal_ty = SrFastLerp( verA->normal_ty, verB->normal_ty, ratio, inv_ratio );
 	verO->worldpos_tx = SrFastLerp( verA->worldpos_tx, verB->worldpos_tx, ratio, inv_ratio );
 	verO->tangent = SrFastLerp( verA->tangent, verB->tangent, ratio, inv_ratio );
 
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕý³£Öµ
+	// ï¿½ï¿½ï¿½ï¿½scanlineÉ¨ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Í¸ï¿½Ó²ï¿½Öµï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	if (final)
 	{
 		verO->normal_ty /= verO->pos.w;
@@ -494,47 +494,47 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 	float2 tc0(in->worldpos_tx.w, in->normal_ty.w);
 	
-	// ²ÉÑùdiffuseÑÕÉ«
+	// ï¿½ï¿½ï¿½ï¿½diffuseï¿½ï¿½É«
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 	float4 matSpec(matDiff.a);
-	// diffuse ×÷ srgb
+	// diffuse ï¿½ï¿½ srgb
 	matDiff = matDiff * matDiff;
 
-	// ·¨ÏßÈÅ¶¯´¦Àí
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 normalDir = in->normal_ty.xyz;
 	normalDir.normalize();
 	float3 tangentDir = in->tangent.xyz;
 	tangentDir.normalize();
 	float3 binormalDir = tangentDir % normalDir;
 
-	// ÀûÓÃÊÀ½ç¿Õ¼äµÄ ÇÐÏß£¬·¨Ïß£¬¸±·¨Ïß ¹¹Ôì´ÓÇÐÏß¿Õ¼äµ½ÊÀ½ç¿Õ¼äµÄ×ª»»¾ØÕó
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¿Õ¼äµ½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float33 tangent2world( tangentDir, binormalDir, normalDir );
 
-	// ²ÉÑùnormal
+	// ï¿½ï¿½ï¿½ï¿½normal
 	uint32 nor = context->Tex2D( tc0, 1 );
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;
 	normalTangent = (normalTangent - float3(0.5f)) * 2.f;
 
-	// ½«²ÉÑùµ½µÄÇÐÏß¿Õ¼ä·¨Ïß×ª»»µ½ÊÀ½ç¿Õ¼ä
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¿Õ¼ä·¨ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 	normalDir = tangent2world * normalTangent;
 	normalDir.normalize();
 
-	// ÊÓÏß·½Ïò¼ÆËã
+	// ï¿½ï¿½ï¿½ß·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - in->worldpos_tx.xyz;
 	viewWS.normalize();
 
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
 	float4 specularAcc(0.f);
 	
-	// ¹âÕÕ¼ÆËã
+	// ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½
 	CalcLights(context, in->worldpos_tx.xyz, normalDir, viewWS, diffuseAcc, specularAcc);
 
 	// calc ssao here
 	
-	// 2.¼ÆËãÐý×ªµÄ²ÉÑùaddress
+	// 2.ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½Ä²ï¿½ï¿½ï¿½address
 	//int address = (int)(in->pos.x) % 4 + (int)(in->pos.y) % 4 * 4 ;
 	//address %= 16;
 	float ao = 0;
@@ -547,16 +547,16 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
  		int x = address % gEnv->context->width;
 		int address = x % 4 + (y % 4) * 4;
 		address %= 16;
-		// aoÀÛ»ý
+		// aoï¿½Û»ï¿½
 		
 
-		// fragmentË÷Òý
+		// fragmentï¿½ï¿½ï¿½ï¿½
 		SrFragment* fragment = (SrFragment*)pIn;
 
-		// 1.µÃµ½×Ô¼ºµÄÎÆÀí×ø±ê
+		// 1.ï¿½Ãµï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		float2 hTc(in->pos.x / (float) gEnv->context->width, in->pos.y / (float) gEnv->context->height);
 
-			// µü´ú°Ë´Î£¬¼ÆËãAO
+			// ï¿½ï¿½ï¿½ï¿½ï¿½Ë´Î£ï¿½ï¿½ï¿½ï¿½ï¿½AO
 		for ( int i=0; i < 8; ++i)
 		{
 			float2 tc = g_kernel[i];
@@ -572,30 +572,30 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 			}
 			diff = diff / d;
 			d*= 0.3f;
-			ao += max(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0 / (1.0 + d) ) * 2.f * (jit ? 2.f : 1.f);
+			ao += fmax(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0 / (1.0 + d) ) * 2.f * (jit ? 2.f : 1.f);
 		}
 
-		// Æ½¾ùAO
+		// Æ½ï¿½ï¿½AO
 		ao *= 0.125f;
 
-		// ½Ø¶Ïµ½0~1
+		// ï¿½Ø¶Ïµï¿½0~1
 		ao = Clamp(ao, 0.f, 1.f);
 		//ao = 1.f - ao;
-		// µ÷ºÍamb
+		// ï¿½ï¿½ï¿½ï¿½amb
 		diffuseAcc *= 1.f - ao;
 
 		ao -= 0.5f;
 		//diffuseAcc *= address / 16.f;
 	}
 
-	// ½Ø¶Ïµ½0-1
+	// ï¿½Ø¶Ïµï¿½0-1
 	diffuseAcc = diffuseAcc * matDiff * cBuffer->difColor;
 	diffuseAcc *= (1.f - ao);
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec.x;
 
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 
-	// srgb»¹Ô­
+	// srgbï¿½ï¿½Ô­
 	diffuseAcc.sqrt();
 
 	*out = float4_2_uint32(diffuseAcc);

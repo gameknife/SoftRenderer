@@ -9,14 +9,9 @@
 
 #include "mmgr.h"
 
-extern "C"
-{
-	EXPORT_API_PUBLIC GlobalEnvironment* gEnv = NULL;
-	EXPORT_API_PUBLIC SrLogger* g_logger = NULL;
-	EXPORT_API_PUBLIC SrRendContext* g_context = NULL;
-}
-
-
+	GlobalEnvironment* gEnv = NULL;
+	SrLogger* g_logger = NULL;
+	SrRendContext* g_context = NULL;
 
 typedef IRenderer* (*fnLoadRenderer)(GlobalEnvironment* pgEnv);
 typedef void (*fnFreeRenderer)();

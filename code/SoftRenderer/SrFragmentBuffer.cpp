@@ -29,13 +29,13 @@ SrFragmentBuffer::~SrFragmentBuffer(void)
 	delete[] zBuffer;
 }
 
-float3 SrFragmentBuffer::GetNormal( float2& texcoord ) const
+float3 SrFragmentBuffer::GetNormal( const float2& texcoord ) const
 {
-	// ÔÚÕâÀï×÷warp
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½warp
 	float u = texcoord.x - floor(texcoord.x);
 	float v = texcoord.y - floor(texcoord.y);
 
-	// ÁÙ½üµã²ÉÑù
+	// ï¿½Ù½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	u *= (m_width);
 	v *= (m_height);
 

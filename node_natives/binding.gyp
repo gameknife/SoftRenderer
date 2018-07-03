@@ -19,9 +19,7 @@
         'targets': [
           {
             "target_name": "addon",
-            "sources": [
-              "../code/SoftRenderer/*.cpp"
-            ],
+            'sources' : [  "<!@(node -p \"require('fs').readdirSync('../code/SoftRenderer').map(f=>'../code/SoftRenderer/'+f).join(' ')\")" ],
             "include_dirs" : ["<!(node -e \"require('nan')\")","../code/SoftRenderer/"],
           },
         ],

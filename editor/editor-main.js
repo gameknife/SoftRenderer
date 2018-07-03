@@ -9,6 +9,9 @@ window.onload = function(){
   let context = canvas.getContext('2d');
 
   let rootPath = path.dirname(__dirname);
+
+  console.log( addon.hello() );
+
   addon.setRootPath(rootPath);
  
   console.log(rootPath);

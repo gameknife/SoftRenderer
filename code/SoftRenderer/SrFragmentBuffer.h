@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -27,14 +27,14 @@ public:
 	// 	return &(fragBufferSync[address].cs);
 	// }
 
-	inline float3 GetNormal(float2& texcoord) const;
-	float3 GetWorldPos(float2& texcoord) const
+	inline float3 GetNormal(const float2& texcoord) const;
+	float3 GetWorldPos(const float2& texcoord) const
 	{
-		// ÔÚÕâÀï×÷warp
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½warp
 		float u = texcoord.x - floor(texcoord.x);
 		float v = texcoord.y - floor(texcoord.y);
 
-		// ÁÙ½üµã²ÉÑù
+		// ï¿½Ù½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		u *= (m_width);
 		v *= (m_height);
 
@@ -56,7 +56,7 @@ public:
 	float*					zBuffer;
 
 private:
-	SrIndexBuffer*			m_fBufferIndices;	///< fragBufferIndicesË÷Òý
+	SrIndexBuffer*			m_fBufferIndices;	///< fragBufferIndicesï¿½ï¿½ï¿½ï¿½
 	
 	SrFragmentBufferSync*	fragBufferSync;
 
