@@ -10,13 +10,6 @@
 
 #ifndef SrScene_h__
 #define SrScene_h__
-#include "prerequisite.h"
-
-class SrEntity;
-struct SrCamera;
-
-
-
 
 class SrScene
 {

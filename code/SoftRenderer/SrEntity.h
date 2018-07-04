@@ -11,8 +11,6 @@
 #ifndef SrEntity_h__
 #define SrEntity_h__
 
-class SrMesh;
-
 SR_ALIGN class SrEntity
 {
 public:

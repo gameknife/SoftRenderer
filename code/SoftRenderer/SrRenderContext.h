@@ -13,7 +13,7 @@
 
 class SrFragmentBuffer;
 
-struct SrRendContext
+SR_ALIGN struct SrRendContext
 {
 	SrRendContext(int w, int h, int obpp)
 	{
@@ -43,18 +43,17 @@ struct SrRendContext
 		return features & feature;
 	}
 	
-	// ��ϸ����
-	int width;							///< ��Ⱦ�����
-	int height;							///< ��Ⱦ���߶�
-	SrViewport viewport;				///< 3ά�ӿ�
-	int bpp;							///< ����λ����λbyte
-	uint32 features;					///< ��Ⱦ����
-	int processorNum;					///< ����������
+	uint32 width;						
+	uint32 height;						
+	SrViewport viewport;				
+	int bpp;							
+	uint32 features;					
+	int processorNum;					
 
 	SrFragmentBuffer* fBuffer;			///< FragBuffer
 };
 extern SrRendContext* g_context;
 
-#endif // SrRenderContext_h__
+#endif 
 
 

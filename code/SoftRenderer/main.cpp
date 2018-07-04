@@ -8,10 +8,6 @@
 
 #include "mmgr.h"
 
-
-std::map<const void*, void*> m_align_pt_mapper;
-std::string g_rootPath;
-
 #ifdef OS_WIN32
 
 int main()

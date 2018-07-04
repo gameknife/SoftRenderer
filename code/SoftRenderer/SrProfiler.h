@@ -11,8 +11,6 @@
 #ifndef SrProfiler_h__
 #define SrProfiler_h__
 
-#include "prerequisite.h"
-
 #define AVGTIME_COUNT 300
 
 enum EProfilerElement

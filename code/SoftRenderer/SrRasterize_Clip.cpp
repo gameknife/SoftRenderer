@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SrRasterizer.h"
 #include "SrSwShader.h"
 #include "SrMaterial.h"
@@ -8,16 +8,16 @@
 
 
 /**
-*@brief ¹âÉº»¯Èı½ÇĞÎ²Ã¼ô
+*@brief å…‰çŠåŒ–ä¸‰è§’å½¢è£å‰ª
 *@return void 
-*@param SrRastTriangle tri ÊÀ½ç¿Õ¼äµÄÈı½ÇĞÎ 
-*@param float zNear Ïà»ú½ü²Ã¼ôÃæ
-*@param float zFar Ïà»úÔ¶²Ã¼ôÃæ
+*@param SrRastTriangle tri ä¸–ç•Œç©ºé—´çš„ä¸‰è§’å½¢ 
+*@param float zNear ç›¸æœºè¿‘è£å‰ªé¢
+*@param float zFar ç›¸æœºè¿œè£å‰ªé¢
 */
 void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, float zFar )
 {
 
-	// ²Ã¼ôµÄÇøÓòÅĞ¶ÏÂë
+	// è£å‰ªçš„åŒºåŸŸåˆ¤æ–­ç 
 #define CLIP_CODE_MORE_Z   0x0001    // z > z_max
 #define CLIP_CODE_LESS_Z   0x0002    // z < z_min
 #define CLIP_CODE_IN_Z   0x0004    // z_min < z < z_max
@@ -32,9 +32,9 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 
 #define CLIP_CODE_NULL 0x0000
 
-	int vertex_ccodes[3]; // Èı½ÇĞÎÈı¸ö¶¥µãµÄÅĞ¶ÏÂë´æ´¢
-	int num_verts_in;     // ÔÚÊÓ×¶ÄÚµÄ¶¥µã¸öÊı
-	int v0, v1, v2;       // ¶¥µãµãĞò
+	int vertex_ccodes[3]; // ä¸‰è§’å½¢ä¸‰ä¸ªé¡¶ç‚¹çš„åˆ¤æ–­ç å­˜å‚¨
+	int num_verts_in;     // åœ¨è§†é”¥å†…çš„é¡¶ç‚¹ä¸ªæ•°
+	int v0, v1, v2;       // é¡¶ç‚¹ç‚¹åº
 
 
 
@@ -42,7 +42,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 	float z_test = z_factor * tri.p[0].pos.w;
 
 	//////////////////////////////////////////////////////////////////////////
-	// ²Ã¼ôXÖá
+	// è£å‰ªXè½´
 	// vertex 0
 	if (tri.p[0].pos.x > z_test)
 		vertex_ccodes[0] = CLIP_CODE_MORE_X;
@@ -71,8 +71,8 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 		vertex_ccodes[2] = CLIP_CODE_IN_X;
 
 
-	// ²âÊÔ£ºµ±Èı½ÇĞÎÍêÈ«ÔÚXÖáÏòÉÏÎ»ÓÚÊÓ×¶Íâ²¿ÊÇ£¬Å×Æú¡£
-	// ·ñÔò²»²Ã¼ôÖ±½Ó½øÈë¹âÕ¤»¯
+	// æµ‹è¯•ï¼šå½“ä¸‰è§’å½¢å®Œå…¨åœ¨Xè½´å‘ä¸Šä½äºè§†é”¥å¤–éƒ¨æ˜¯ï¼ŒæŠ›å¼ƒã€‚
+	// å¦åˆ™ä¸è£å‰ªç›´æ¥è¿›å…¥å…‰æ …åŒ–
 	if ( ((vertex_ccodes[0] == CLIP_CODE_MORE_X) && 
 		(vertex_ccodes[1] == CLIP_CODE_MORE_X) && 
 		(vertex_ccodes[2] == CLIP_CODE_MORE_X) ) ||
@@ -84,11 +84,11 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 	{
 		return;
 	}
-	// ²Ã¼ôXÖá
+	// è£å‰ªXè½´
 	//////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
-	// ²Ã¼ôYÖá
+	// è£å‰ªYè½´
 	z_factor = 1.f;  
 	z_test = z_factor * tri.p[0].pos.w;
 	
@@ -118,8 +118,8 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 	else
 		vertex_ccodes[2] = CLIP_CODE_IN_Y;
 
-	// ²âÊÔ£ºµ±Èı½ÇĞÎÍêÈ«ÔÚXÖáÏòÉÏÎ»ÓÚÊÓ×¶Íâ²¿ÊÇ£¬Å×Æú.
-	// ·ñÔò²»²Ã¼ôÖ±½Ó½øÈë¹âÕ¤»¯
+	// æµ‹è¯•ï¼šå½“ä¸‰è§’å½¢å®Œå…¨åœ¨Xè½´å‘ä¸Šä½äºè§†é”¥å¤–éƒ¨æ˜¯ï¼ŒæŠ›å¼ƒ.
+	// å¦åˆ™ä¸è£å‰ªç›´æ¥è¿›å…¥å…‰æ …åŒ–
 	if ( ((vertex_ccodes[0] == CLIP_CODE_MORE_Y) && 
 		(vertex_ccodes[1] == CLIP_CODE_MORE_Y) && 
 		(vertex_ccodes[2] == CLIP_CODE_MORE_Y) ) ||
@@ -131,16 +131,16 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 	{
 		return;
 	}
-	// ²Ã¼ôYÖá
+	// è£å‰ªYè½´
 	//////////////////////////////////////////////////////////////////////////
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ²Ã¼ôZÖá
+	// è£å‰ªZè½´
 	{
-		// Ê×ÏÈÅĞ¶ÏÈı¸ö¶¥µãÓëZNEARÆ½ÃæµÄ×´Ì¬
+		// é¦–å…ˆåˆ¤æ–­ä¸‰ä¸ªé¡¶ç‚¹ä¸ZNEARå¹³é¢çš„çŠ¶æ€
 
-		// ÔÚÊÓ×¶ÌåÄÚ²¿µÄ¶¥µãÊıÁ¿ÖÃ0
+		// åœ¨è§†é”¥ä½“å†…éƒ¨çš„é¡¶ç‚¹æ•°é‡ç½®0
 		num_verts_in = 0;
 
 		// vertex 0
@@ -188,7 +188,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 			num_verts_in++;
 		} 
 
-		// ²âÊÔ£ºµ±Èı½ÇĞÎÍêÈ«ÔÚZÖáÏòÉÏÎ»ÓÚÊÓ×¶Íâ²¿Ê±£¬Å×Æú¡£
+		// æµ‹è¯•ï¼šå½“ä¸‰è§’å½¢å®Œå…¨åœ¨Zè½´å‘ä¸Šä½äºè§†é”¥å¤–éƒ¨æ—¶ï¼ŒæŠ›å¼ƒã€‚
 		if ( ((vertex_ccodes[0] == CLIP_CODE_MORE_Z) && 
 			(vertex_ccodes[1] == CLIP_CODE_MORE_Z) && 
 			(vertex_ccodes[2] == CLIP_CODE_MORE_Z) ) ||
@@ -198,12 +198,12 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 			(vertex_ccodes[2] == CLIP_CODE_LESS_Z) ) )
 
 		{
-			// ËùÓÃ¶¥µã¾ùÔÚ²»Î»ÓÚÊÓ×¶ÄÚ²¿£¬Ö±½ÓÌŞ³ı
+			// æ‰€ç”¨é¡¶ç‚¹å‡åœ¨ä¸ä½äºè§†é”¥å†…éƒ¨ï¼Œç›´æ¥å‰”é™¤
 			return;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		// µ±ËùÓĞ¶¥µã£¬¾ùÎ»ÓÚZ·¶Î§ÄÚ£¬Ö±½ÓÌá½»
+		// å½“æ‰€æœ‰é¡¶ç‚¹ï¼Œå‡ä½äºZèŒƒå›´å†…ï¼Œç›´æ¥æäº¤
 		if ( (vertex_ccodes[0] == CLIP_CODE_IN_Z) && 
 			(vertex_ccodes[1] == CLIP_CODE_IN_Z) && 
 			(vertex_ccodes[2] == CLIP_CODE_IN_Z) )
@@ -211,11 +211,11 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 			RasterizeTriangle(tri);
 		}
 
-		// ÕâÊ±£¬ÅĞ¶Ï£¬ÊÇ·ñÓĞµãÎ»ÓÚ½üÆ½ÃæÒÔÄÚ£¿
+		// è¿™æ—¶ï¼Œåˆ¤æ–­ï¼Œæ˜¯å¦æœ‰ç‚¹ä½äºè¿‘å¹³é¢ä»¥å†…ï¼Ÿ
 		if ( ( (vertex_ccodes[0] | vertex_ccodes[1] | vertex_ccodes[2]) & CLIP_CODE_LESS_Z) )
 		{
-			// ÓĞ
-			// ÕâÊ±£¬Õâ¸öÈı½ÇĞÎÒ»¶¨Óë½üÆ½Ãæ½»´í
+			// æœ‰
+			// è¿™æ—¶ï¼Œè¿™ä¸ªä¸‰è§’å½¢ä¸€å®šä¸è¿‘å¹³é¢äº¤é”™
 
 
 
@@ -223,15 +223,15 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 
 			if (num_verts_in == 1)
 			{
-				// Çé¿öA:
-				// µ±Ò»¸ö¶¥µãÔÚÊÓ×¶ÄÚ
-				// ×î¼òµ¥£¬Ö±½Ó½ØÈ¡
+				// æƒ…å†µA:
+				// å½“ä¸€ä¸ªé¡¶ç‚¹åœ¨è§†é”¥å†…
+				// æœ€ç®€å•ï¼Œç›´æ¥æˆªå–
 				//     /\
 				//    /  \
 				//   /____\
 				//  /      \
 
-				// 1.ÏÈ¼òµ¥ÅÅĞò£¬°ÑÔÚÊÓ×¶ÀïÃæµÄ¶¥µãÅÅµ½µÚÒ»¸ö
+				// 1.å…ˆç®€å•æ’åºï¼ŒæŠŠåœ¨è§†é”¥é‡Œé¢çš„é¡¶ç‚¹æ’åˆ°ç¬¬ä¸€ä¸ª
 				if ( vertex_ccodes[0] == CLIP_CODE_IN_Z)
 				{ v0 = 0; v1 = 1; v2 = 2; }
 				else if (vertex_ccodes[1] == CLIP_CODE_IN_Z)
@@ -239,8 +239,8 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 				else
 				{ v0 = 2; v1 = 0; v2 = 1; }
 
-				// 2. ²Ã¼ô£¬
-				// ¹¹ÔìÈı¸öĞÂ¶¥µã
+				// 2. è£å‰ªï¼Œ
+				// æ„é€ ä¸‰ä¸ªæ–°é¡¶ç‚¹
 				SrRendVertex p0 = tri.p[v0];
 				SrRendVertex p1 = tri.p[v1];
 				SrRendVertex p2 = tri.p[v2];
@@ -252,7 +252,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 				float ratio1 = (p0.pos.w - zNear) / (p0.pos.w - p1.pos.w);
 				float ratio2 = (p0.pos.w - zNear) / (p0.pos.w - p2.pos.w);
 
-				// ÕâÀï£¬ÓÉÓÚÈı½ÇĞÎ»¹ÔÚ3D¿Õ¼ä£¬Òò´ËÖ±½Ó²åÖµ£¬²»ĞèÒªÍ¸ÊÓ½ÃÕı
+				// è¿™é‡Œï¼Œç”±äºä¸‰è§’å½¢è¿˜åœ¨3Dç©ºé—´ï¼Œå› æ­¤ç›´æ¥æ’å€¼ï¼Œä¸éœ€è¦é€è§†çŸ«æ­£
 #ifdef FIXED_FUNCTION_RASTERIZOR
 				FixedRasterize(&p1, &tri.p[v0], &tri.p[v1], NULL, ratio1, &(tri.primitive->shaderConstants));
 				FixedRasterize(&p2, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants));
@@ -266,7 +266,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 				tri.p[v1] = p1;
 				tri.p[v2] = p2;
 
-				// ²Ã¼ôÍê±Ï£¬Ìá½»
+				// è£å‰ªå®Œæ¯•ï¼Œæäº¤
 				RasterizeTriangle(tri);					
 
 			}
@@ -274,9 +274,9 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 			{ 
 				// num_verts = 2
 				
-				// Çé¿öB£º
-				// ÓĞÁ½¸ö¶¥µãÔÚÊÓ×¶ÄÚ
-				// ÉÔÎ¢¸´ÔÓ£¬²Ã¼ôÍêºóÊÇÒ»¸öËÄ±ßĞÎ£¬ĞèÒª·Ö¸î
+				// æƒ…å†µBï¼š
+				// æœ‰ä¸¤ä¸ªé¡¶ç‚¹åœ¨è§†é”¥å†…
+				// ç¨å¾®å¤æ‚ï¼Œè£å‰ªå®Œåæ˜¯ä¸€ä¸ªå››è¾¹å½¢ï¼Œéœ€è¦åˆ†å‰²
 
 				//1          2
 				//3__________4
@@ -287,7 +287,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 
 				//     p0
 
-				// 1. ÕÒ³ö²»ÔÚÊÓ×¶ÌåÄÚµÄ¶¥µã
+				// 1. æ‰¾å‡ºä¸åœ¨è§†é”¥ä½“å†…çš„é¡¶ç‚¹
 				if ( vertex_ccodes[0] == CLIP_CODE_LESS_Z)
 				{ v0 = 0; v1 = 1; v2 = 2; }
 				else if (vertex_ccodes[1] == CLIP_CODE_LESS_Z)
@@ -295,7 +295,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 				else
 				{ v0 = 2; v1 = 0; v2 = 1; }
 
-				// step 2: ²Ã¼ô
+				// step 2: è£å‰ª
 				SrRendVertex p0 = tri.p[v0];
 				SrRendVertex p1 = tri.p[v1];
 				SrRendVertex p2 = tri.p[v2];
@@ -318,7 +318,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 				tri.primitive->shader->ProcessRasterize(&p4, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants));
 #endif
 
-				// step 3: ¹¹Ôì
+				// step 3: æ„é€ 
 				SrRastTriangle tri1 = tri;
 				SrRastTriangle tri2 = tri;
 				tri1.p[v0] = p3;
@@ -327,7 +327,7 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 				tri2.p[v0] = p4;
 				tri2.p[v1] = p3;
 
-				// Ìá½»·Ö¸îºóµÄÈı½ÇĞÎ
+				// æäº¤åˆ†å‰²åçš„ä¸‰è§’å½¢
 
 				RasterizeTriangle(tri1);
 				RasterizeTriangle(tri2);

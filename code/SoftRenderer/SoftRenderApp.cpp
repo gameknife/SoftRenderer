@@ -9,9 +9,16 @@
 
 #include "mmgr.h"
 
-	GlobalEnvironment* gEnv = NULL;
-	SrLogger* g_logger = NULL;
-	SrRendContext* g_context = NULL;
+
+// 全局变量
+GlobalEnvironment* gEnv = NULL;
+SrLogger* g_logger = NULL;
+SrRendContext* g_context = NULL;
+std::map<const void*, void*> m_align_pt_mapper;
+std::string g_rootPath;
+
+
+
 
 typedef IRenderer* (*fnLoadRenderer)(GlobalEnvironment* pgEnv);
 typedef void (*fnFreeRenderer)();

@@ -1,11 +1,10 @@
-/**
+﻿/**
   @file math_def.h
   
-  @brief ��ѧ��ͷ�ļ�
+  @brief 数学库
 
   @author yikaiming
 
-  ������־ history
   ver:1.0
    
  */
@@ -15,29 +14,25 @@
 
 //#define assert( x )  
 
-// ���峣��
+// PI定义
 #define SR_PI 3.1415926f
 #define SR_EQUAL_PRECISION 0.001f
 
 
 
-// ���峣�ó��ȣ�λ������λ
+// 基础数据类型
 typedef unsigned long long uint64;
 typedef unsigned int uint32;
 typedef unsigned short uint16;
 typedef unsigned char uint8;
 
-// ������ѧ����
+// 系统数学库引入
 #include <math.h>
 
 // namespace srmath
 // {
 static inline float isqrtf(float x) {return 1.f/sqrtf(x);}
 static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = float(sin(angle));	*pCos = float(cos(angle));	}
-
-// ��ѧ�ṹ��ǰ����
-
-// ��������vector, quaternion, matrixʵ��
 
 #ifdef SR_USE_SIMD
 // SSE3 including
@@ -47,26 +42,26 @@ static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = flo
 #endif
 
 
-// ɫ������
+// 使用RGBA的输出格式
 #define SR_COLOR_RGBA
 
-
+// 引入向量，四元数，矩阵实现
 #include "vector.h"
 #include "quaternion.h"
 #include "matrix.h"
 
 
 
-// ������ѧ����
+// 模板方法
 
 /**
- @breif ģ��ض�
+ @breif 截断
  */
 template<typename T>
 static inline T Clamp( const T& p , const T& min , const T& max ) { if( p < min ) return min; if( p > max ) return max; return p; }
 
 /**
- @breif float4�ض�
+ @breif float4的单值截断
  */
 static inline float4 Clamp(  const float4& p , float min, float max )
 {
@@ -87,7 +82,7 @@ static inline float4 Clamp(  const float4& p , float min, float max )
 }
 
 /**
- @breif  ����
+ @breif 交换
  */
 template<typename T> void SWAP(T& x, T& y)
 {
@@ -97,7 +92,7 @@ template<typename T> void SWAP(T& x, T& y)
 }
 
 /**
- @breif ����ж�
+ @breif 相等判断
  */
 static inline bool Equal(float x, float y, float evsilon = SR_EQUAL_PRECISION)
 {
@@ -109,7 +104,7 @@ static inline bool Equal(float x, float y, float evsilon = SR_EQUAL_PRECISION)
 }
 
 /**
- @breif Smooth Hermite��ֵ
+ @breif Smooth Hermite插值
  */
 static inline float SmoothStep(float mini, float maxi, float x)
 {
@@ -118,7 +113,7 @@ static inline float SmoothStep(float mini, float maxi, float x)
 }
 
 /**
- @breif Smooth Hermite��ֵ
+ @breif Smooth Hermite插值
  */
 static inline float SmoothStep(float maxi, float x)
 {
@@ -127,7 +122,7 @@ static inline float SmoothStep(float maxi, float x)
 }
 
 /**
- @breif ARGB char[4] �� DWORD ARGB
+ @breif ARGB char[4] 转换到 DWORD ARGB
  */
 static inline uint32 uint8ARGB_2_uint32( const uint8 * const ch )
 {
@@ -139,7 +134,7 @@ static inline uint32 uint8ARGB_2_uint32( const uint8 * const ch )
 }
 
 /**
- @breif ARGB char[4] �� DWORD ARGB
+ @breif ARGB char[4] 转换到 DWORD ARGB
  */
 static inline uint32 uint32RGB_2_uint32ABGR( const uint32 rgb )
 {
@@ -152,7 +147,7 @@ static inline uint32 uint32RGB_2_uint32ABGR( const uint32 rgb )
 }
 
 /**
- @breif bmp32 - BGRA �� DWORD ARGB
+ @breif bmp32 - BGRA 转换到 DWORD ARGB
  */
 static inline uint32 uint8BGRA_2_uint32( const uint8 * const ch )
 {
@@ -164,7 +159,7 @@ static inline uint32 uint8BGRA_2_uint32( const uint8 * const ch )
 }
 
 /**
- @breif bmp24 - BGR �� DWORD ARGB
+ @breif bmp24 - BGR 转换到 DWORD ARGB
  */
 static inline uint32 uint8BGR_2_uint32( const uint8 * const ch )
 {
@@ -176,7 +171,7 @@ static inline uint32 uint8BGR_2_uint32( const uint8 * const ch )
 }
 
 /**
- @breif float4 argb �� DWORD ARGB
+ @breif float4 argb 转换到 DWORD ARGB
  */
 static inline uint32 float4_2_uint32( const float4& f )
 {
@@ -217,7 +212,7 @@ static inline uint32 float4_2_uint32( const float4& f )
 }
 
 /**
- @breif DWORD ARGB �� float4 argb
+ @breif DWORD ARGB 转换到 float4 argb
  */
 static inline float4 uint32_2_float4( uint32 p )
 {
@@ -230,9 +225,7 @@ static inline float4 uint32_2_float4( uint32 p )
 	__m128i dword4 = _mm_set_epi32( ( p & 0xFF ) >> 0, ( p & 0xFF00 ) >> 8, ( p & 0xFF0000 ) >> 16,( p & 0xFF000000 ) >> 24 );
 #endif
 
-	// ת����SP
 	ret.m128 = _mm_cvtepi32_ps(dword4);
-	// ��255
 	ret.m128 = _mm_div_ps(ret.m128, _mm_set_ps1(255.f));
 	return ret;
 #else
@@ -253,7 +246,7 @@ static inline float4 uint32_2_float4( uint32 p )
 }
 
 /**
- @breif DWORD ARGB ֱ�ӻ��
+ @breif DWORD ARGB ֱ混合
  */
 static inline uint32 SrColorMerge( uint32& color1, uint32& color2, bool avg )
 {
@@ -280,7 +273,7 @@ static inline uint32 SrColorMerge( uint32& color1, uint32& color2, bool avg )
 }
 
 /**
- @breif DWORD ARGB ʹ�� floatֵ ����
+ @breif DWORD ARGB 乘 floatֵ
  */
 static inline uint32 SrColorMulFloat( uint32& color1, float ratio )
 {

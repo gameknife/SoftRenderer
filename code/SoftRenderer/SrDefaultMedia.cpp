@@ -1,9 +1,9 @@
-/**
+ï»¿/**
   @file SrDefaultMedia.cpp
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -75,11 +75,11 @@ static const char* g_defaultMaterial = "newmtl $srdefualt\n\
 
 SrDefaultMediaPack::SrDefaultMediaPack( void )
 {
-	// ³ÌĞòË³Ğò±£Ö¤ÕâÀïÄÜ¹» µÃµ½ resourcemanager
+	// ç¨‹åºé¡ºåºä¿è¯è¿™é‡Œèƒ½å¤Ÿ å¾—åˆ° resourcemanager
 	defaultDiffuse = gEnv->resourceMgr->CreateRenderTexture("$default_d", 4, 4, 4);
 	defaultFlat = gEnv->resourceMgr->CreateRenderTexture("$default_n", 4, 4, 4);
 
-	// Ğ´render texture
+	// å†™render texture
 	uint32* buffer = NULL;
 	
 	// diffuse
@@ -107,7 +107,7 @@ SrDefaultMediaPack::SrDefaultMediaPack( void )
 
 SrDefaultMediaPack::~SrDefaultMediaPack( void )
 {
-	// ×ÊÔ´¹ÜÀíÆ÷»á×Ô¶¯É¾³ıtexture
+	// èµ„æºç®¡ç†å™¨ä¼šè‡ªåŠ¨åˆ é™¤texture
 }
 
 const char* SrDefaultMediaPack::getDefaultMesh() const

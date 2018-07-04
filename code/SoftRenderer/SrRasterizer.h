@@ -1,9 +1,9 @@
-/**
+ï»¿/**
   @file SrRasterizer.h
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -52,17 +52,17 @@ inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1
 	const SrRendVertex* verB = static_cast<const SrRendVertex*>(rInRef1);
 	SrRendVertex* verO = static_cast<SrRendVertex*>(rOut);
 
-	// ÏßĞÔ²åÖµproject space pos
+	// çº¿æ€§æ’å€¼project space pos
 	float inv_ratio = 1.f - ratio;
 	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
 
-	// ÒÑ¾­³ıw
-	// Ö±½Ó²åÖµ£¬ÆäËûchannel
+	// å·²ç»é™¤w
+	// ç›´æ¥æ’å€¼ï¼Œå…¶ä»–channel
 	verO->channel1 = SrFastLerp( verA->channel1, verB->channel1, ratio, inv_ratio );
 	verO->channel2 = SrFastLerp( verA->channel2, verB->channel2, ratio, inv_ratio );
 	verO->channel3 = SrFastLerp( verA->channel3, verB->channel3, ratio, inv_ratio );
 
-	// ¶ÔÓÚscanlineÉ¨ÃèµÄ£¬½«Í¸ÊÓ²åÖµ×ø±ê£¬²åÖµ»ØÕı³£Öµ
+	// å¯¹äºscanlineæ‰«æçš„ï¼Œå°†é€è§†æ’å€¼åæ ‡ï¼Œæ’å€¼å›æ­£å¸¸å€¼
 	if (final)
 	{
 		verO->channel1 /= verO->pos.w;
@@ -72,7 +72,7 @@ inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1
 };
 
 /**
- *@brief äÖÈ¾primitive
+ *@brief æ¸²æŸ“primitive
  */
 SR_ALIGN struct SrRendPrimitve
 {
@@ -86,13 +86,13 @@ SR_ALIGN struct SrRendPrimitve
 };
 
 /**
- *@brief ¹âÕ¤»¯´¦ÀíÆ÷
+ *@brief å…‰æ …åŒ–å¤„ç†å™¨
  */
 SR_ALIGN class SrRasterizer
 {
 public:
 	/**
-	 *@brief ¹âÕ¤»¯ÓÃÈı½ÇĞÎ£¬ÒıÓÃäÖÈ¾¶¥µã
+	 *@brief å…‰æ …åŒ–ç”¨ä¸‰è§’å½¢ï¼Œå¼•ç”¨æ¸²æŸ“é¡¶ç‚¹
 	 */
 	SR_ALIGN struct SrRastTriangle
 	{
@@ -106,55 +106,55 @@ public:
 	virtual ~SrRasterizer(void);
 
 	/**
-	 *@brief ³õÊ¼»¯¹âÕ¤»¯´¦ÀíÆ÷
+	 *@brief åˆå§‹åŒ–å…‰æ …åŒ–å¤„ç†å™¨
 	 */
 	void Init(SrSoftRenderer* renderer);
 
-	// ½ÓÊÜÍâ½çÀ´×ÔprimitiveµÄäÖÈ¾µ÷ÓÃ£¬»º´æ
+	// æ¥å—å¤–ç•Œæ¥è‡ªprimitiveçš„æ¸²æŸ“è°ƒç”¨ï¼Œç¼“å­˜
 	bool DrawPrimitive( SrPrimitve* primitive );
 	bool DrawLine(const float3& from, const float3& to);
 	bool DrawRHZPrimitive( SrRendPrimitve& rendPrimitive );
 
-	// Ö¡Ä©Î²£¬¶Ô»º´æµÄprimitive½øĞĞäÖÈ¾
+	// å¸§æœ«å°¾ï¼Œå¯¹ç¼“å­˜çš„primitiveè¿›è¡Œæ¸²æŸ“
 	void Flush();
 
-	// ¹âÕ¤»¯primitiveÈë¿Ú
+	// å…‰æ …åŒ–primitiveå…¥å£
 	static void ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* out_gBuffer );
 
-	// ¶ÔÈı½ÇĞÎ½øĞĞÕë¶ÔÊÓ×¶µÄ²Ã¼ô£¬²¢Ìá½»
+	// å¯¹ä¸‰è§’å½¢è¿›è¡Œé’ˆå¯¹è§†é”¥çš„è£å‰ªï¼Œå¹¶æäº¤
 	static void RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, float zFar );
-	// ¹âÕ¤»¯´¦ÀíºóµÄÈı½ÇĞÎÈë¿Ú
+	// å…‰æ …åŒ–å¤„ç†åçš„ä¸‰è§’å½¢å…¥å£
 	static void RasterizeTriangle( SrRastTriangle& tri, bool subtri = false );
 	
 	//////////////////////////////////////////////////////////////////////////
-	// ÄÚ²¿¹âÕ¤»¯º¯Êı
+	// å†…éƒ¨å…‰æ …åŒ–å‡½æ•°
 
-	// ¹âÕ¤»¯Æ½¶¥Èı½ÇĞÎ
+	// å…‰æ …åŒ–å¹³é¡¶ä¸‰è§’å½¢
 	static void Rasterize_Top_Tri_F( SrRastTriangle& tri );
-	// ¹âÕ¤»¯Æ½µ×Èı½ÇĞÎ
+	// å…‰æ …åŒ–å¹³åº•ä¸‰è§’å½¢
 	static void Rasterize_Bottom_Tri_F( SrRastTriangle& tri );
-	// ¹âÕ¤»¯É¨ÃèÏß
+	// å…‰æ …åŒ–æ‰«æçº¿
 	static void Rasterize_ScanLine( uint32 line, float fstart, float fcount, const void* vertA, const void* vertB, SrRendPrimitve* primitive, ERasterizeMode rMode = eRm_WireFrame, bool toptri = true );
-	// ¹âÕ¤»¯ ĞèÒª²Ã¼ôµÄ É¨ÃèÏß
+	// å…‰æ …åŒ– éœ€è¦è£å‰ªçš„ æ‰«æçº¿
 	static void Rasterize_ScanLine_Clipped( uint32 line, float fstart, float fcount, float clipStart, float clipCount, const void* vertA, const void* vertB, SrRendPrimitve* primitive, ERasterizeMode rMode = eRm_Solid );
-	// ¹âÕ¤»¯²¢Ğ´pixel
+	// å…‰æ …åŒ–å¹¶å†™pixel
 	static void Rasterize_WritePixel( const void* vertA, const void* vertB, float ratio, SrFragment* thisBuffer, SrRendPrimitve* primitive, uint32 address );
 
 	static int Draw_Line(int x0, int y0, int x1, int y1, int color, uint32 *vb_start, int lpitch);
 	static int Clip_Line(int &x1,int &y1,int &x2, int &y2);
 	static int Draw_Clip_Line(int x0,int y0, int x1, int y1, int color, uint32 *dest_buffer, int lpitch);
 public:
-	std::list<SrRendPrimitve*> m_rendPrimitives;			///< äÖÈ¾Primitive¶ÓÁĞ£¬Ã¿Ö¡½ÓÊÜDrawPrimitiveµ÷ÓÃºó»º´æÔÚÕâÀï£¬flush½áÊøÊ±É¾³ı
+	std::list<SrRendPrimitve*> m_rendPrimitives;			///< æ¸²æŸ“Primitiveé˜Ÿåˆ—ï¼Œæ¯å¸§æ¥å—DrawPrimitiveè°ƒç”¨åç¼“å­˜åœ¨è¿™é‡Œï¼Œflushç»“æŸæ—¶åˆ é™¤
 
-	std::list<SrRendPrimitve*> m_rendPrimitivesRHZ;		///< äÖÈ¾Primitive¶ÓÁĞ£¬Ã¿Ö¡½ÓÊÜDrawPrimitiveµ÷ÓÃºó»º´æÔÚÕâÀï£¬flush½áÊøÊ±É¾³ı
+	std::list<SrRendPrimitve*> m_rendPrimitivesRHZ;		///< æ¸²æŸ“Primitiveé˜Ÿåˆ—ï¼Œæ¯å¸§æ¥å—DrawPrimitiveè°ƒç”¨åç¼“å­˜åœ¨è¿™é‡Œï¼Œflushç»“æŸæ—¶åˆ é™¤
 
 	std::vector<float4> m_rendDynamicVertex;
 
-	SrTexture* m_MemSBuffer;								///< ¶¯Ì¬ÎÆÀí£¬µ±Ç°Ö¡
-	SrTexture* m_BackS1Buffer;								///< ¶¯Ì¬ÎÆÀí£¬ÓÃÓÚ»º´æjitAA¿ªÆôÊ±µÄÉÏÒ»Ö¡
-	SrTexture* m_BackS2Buffer;								///< ¶¯Ì¬ÎÆÀí£¬ÓÃÓÚ»º´æjitAA¿ªÆôÊ±µÄÉÏÒ»Ö¡
+	SrTexture* m_MemSBuffer;								///< åŠ¨æ€çº¹ç†ï¼Œå½“å‰å¸§
+	SrTexture* m_BackS1Buffer;								///< åŠ¨æ€çº¹ç†ï¼Œç”¨äºç¼“å­˜jitAAå¼€å¯æ—¶çš„ä¸Šä¸€å¸§
+	SrTexture* m_BackS2Buffer;								///< åŠ¨æ€çº¹ç†ï¼Œç”¨äºç¼“å­˜jitAAå¼€å¯æ—¶çš„ä¸Šä¸€å¸§
 
-	SrRasTaskDispatcher* m_rasTaskDispatcher;				///< Task·Ö·¢Æ÷£¬ÓÃÓÚÈÎÎñ¶¯Ì¬µ÷¶È
+	SrRasTaskDispatcher* m_rasTaskDispatcher;				///< Taskåˆ†å‘å™¨ï¼Œç”¨äºä»»åŠ¡åŠ¨æ€è°ƒåº¦
 	class SrSoftRenderer* m_renderer;
 };
 

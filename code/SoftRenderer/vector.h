@@ -1,4 +1,4 @@
-/**
+﻿/**
   @file vector.h
   
   @brief SoftRenderer��ѧ�⣺������

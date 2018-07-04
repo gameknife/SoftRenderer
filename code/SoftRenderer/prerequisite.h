@@ -1,4 +1,4 @@
-/**
+﻿/**
   @file prerequisite.h
   
   @brief 前提，所有头文件均引入此文件
@@ -13,7 +13,7 @@
 #ifndef prerequisite_h__
 #define prerequisite_h__
 
-
+// 平台判断
 
 #if defined(__GNUG__)
 # define COMPILER_GCC
@@ -25,10 +25,6 @@
 # error "Could not determine compiler"
 #endif
 
- //////////////////////////////////////////////////////////////////////////
- // OS Judge
- // Determine OS: after this, one of the following symbols will be
- // defined: OS_LINUX, OS_WIN32, OS_NETBSD.
 #if defined( __SYMBIAN32__ ) 
 #   define OS_SYMBIAN
 #elif defined( __WIN32__ ) || defined( _WIN32 )
@@ -61,22 +57,18 @@
 // SIMD加速
 //#define SR_USE_SIMD
 
+
+
+
 // Windows Header Files:
 #ifdef OS_WIN32
 #include <windows.h>
 #endif
 
+// SIMD
 #ifdef SR_USE_SIMD
 #include <future>
 #endif
-
-/////////////////////////////
-// mm_malloc for mac
-//#ifndef OS_WIN32
-#define _mm_malloc(a,b) malloc(a)
-#define _mm_free(a) free(a)
-//#endif
-//
 
 //////////////////////////////////////////////////////////////////////////
 // stl
@@ -97,13 +89,6 @@
 #include <assert.h>
 #endif
 
-#ifdef OS_WIN32
-#define EXPORT_API_PUBLIC  
-#else
-#define EXPORT_API_PUBLIC __attribute__((visibility ("default")))
-#endif
-
-
 // 内存对齐
 #ifdef OS_WIN32
 #define SR_ALIGN _CRT_ALIGN(16)
@@ -123,14 +108,15 @@
 
 #include "IEvent.h"
 #include "IThread.h"
+#include "mmalloc.h"
 
-extern std::string g_rootPath;
+
 
 //////////////////////////////////////////////////////////////////////////
 // 渲染规格配置
 #define SR_MAX_TEXTURE_STAGE_NUM 16
 #define FBUFFER_CHANNEL_SIZE 4
-#define SR_GREYSCALE_CLEARCOLOR 0x1
+#define SR_GREYSCALE_CLEARCOLOR 0x0
 #define SR_SHADER_CONSTANTS_NUM 8
 
 // 软件光栅化分块策略
@@ -156,51 +142,25 @@ extern std::string g_rootPath;
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 #endif
 
-extern std::map<const void*, void*> m_align_pt_mapper;
-
-inline void* _mm_malloc_16byte(size_t sz, size_t align)
-{
-	if(sz <= 0)   {
-		return NULL;
-	}
-	unsigned char* pSystemPointer = (unsigned char* )_mm_malloc(sz + 15, 16);
-	if(NULL == pSystemPointer)   {
-		return NULL;
-	}
-	size_t offset = 16 - (((uint64)pSystemPointer ) % 16);
-
-	m_align_pt_mapper[pSystemPointer + offset] = pSystemPointer;
-
-	return pSystemPointer + offset;
-}
-
-inline void _mm_free_16byte(void* p)
-{
-	_mm_free(m_align_pt_mapper[p]);
-}
-
-#define _mm_malloc_custom _mm_malloc_16byte
-#define _mm_free_custom _mm_free_16byte
-
 //////////////////////////////////////////////////////////////////////////
 // 置前声明
 class IRenderer;
 struct SrRendPrimitve;
-class IProfiler;
+struct IProfiler;
 struct SrShaderContext;
 struct SrMaterial;
-class IResourceManager;
+struct IResourceManager;
 class SrTexture;
 class SrScene;
 class SrSwShader;
 class SrResource;
 class SrMesh;
 class SrShader;
-class SrDefaultMediaPack;
+struct SrDefaultMediaPack;
 struct ILogger;
 struct SrRendContext;
-
-typedef std::vector<SrShader*> SrShaderList;
+class SrEntity;
+struct SrCamera;
 
 //////////////////////////////////////////////////////////////////////////
 // 全局环境
@@ -224,162 +184,10 @@ struct GlobalEnvironment
 extern GlobalEnvironment* gEnv;
 
 #include "SrLogger.h"
-//	 Simple logs of data with low verbosity.
-inline void GtLog( const char* format, ... )
-{
-	if (gEnv->logger)		
-	{
-		va_list args;
-		va_start(args,format);
-		char buffer[1024];
-		strcpy(buffer, "#0");
-		strcat(buffer, format);
-		gEnv->logger->Log( buffer, args );
-		va_end(args);
-	}
-}
 
-inline void GtLogInfo( const char* format, ... )
-{
-	if (gEnv->logger)		
-	{
-		va_list args;
-		va_start(args,format);
-		char buffer[1024];
-		strcpy(buffer, "#1");
-		strcat(buffer, format);
-		gEnv->logger->Log( buffer, args );
-		va_end(args);
-	}
-}
+#include "srtype.h"
 
-inline void GtLogWarning( const char* format, ... )
-{
-	if (gEnv->logger)		
-	{
-		va_list args;
-		va_start(args,format);
-		char buffer[1024];
-		strcpy(buffer, "#2");
-		strcat(buffer, format);
-		gEnv->logger->Log( buffer, args );
-		va_end(args);
-	}
-}
 
-inline void GtLogError( const char* format, ... )
-{
-	if (gEnv->logger)		
-	{
-		va_list args;
-		va_start(args,format);
-		char buffer[1024];
-		strcpy(buffer, "#3");
-		strcat(buffer, format);
-		gEnv->logger->Log( buffer, args );
-		va_end(args);
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////
-// 枚举
-
-/**
- *@brief VB格式, 暂时只使用P3N3T2
- */
-enum ESrVertDecl
-{
-	// data struct ALIGNED
-	eVd_Invalid = 0,
-	eVd_F4F4,
-	eVd_F4F4F4,
-	eVd_F4F4F4F4U4,
-
-	eVd_Max,
-};
-
-/**
- *@brief 矩阵组
- */
-enum EMatrixDefine
-{
-	eMd_WorldViewProj = 0,
-	eMd_World,
-	eMd_View,
-	eMd_Projection,
-	eMd_WorldInverse,
-	eMd_ViewInverse,
-	eMd_Count,
-};
-
-/**
- *@brief 光栅化方式
- */
-enum ERasterizeMode
-{
-	eRm_Solid,
-	eRm_WireFrame,
-	eRm_Point,
-};
-
-/**
- *@brief 采样滤镜
- */
-enum ESamplerFilter
-{
-	eSF_Nearest,		///< 临近点采样
-	eSF_Linear,			///< 双线性过滤
-};
-
-/**
- *@brief 渲染器状态
- */
-enum ERenderingState
-{
-	eRs_Rendering = 1<<0,
-	eRS_Locked = 1<<1,
-	eRS_Swaping = 1<<2,
-};
-
-/**
- *@brief 渲染特性
- */
-enum ERenderFeature
-{
-	eRFeature_JitAA = 1<<0,						///< 抖动抗锯齿
-	eRFeature_MThreadRendering = 1<<1,			///< 多线程渲染
-	eRFeature_LinearFiltering = 1<<2,			///< 双线性采样
-	eRFeature_DotCoverageRendering = 1<<3,		///< Dot空洞渲染
-	eRFeature_InterlaceRendering = 1<<4,		///< Dot空洞渲染
-};
-
-/**
- *@brief 资源类型
- */
-enum EResourceType
-{
-	eRt_Mesh = 0,
-	eRT_Texture,
-	eRT_Material,
-	eRT_Shader,
-
-	eRT_Count,
-};
-
-enum EShaderConstantsSlot
-{
-	eSC_VS0 = 0,
-	eSC_VS1,
-	eSC_VS2,
-	eSC_VS3,
-
-	eSC_PS0 = SR_SHADER_CONSTANTS_NUM,
-	eSC_PS1,
-	eSC_PS2,
-	eSC_PS3,
-
-	eSC_ShaderConstantCount = SR_SHADER_CONSTANTS_NUM * 2,
-};
 //////////////////////////////////////////////////////////////////////////
 // 公共渲染结构定义
 
@@ -406,8 +214,6 @@ SR_ALIGN struct SrRendVertex
 	float4 channel1;
 	float4 channel2;
 	float4 channel3;
-	// 	float4 channel6;
-	// 	float4 channel7;
 };
 
 /**

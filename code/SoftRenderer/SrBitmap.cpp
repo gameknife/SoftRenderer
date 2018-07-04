@@ -1,9 +1,9 @@
-/**
+ï»¿/**
   @file SrBitmap.cpp
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -63,12 +63,12 @@ SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 	{
 		const char* start = bitmapfile.Data();
 
-		// »ñµÃÎÄ¼þÍ·
+		// èŽ·å¾—æ–‡ä»¶å¤´
 		bmpfile_magic* magic = (bmpfile_magic*)start;
 		bmpfile_header* header = (bmpfile_header*)(start + sizeof(bmpfile_magic));
 		bmpfile_dib_info* info = (bmpfile_dib_info*)(start + +sizeof(bmpfile_magic) + sizeof(bmpfile_header));
 
-		// ³õÊ¼»¯debugÊý¾Ý
+		// åˆå§‹åŒ–debugæ•°æ®
 		GtLog("BMP file openup[%s] width: %d | height: %d | bpp: %d | offset: %d | size: %d kb", getName(),
 			info->width,
 			info->height,
@@ -76,7 +76,7 @@ SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 			header->bmp_offset,
 			header->file_size / 1024 );
 
-		// »ù±¾Êý¾Ý¶ÁÈ¡
+		// åŸºæœ¬æ•°æ®è¯»å–
 		m_width = info->width;
 		m_height = abs(info->height);
 		m_bpp = info->bits_per_pixel / 8;

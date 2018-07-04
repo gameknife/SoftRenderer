@@ -1,4 +1,4 @@
-/**
+﻿/**
   @file quaternion.h
   
   @brief SoftRenderer��ѧ�⣺��Ԫ����

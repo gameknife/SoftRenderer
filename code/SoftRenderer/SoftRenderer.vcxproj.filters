@@ -44,6 +44,9 @@
     <Filter Include="util\thread">
       <UniqueIdentifier>{f72cd164-11d9-4a1c-964f-feea842df8b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="util\interface">
+      <UniqueIdentifier>{b546f654-d0c4-46f4-869c-a0718211052e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -186,6 +189,15 @@
     </ClInclude>
     <ClInclude Include="IThread_win32.h">
       <Filter>util\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="mmalloc.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="srinterface.h">
+      <Filter>util\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="srtype.h">
+      <Filter>util\interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

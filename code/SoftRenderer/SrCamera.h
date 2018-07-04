@@ -1,9 +1,9 @@
-/**
+ï»¿/**
   @file SrCamera.h
   
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
