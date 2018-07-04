@@ -590,6 +590,7 @@ struct SrPixelShader_Constants
 	float glossness; float fresnelPower; float fresnelBia; float fresnelScale;
 };
 
+
 struct IResourceManager
 {
 	virtual ~IResourceManager(void) {}
