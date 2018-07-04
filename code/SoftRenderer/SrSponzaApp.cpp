@@ -32,8 +32,7 @@ void SrSponzaApp::OnInit()
 
 	// ����SPONZA
 	m_ent = m_scene->CreateEntity("model1", "media/sponza.obj", "media/sponza.mtl", poszero, rotidtt);
-
-	//m_ent = m_scene->CreateEntity("model1", "media\\prophet\\prophet.obj", "media\\prophet\\prophet.mtl");
+	
 	m_ent->SetScale(float3(2,2,2));
 	SwitchSSAO();
 
