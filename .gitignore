@@ -43,3 +43,4 @@ node_modules/
 bin32/
 bin64/
 .vs/
+.DS_Store
