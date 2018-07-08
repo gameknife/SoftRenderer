@@ -10,8 +10,10 @@ SrLogger::SrLogger(void)
 	m_size = 0;
 
 	//AllocConsole();
+	#ifdef OS_WIN32
 	freopen("CONOUT$","w+t",stdout);  
 	freopen("CONIN$","r+t",stdin);
+	#endif
 }
 
 SrLogger::~SrLogger(void)
@@ -20,8 +22,10 @@ SrLogger::~SrLogger(void)
 
 	delete[] m_data;
 
+	#ifdef OS_WIN32
 	fclose(stdout);
 	fclose(stdin);
+	#endif
 	//FreeConsole();
 }
 

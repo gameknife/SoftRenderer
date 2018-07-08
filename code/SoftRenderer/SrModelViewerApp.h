@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  更改日志 history
+  锟斤拷锟斤拷锟斤拷志 history
   ver:1.0
    
  */
@@ -12,7 +12,7 @@
 #define SrModelViewerApp_h__
 
 #include "prerequisite.h"
-#include "srappframework.h"
+#include "SrAppFramework.h"
 
 class SrModelViewerApp :
 	public SrAppFramework

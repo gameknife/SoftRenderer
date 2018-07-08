@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  更改日志 history
+history
   ver:1.0
    
  */
@@ -12,7 +12,7 @@
 #define SrAppFramework_h__
 
 /**
- *@breif SrAppFramework结构
+ *@breif SrAppFramework
  */
 SR_ALIGN class SrAppFramework
 {

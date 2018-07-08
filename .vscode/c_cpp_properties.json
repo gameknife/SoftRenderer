@@ -8,7 +8,9 @@
                 "${workspaceFolder}/node_modules/_nan@2.10.0@nan",
                 "/usr/local/include/node"
             ],
-            "defines": [],
+            "defines": [
+                "__cdecl=__attribute__((__cdecl__))"
+            ],
             "macFrameworkPath": [
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/System/Library/Frameworks"
             ],

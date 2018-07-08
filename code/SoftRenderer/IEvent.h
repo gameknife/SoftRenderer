@@ -212,7 +212,8 @@ class IEvent
         
         while (!m_state)
         {
-            if (rc = pthread_cond_timedwait(&m_event_handle, &m_count_mutex, &abstime))
+            rc = pthread_cond_timedwait(&m_event_handle, &m_count_mutex, &abstime);
+            if (rc)
             {
                 if (rc == -1) break;
                 pthread_mutex_unlock(&m_count_mutex);
