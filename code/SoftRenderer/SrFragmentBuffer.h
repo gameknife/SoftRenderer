@@ -3,7 +3,6 @@
   
   @author yikaiming
 
-  ������־ history
   ver:1.0
    
  */
@@ -30,15 +29,12 @@ public:
 	inline float3 GetNormal(const float2& texcoord) const;
 	float3 GetWorldPos(const float2& texcoord) const
 	{
-		// ��������warp
 		float u = texcoord.x - floor(texcoord.x);
 		float v = texcoord.y - floor(texcoord.y);
 
-		// �ٽ������
 		u *= (m_width);
 		v *= (m_height);
 
-		// get int
 		int x = (int)( u );
 		int y = (int)( v );
 		x = x % m_width;
@@ -56,7 +52,7 @@ public:
 	float*					zBuffer;
 
 private:
-	SrIndexBuffer*			m_fBufferIndices;	///< fragBufferIndices����
+	SrIndexBuffer*			m_fBufferIndices;	///< fragBufferIndices
 	
 	SrFragmentBufferSync*	fragBufferSync;
 

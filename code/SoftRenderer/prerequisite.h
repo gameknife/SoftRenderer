@@ -14,7 +14,6 @@
 #define prerequisite_h__
 
 // 平台判断
-
 #if defined(__GNUG__)
 # define COMPILER_GCC
 #elif defined(_MSC_VER)

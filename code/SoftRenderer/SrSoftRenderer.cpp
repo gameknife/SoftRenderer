@@ -244,7 +244,6 @@ SrSwShader* LoadShader(const char* shaderName)
 
 	shaders.push_back(&g_SkinSimShader);
 	shaders.push_back(&g_FresnelNormalShader);
-	shaders.push_back(&g_HairShader);
 
 	for (uint32 i = 0; i < shaders.size(); ++i)
 	{
@@ -287,7 +286,6 @@ bool SrSoftRenderer::InnerInitShaders()
 
 	m_swShaders.push_back(&g_SkinSimShader);
 	m_swShaders.push_back(&g_FresnelNormalShader);
-	m_swShaders.push_back(&g_HairShader);
 
 	return true;
 }

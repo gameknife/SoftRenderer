@@ -19,7 +19,7 @@ SrObjLoader::~SrObjLoader(void)
 //////////////////////////////////////////////////////////////////////////
 bool SrObjLoader::IsMatIDExist( uint32 matID )
 {
-	int num = m_Attributes.size();
+	int num = (int)m_Attributes.size();
 	for(int i=0; i < num; i++)
 	{
 		if (m_Attributes[i] == matID)
@@ -31,12 +31,12 @@ bool SrObjLoader::IsMatIDExist( uint32 matID )
 	return false;
 }
 //--------------------------------------------------------------------------------------
-uint16 SrObjLoader::AddVertex( uint32 hash, SrVertexP3N3T2* pVertex )
+uint32 SrObjLoader::AddVertex( uint32 hash, SrVertexP3N3T2* pVertex )
 {
 	// If this vertex doesn't already exist in the Vertices list, create a new entry.
 	// Add the index of the vertex to the Indices list.
 	bool bFoundInList = false;
-	uint16 index = 0;
+	uint32 index = 0;
 
 	// Since it's very slow to check every element in the vertex list, a hashtable stores
 	// vertex indices according to the vertex position's index as reported by the OBJ file
@@ -65,7 +65,7 @@ uint16 SrObjLoader::AddVertex( uint32 hash, SrVertexP3N3T2* pVertex )
 	if( !bFoundInList )
 	{
 		// Add to the Vertices list
-		index = m_Vertices.size();
+		index = (uint32)m_Vertices.size();
 		m_Vertices.push_back( *pVertex );
 
 		// Add this to the hashtable
@@ -134,7 +134,6 @@ void SrObjLoader::DeleteCache()
 bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& primitives )
 {
 	// Find the file
-	// ���ļ�
 
 	// File input
 	char strCommand[256] = {0};
@@ -161,17 +160,15 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 		}
 		else if( 0 == strcmp( strCommand, "g" ) )
 		{
-			// ����
 			flushFace = true;
 		}
 		else if( 0 == strcmp( strCommand, "usemtl" ) )
 		{
-			// �������
 			InFile >> currMtlName;
 		}
 		else if( 0 == strcmp( strCommand, "mtllib" ) )
 		{
-			// �������
+
 		}
 		else if( 0 == strcmp( strCommand, "v" ) )
 		{
@@ -189,15 +186,12 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 			InFile >> x >> y >> z;
 
 			Positions.push_back( float4( x, y, z, 1 ) );
-
-			// for3DsMax, ������У���󷽱������ʱ������normal��tc
 		}
 		else if( 0 == strcmp( strCommand, "vt" ) )
 		{
 			// Vertex TexCoord
 			float u, v;
 			InFile >> u >> v;
-			// for3DsMax, ������У���󷽱������ʱ������normal��tc
 			TexCoords.push_back( float2( u, 1-v ) );
 		}
 		else if( 0 == strcmp( strCommand, "vn")  )
@@ -288,11 +282,11 @@ void SrObjLoader::CreateMeshInternal(SrPrimitives& primitives )
 	m_bIsLoaded = true;
 
 	// Create Mesh
-	SrVertexBuffer* vb = gEnv->resourceMgr->AllocateVertexBuffer( sizeof(SrVertexP3N3T2), m_Vertices.size() );
-	SrIndexBuffer* ib = gEnv->resourceMgr->AllocateIndexBuffer( m_Indices.size() );
+	SrVertexBuffer* vb = gEnv->resourceMgr->AllocateVertexBuffer( sizeof(SrVertexP3N3T2), (uint32)m_Vertices.size() );
+	SrIndexBuffer* ib = gEnv->resourceMgr->AllocateIndexBuffer((uint32)m_Indices.size() );
 
-	memcpy( vb->data, m_Vertices.data(), sizeof(SrVertexP3N3T2) * m_Vertices.size() );
-	memcpy( ib->data, m_Indices.data(), sizeof(uint32) * m_Indices.size() );
+	memcpy( vb->data, m_Vertices.data(), sizeof(SrVertexP3N3T2) * (uint32)m_Vertices.size() );
+	memcpy( ib->data, m_Indices.data(), sizeof(uint32) * (uint32)m_Indices.size() );
 
 	gEnv->renderer->UpdateVertexBuffer(vb);
 	gEnv->renderer->UpdateIndexBuffer(ib);
@@ -418,7 +412,6 @@ struct SrMatLoadingParam
 bool SrObjLoader::LoadMaterialFromMTL( const char* strFileData )
 {
 	// Find the file
-	// ���ļ�
 
 	// File input
 	char strCommand[256] = {0};

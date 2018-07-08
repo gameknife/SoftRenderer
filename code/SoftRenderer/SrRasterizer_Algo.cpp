@@ -3,7 +3,6 @@
   
   @author yikaiming
 
-  ������־ history
   ver:1.0
    
  */
@@ -20,10 +19,8 @@
 
 void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 {
-	// ������ύ�����Σ��Ƚ���͸�ӱ任
 	if(!subtri)
 	{
-		// ccw,cw ������ü�
 		if (calTri.primitive->shaderConstants.culling)
 		{
 			assert( abs(calTri.p[0].pos.w) > SR_EQUAL_PRECISION );
@@ -52,7 +49,6 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 		SrRendVertex tmp[3] = {calTri.p[0], calTri.p[1], calTri.p[2]};
 		calTri.primitive->shader->ProcessPatch( p[0], p[1], p[2], &(tmp[0]), &(tmp[1]), &(tmp[2]), &(calTri.primitive->shaderConstants) );
 
-		// ��ʱ�������λ��ڲü�ռ䣬��ҪͶӰ����Ļ�ռ䣡
 		for(int i=0; i < 3; ++i)
 		{
 			SrRendVertex* p1 = p[i];
@@ -66,17 +62,14 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 			p1->channel1 *= p1->pos.w;
 			p1->channel2 *= p1->pos.w;
 			p1->channel3 *= p1->pos.w;
-// 			p1->channel4 *= p1->pos.w;
-// 			p1->channel5 *= p1->pos.w;
 
-			// �任����Ļ�ռ�
 			p1->pos.x = ((p1->pos.x * .5f + 0.5f) * g_context->width);
 			p1->pos.y = ((-p1->pos.y * .5f + 0.5f) * g_context->height);
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// ���������Σ���Ϊ
+	// 
 	//  |
 	// \|/
 	//  y5
@@ -100,13 +93,11 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	{
 		SWAP(calTri.p[2], calTri.p[1]);
 	}
-	// �������
+
 	//////////////////////////////////////////////////////////////////////////
 
 	if (Equal(calTri.p[0].pos.y, calTri.p[1].pos.y))
 	{
-
-		// ƽ������
 
 		// 1  ____0   0___1
 		// 	  \  |    |  /
@@ -122,7 +113,6 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 			// 	   |/
 			// 	   2
 
-
 		}
 		else
 		{
@@ -134,7 +124,6 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	}
 	else if (Equal(calTri.p[2].pos.y, calTri.p[1].pos.y))
 	{
-		// ƽ������
 
 		// 	     2   2
 		// 	    /|   |\
@@ -162,7 +151,6 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	}
 	else
 	{
-		// ��Ҫ�ָ�
 		// 	     0
 		// 	    /|
 		// 	   / |
@@ -191,8 +179,6 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 
 		topTri.p[2] = newVertINST;
 		bottomTri.p[0] = newVertINST;
-
-		//assert(!subtri);
 
 		if (subtri)
 		{
@@ -234,7 +220,7 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 	for ( uint32 i = 0; i < count; ++i )
 	{
 		uint32 address = address_start + i;
-		// ���������dotRendering
+		// dotRendering
 		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 		{
 			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
@@ -251,7 +237,7 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 		assert( address >=0 && address < g_context->width * g_context->height );
 		SrFragment* thisBuffer = fBuffer->fBuffer + address;
 		{
-			// ztest �����ٹ�դ��֮ǰ������ʱ����Ԥ��zֵ����ǰkill�����
+			// ztest
 			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
 		}
 	}
@@ -296,7 +282,7 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 	for ( uint32 i = 0; i < clipCount; ++i )
 	{
 		uint32 address = address_start + i;
-		// ���������dotRendering
+		// dotRendering
 		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 		{
 			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
@@ -314,7 +300,6 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 		assert( address >=0 && address < g_context->width * g_context->height );
 		SrFragment* thisBuffer = fBuffer->fBuffer + address;
 		{
-			// ztest �����ٹ�դ��֮ǰ������ʱ����Ԥ��zֵ����ǰkill�����
 			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
 		}
 	}
@@ -322,8 +307,6 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 
 void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 {
-	// ������ ��դ������
-
 	float dx_right,    
 		dx_left,     // the dx/dy ratio of the left edge of line
 		xs,xe,       // the starting and ending points of the edges
@@ -345,21 +328,17 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	float min_clip_x = g_context->viewport.x;
 	float max_clip_x = g_context->viewport.x + g_context->viewport.w;
 
-	// ����ɨ������
 	height = y3-y1;
 	float sy1 = y1;
 
 	dx_left  = (x3-x1)/height;
 	dx_right = (x3-x2)/height;
 
-	// ������ʼɨ���
 	xs = x1;
 	xe = x2;
 
-	// ��¼ÿ��ɨ���߼���ratioʱ��ƫ��ֵ
 	float offsetY = 0;
 
-	// y��ü�
 	if (y1 < min_clip_y)
 	{
 		// compute new xs and ys
@@ -375,9 +354,9 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	} // end if top is off screen
 	else
 	{
-		// ȷ�� top-left ��䷨��
+		// top-left
 		iy1 = (int)(ceil(y1));
-		// ����ƫ��ֵ
+		// 
 		offsetY = iy1 - y1;
 
 		// bump xs and xe appropriately
@@ -416,8 +395,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 		for (loop_y=iy1; loop_y<=iy3; loop_y++)
 		{
 			// calc ratio
-			// ȡ�ô�ɨ������β�� ��ֵ�� ����
-			// ���б�ʴ���1����ʹ�ú�������������ratio
 			float dx = (float)height / float(x2 - x1);
 			float ratio = 1.f;
 
@@ -429,7 +406,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			}
 			else
 			{
-				// �� ratioȫΪ ���Ը���ֵ������Ҫ��offset����
 				if(abs(x2 - x3) > abs(x3 - x1))
 				{
 					ratio = 1.f - abs(xe - x3) / abs(x2 - x3);
@@ -453,10 +429,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 #endif
 			}
 
-			// ɨ����
 			Rasterize_ScanLine(loop_y, xs, xe, leftVert, rightVert, tri.primitive, eRm_Solid );
 			
-			// ����ʼĩ�㵽��һ��
 			xs+=dx_left;
 			xe+=dx_right;
 		}
@@ -464,7 +438,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	}
 	else
 	{
-		// X����Ҫ�ü�
 		for (loop_y=iy1; loop_y<=iy3; loop_y++, xs+=dx_left, xe+=dx_right)
 		{
 			left  = xs;
@@ -487,8 +460,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			}
 
 			// calc ratio
-			// ȡ�ô�ɨ������β�� ��ֵ�� ����
-			// ���б�ʴ���1����ʹ�ú�������������ratio
 			float dx = (float)height / float(x2 - x1);
 			float ratio = 1.f;
 
@@ -524,7 +495,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 
 			}
 
-			// ɨ����
 			Rasterize_ScanLine_Clipped(loop_y, xs, xe, left, right, leftVert, rightVert, tri.primitive, eRm_Solid );
 		} 
 
@@ -533,16 +503,14 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 
 void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 {
-	// ������ ��դ������
-
-	float dx_right,		// �ұߵ�б��
-		dx_left,		// ��ߵ�б��
-		xs,xe,			// ��ʼ���ͽ���������
-		height,			// �洢�߶�
-		right,			// �洢�ü����������
+	float dx_right,		
+		dx_left,		
+		xs,xe,			
+		height,			
+		right,			
 		left;
 
-	int iy1,iy3,loop_y; // ɨ��������
+	int iy1,iy3,loop_y;
 
 	float x1 = tri.p[2].pos.x;
 	float y1 = tri.p[2].pos.y;
@@ -556,29 +524,22 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 	float min_clip_x = g_context->viewport.x;
 	float max_clip_x = g_context->viewport.x + g_context->viewport.w;
 
-	// ����߶ȣ��洢��sy1
 	height = y3-y1;
 	float sy1 = y1;
 
-	// ����б��
 	dx_left  = (x2-x1)/height;
 	dx_right = (x3-x1)/height;
 
-	// ������ʼ��
 	xs = x1;
 	xe = x1; 
 
-	// ��¼ÿ��ɨ���߼���ratioʱ��ƫ��ֵ
 	float offsetY = 0;
 
-	// y �ü�
 	if (y1 < min_clip_y)
 	{
-		// ���¼�����ʼ��
 		xs = xs+dx_left*(-y1+min_clip_y);
 		xe = xe+dx_right*(-y1+min_clip_y);
 
-		// ����
 		offsetY = ceil(y1) - y1;
 		y1 = min_clip_y;
 
@@ -618,9 +579,6 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 		for (loop_y = iy1; loop_y <= iy3; loop_y++)
 		{
 			// calc ratio
-			// ȡ�ô�ɨ������β�� ��ֵ�� ����
-
-			// ���б�ʴ���1����ʹ�ú�������������ratio
 			float dx = (float)height / float(x3 - x2);
 			float ratio = 1.f;
 
@@ -689,9 +647,6 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 			}
 
 			// calc ratio
-			// ȡ�ô�ɨ������β�� ��ֵ�� ����
-
-			// ���б�ʴ���1����ʹ�ú�������������ratio
 			float dx = (float)height / float(x3 - x2);
 			float ratio = 1.f;
 
@@ -797,7 +752,7 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 // 			return;
 // 		}
 
-		// lerp z ��Ԥ��
+		// lerp z
 		float z = posA->z * (1.f - ratio) + posB->z * ratio;
 		z = (z - 1.f);
 

@@ -3,7 +3,6 @@
   
   @author yikaiming
 
-  ������־ history
   ver:1.0
    
  */
@@ -29,7 +28,6 @@ SR_ALIGN struct SrRendContext
 			processorNum = 4;//siSysInfo.dwNumberOfProcessors;
 	}
 
-	// ��Ⱦ�������
 	void OpenFeature( ERenderFeature feature )
 	{
 		features |= feature;

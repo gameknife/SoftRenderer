@@ -27,7 +27,7 @@ SrLogger::~SrLogger(void)
 
 void SrLogger::Log( const char* line )
 {
-	uint32 length = strlen(line);
+	uint32 length = (uint32)strlen(line);
 	
 	// ����װ�����ˣ�д���ļ�
 	//if (m_size + length + 2 > LOG_FILE_SZIE)
@@ -67,7 +67,7 @@ void SrLogger::Log( const char* line )
 
 
 		memcpy( m_data + m_size, buffer, strlen(buffer) );
-		m_size += strlen(buffer);
+		m_size += (uint32)strlen(buffer);
 
 		std::cout << buffer;
 

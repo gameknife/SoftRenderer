@@ -99,8 +99,9 @@ SrMaterial* SrEntity::getMaterial( uint32 index )
 	SrMaterial* ret = NULL;
 	if (index < m_mesh->m_primitives.size())
 	{
-		return m_mesh->m_primitives[index].material;
+		ret = m_mesh->m_primitives[index].material;
 	}
+	return ret;
 }
 
 uint32 SrEntity::getMaterialCount()
@@ -108,7 +109,7 @@ uint32 SrEntity::getMaterialCount()
 	uint32 ret = 0;
 	if (m_mesh)
 	{
-		ret = m_mesh->m_primitives.size();
+		ret = (uint32)m_mesh->m_primitives.size();
 	}
 	return ret;
 }

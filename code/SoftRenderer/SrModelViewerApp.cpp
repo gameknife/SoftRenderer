@@ -19,12 +19,10 @@ SrModelViewerApp::~SrModelViewerApp(void)
 
 void SrModelViewerApp::OnInit()
 {
-	// ����Ⱦ����
 	g_context->OpenFeature(eRFeature_MThreadRendering);
 	g_context->OpenFeature(eRFeature_JitAA);
 	g_context->OpenFeature(eRFeature_LinearFiltering);
 
-	// ��������
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 
@@ -37,9 +35,6 @@ void SrModelViewerApp::OnInit()
 	m_ents.push_back(m_ent);
 	m_ent->SetScale(float3(40, 40, 40));
 	
-	//SwitchSSAO();
-
-	// �������
 	m_camera = m_scene->CreateCamera("cam0");
 	m_camera->setPos(float3(0,0,-15));
 	m_camera->setFov(68.0f);
@@ -48,14 +43,12 @@ void SrModelViewerApp::OnInit()
 	m_camdist = 15.0f;
 	updateCam();
 
-	// ���һ������
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
 	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
 
-	// set shademode -> 0
 	m_shade_mode = 0;
 	UpdateShader();
 }
@@ -69,22 +62,14 @@ void SrModelViewerApp::OnUpdate()
 	
 	m_scene->Update();
 
-	// dotCovarageǿ�ƹر�JITAA
 	if ( g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) )
 	{
 		g_context->CloseFeature(eRFeature_JitAA);
 	}
-
-	// ��Ϣ���
-	char buffer[255];
-	int keyL = 15;
-	int startxL = 70;
-	int starty = 4 * g_context->height / 5;
 }
 
 void SrModelViewerApp::OnDestroy()
 {
-	// ɾ������
 	m_ents.clear();
 	m_ent = NULL;
 	delete m_scene;

@@ -1,26 +1,22 @@
-/**
+﻿/**
   @file shading.h
 
-  @brief ��ɫ��ͼ���㷨
+  @brief shader基础结构
   
   @author yikaiming
 
-  ������־ history
   ver:1.0
-   
+
  */
 
 #ifndef srswshader_h_
 #define srswshader_h_
 
-#include "RendererBase.h"
-
 #include "SrShader.h"
 
 /**
- *@brief ShadingMode����
- *@remark Shader�࣬�����������ɫ���ԡ�����VS,RS,PSÿ����ɫ����ʵ��
-   PATCH SHADERΪ��դ��ǰ�Զ���������Ƭ�Ĵ�����ᣬ��Ҫ������һ�׶ε���ɫ���Կ���ѡ��ʵ�֡�
+ *@brief ShadingMode
+ *@remark 
  */
 class SrSwShader : public SrResource
 {
@@ -29,7 +25,7 @@ public:
 	virtual ~SrSwShader(void) {}
 
 	/**
-	 *@brief Patch Shader, �ڹ�դ��ǰ��������������������������������ɫ�����̳е���ɫ���԰���ʵ�֡�
+	 *@brief Patch Shader, 简单的面片渲染
 	 *@return void 
 	 *@param void * vOut 
 	 *@param void * vOut1 
@@ -49,36 +45,34 @@ public:
 };
 
 /**
- *@brief ���ߵļ��㺯��
- *@return float4 ���ص�����
- *@param const float3 & position1 ��������ģ�Ϳռ�λ��
- *@param const float3 & position2 ͬ�������εĵ�һ������
- *@param const float3 & position3 ͬ�������εĵڶ�������
- *@param float2 uv1 ��������uv
+ *@brief 静态接口，计算切空间
+ *@return float4 
+ *@param const float3 & position1 
+ *@param const float3 & position2
+ *@param const float3 & position3
+ *@param float2 uv1
  *@param float2 uv2 ..
  *@param float2 uv3 ..
  */
 static inline float4 CalculateTangentSpaceVector(const float3& position1, const float3& position2, const float3& position3,
 	float2& uv1, float2& uv2, float2& uv3)
 {
-	// ����������ε�����
 	float3 side0 = position1 - position2;
 	float3 side1 = position3 - position1;
-	// ��˵ó�����
+
 	float3 normal = side1 % side0;
 	normal.normalize();
-	// �ó�tangent����
+
 	float deltaV0 = uv1.y - uv2.y;
 	float deltaV1 = uv3.y - uv1.y;
 	float3 tangent = side0 * deltaV1- side1 * deltaV0;
 	tangent.normalize();
-	// �ó�binormal����
+
 	float deltaU0 = uv1.x - uv2.x;
 	float deltaU1 = uv3.x - uv1.x;
 	float3 binormal = side0 * deltaU1 - side1 * deltaU0;
 	binormal.normalize();
 
-	// ���¼���normal������ͳ�ʼnormal�෴����xy��������һ�£���Ҫ����
 	float3 tangentCross = tangent % binormal;
 	float flip = 1.f;
 	if ( float3::dot(tangentCross,normal) < 0.0f)
@@ -92,18 +86,17 @@ static inline float4 CalculateTangentSpaceVector(const float3& position1, const 
 }
 
 /**
- *@brief Blinn-Phong����ģ��
+ *@brief Blinn-Phong光照模型
  *@return void 
- *@param float3 normalDir ���߷���
- *@param float3 lightDir ���շ���
- *@param float3 viewDir ���߷���
- *@param float power �����
- *@param float & diffuse �����diffuse
- *@param float & specular �����specular
+ *@param float3 normalDir 
+ *@param float3 lightDir 
+ *@param float3 viewDir 
+ *@param float power 
+ *@param float & diffuse 
+ *@param float & specular 
  */
 static inline void BlinnBRDF( float3& normalDir, float3& lightDir, float3& viewDir, float power, float& diffuse, float& specular )
 {
-	// Lambert������
 	float NdotL = float3::dot( normalDir, lightDir );
 	diffuse = Clamp( NdotL, 0.f, 1.f );
 
@@ -113,36 +106,18 @@ static inline void BlinnBRDF( float3& normalDir, float3& lightDir, float3& viewD
 	specular = pow( Clamp( float3::dot(H, normalDir),0.f, 1.f), power ) * diffuse;
 }
 
-static inline void Kajiya_Kay_BRDF( float3& normalDir, float3& tangentDir, float3& lightDir, float3& viewDir, float power, float& diffuse, float& specular )
-{
-	// Kajiya_Kay������
-	//float TdotL = float3::dot( tangentDir, lightDir );
-	//diffuse = sqrt(1.f - TdotL * TdotL );
-
-	// Half-Lambert������
-	float NdotL = float3::dot( normalDir, lightDir );
-	diffuse = Clamp( NdotL * 0.5f + 0.5f, 0.f, 1.f );
-
-	// blinn BDRF
-	float3 H = lightDir + viewDir;
-	H.normalize();
-	float HdotT = float3::dot(H, tangentDir);
-	specular = pow(  sqrt( 1.f - HdotT * HdotT), power ) * diffuse;
-}
-
 /**
- *@brief Phong����ģ��
+ *@brief Phongu光照模型
  *@return void 
- *@param float3 normalDir ���߷���
- *@param float3 lightDir ���շ���
- *@param float3 viewDir ���߷���
- *@param float power �����
- *@param float & diffuse �����diffuse
- *@param float & specular �����specular
+ *@param float3 normalDir
+ *@param float3 lightDir
+ *@param float3 viewDir
+ *@param float power
+ *@param float & diffuse
+ *@param float & specular
  */
 static inline void PhongBRDF( float3& normalDir, float3& lightDir, float3& viewDir, float power, float& diffuse, float& specular )
 {
-	// Lambert������
 	float NdotL = float3::dot( normalDir, lightDir );
 	diffuse = Clamp( NdotL, 0.f, 1.f );
 
@@ -153,7 +128,7 @@ static inline void PhongBRDF( float3& normalDir, float3& lightDir, float3& viewD
 }
 
 /**
- *@brief ���ٷ������㷨
+ *@brief Fresnel通用计算
  *@return float 
  *@param float NdotE 
  *@param float bias 
@@ -166,7 +141,7 @@ static inline float GetFresnel(float NdotE, float bias, float power, float scale
 }
 
 /**
- *@brief nv�Ŀ��ٴα�����͸ģ��
+ *@brief nv的快速皮肤模拟
  *@return void 
  *@param float NdotL 
  *@param float RollOff 
@@ -181,16 +156,15 @@ static inline void nvLambSkin(float NdotL,
 	subSurface = fmax(0.0f,subSurface);
 }
 
-
 /**
- *@brief һ���Դ�Ķ��Դ��������
+ *@brief 光照封装
  *@return void 
- *@param const SrShaderContext * context ������
- *@param float3 worldPos Ԫ�ص�����ռ�����
- *@param float3 normalDir Ԫ�ص�����ռ䷨����
- *@param float3 viewWS Ԫ�ص�����ռ�����
- *@param float4 & diffuseAcc ���ص�������ۼ�
- *@param float4 & specularAcc ���صľ��淴��ۼ�
+ *@param const SrShaderContext * context 
+ *@param float3 worldPos
+ *@param float3 normalDir
+ *@param float3 viewWS
+ *@param float4 & diffuseAcc
+ *@param float4 & specularAcc
  */
 static inline void CalcLights( const SrShaderContext* context, float3& worldPos, float3& normalDir, float3& viewWS, float4 &diffuseAcc, float4 &specularAcc )
 {
@@ -198,50 +172,22 @@ static inline void CalcLights( const SrShaderContext* context, float3& worldPos,
 
 	for (uint32 i=0; i < context->lightList.size(); ++i)
 	{
-		// ���Դ��ȡ�ù��շ���
 		SrLight* lt = context->lightList[i];
 		float3 lightPosWS = lt->worldPos;
 		float3 lightDirWS = lightPosWS - worldPos;
 		lightDirWS.normalize();
 
-		// ���ռ���
 		float diffuse;
 		float specular;
 		BlinnBRDF(normalDir, lightDirWS, viewWS, cBuffer->glossness, diffuse, specular);
 
-		// �ۼӵ��ۼ�
-		diffuseAcc += (lt->diffuseColor * diffuse);
-		specularAcc += (lt->specularColor * specular);
-	}
-
-
-}
-
-static inline void CalcLightsKajiya_Kay( const SrShaderContext* context, float3& worldPos, float3& normalDir, float3& tangentDir, float3& viewWS, float4 &diffuseAcc, float4 &specularAcc )
-{
-	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
-
-	for (uint32 i=0; i < context->lightList.size(); ++i)
-	{
-		// ���Դ��ȡ�ù��շ���
-		SrLight* lt = context->lightList[i];
-		float3 lightPosWS = lt->worldPos;
-		float3 lightDirWS = lightPosWS - worldPos;
-		lightDirWS.normalize();
-
-		// ���ռ���
-		float diffuse;
-		float specular;
-		Kajiya_Kay_BRDF(normalDir, tangentDir, lightDirWS, viewWS, cBuffer->glossness, diffuse, specular);
-
-		// �ۼӵ��ۼ�
 		diffuseAcc += (lt->diffuseColor * diffuse);
 		specularAcc += (lt->specularColor * specular);
 	}
 }
 
 /**
- *@brief ��Զ��Դ��Ƥ���������
+ *@brief 皮肤光照封装
  *@return void 
  *@param const SrShaderContext * context 
  *@param float3 worldPos 
@@ -262,14 +208,12 @@ static inline void CalcLightsSkin( const SrShaderContext* context, float3& world
 		float3 lightDirWS = lightPosWS - worldPos;
 		lightDirWS.normalize();
 
-		// ���ռ���
 		float diffuse;
 		float specular;
 		float subSurface;
 		BlinnBRDF(normalDir, lightDirWS, viewWS, cBuffer->glossness, diffuse, specular);
 		nvLambSkin( float3::dot( lightDirWS, normalDir ) , 0.5f, subSurface);
 
-		// 
 		diffuseAcc += ((lt->diffuseColor * diffuse) + subSurfaceCol * subSurface);
 		specularAcc += (lt->specularColor * specular);
 	}

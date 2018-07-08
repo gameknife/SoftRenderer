@@ -31,7 +31,7 @@ public:
 	bool LoadGeometryFromOBJ( const char* strMeshData, SrPrimitives& primitives );
 	bool LoadMaterialFromMTL( const char* strFileData);
 private:
-	uint16 AddVertex( uint32 hash, SrVertexP3N3T2* pVertex );
+	uint32 AddVertex( uint32 hash, SrVertexP3N3T2* pVertex );
 	bool IsMatIDExist( uint32 matID );
 	void DeleteCache();
 	void ClearData();

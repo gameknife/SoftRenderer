@@ -1,11 +1,11 @@
 /**
   @file IRenderer.h
   
-  @brief ��������Ⱦ�ṹ����
+  @brief renderer interface
 
   @author yikaiming
 
-  ������־ history
+  history
   ver:1.0
    
  */
@@ -61,35 +61,28 @@ public:
 
 	virtual const char* getName() =0;
 
-	// ����رպ���
 	virtual bool Resize(uint32 width, uint32 height)=0;
 	virtual uint32 getWidth() =0;
 	virtual uint32 getHeight() =0;
 
-	// ֡���ƺ���
 	virtual void BeginFrame()=0;
 	virtual void EndFrame()=0;
 
-	// Ӳ��Clear
 	virtual bool HwClear()=0;
 
-	// ��ȡScreenBuffer����
 	virtual const uint8* getBuffer() = 0;
 	virtual int getBufferLength() = 0;
 
-	// ����ͨ������
 	virtual bool SetTextureStage( const SrTexture* texture, int stage )=0;
 	virtual void ClearTextureStage()=0;
 
 	virtual bool UpdateVertexBuffer(SrVertexBuffer* target) {return true;}
 	virtual bool UpdateIndexBuffer(SrIndexBuffer* target) {return true;}
 
-	// ��Ⱦ����
 	virtual bool DrawPrimitive( SrPrimitve* primitive )=0;
 	virtual bool DrawLine(const float3& from, const float3& to)=0;
 	virtual bool DrawScreenText(const char* str, int x,int y, uint32 size, uint32 color = SR_UICOLOR_HIGHLIGHT) =0;
 
-	// Shader����
 	virtual bool SetShader(const SrShader* shader) =0;
 	virtual bool SetShaderConstant( uint32 slot, const float* constantStart, uint32 vec4Count ) =0;
 

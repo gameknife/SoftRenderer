@@ -71,7 +71,6 @@ public:
 	{
 		uint32 final = 0x00000000;
 
-		// ��������warp
 		float u = p.x - floor(p.x);
 		float v = p.y - floor(p.y);
 
@@ -79,11 +78,9 @@ public:
 		{
 		case eSF_Nearest:
 			{
-				// �ٽ������
 				u *= (m_width);
 				v *= (m_height);
 
-				// get int
 				int x = (int)( u );
 				int y = (int)( v );
 
@@ -98,22 +95,17 @@ public:
 
 			break;
 		case eSF_Linear:
-			// ˫�����ڲ�
 		default:
 			{
-				// ȡ������ռ�ĵ�ַ
 				u *= (m_width - 1);
 				v *= (m_height - 1);
 
-				// ȡ��
 				int x = (int)( u );
 				int y = (int)( v );
 
-				// ����������ƫ��
 				float du = u - x;
 				float dv = v - y;
 
-				// ȡ�õ�ַλ�ã�ȷ�������������Χ��
 				int left = (x) % m_width;
 				int right = (x + 1) % m_width;
 				int up = (y) % m_height;
@@ -124,13 +116,11 @@ public:
 				assert( up >= 0 && up < m_height );
 				assert( down >= 0 && down < m_height );
 
-				// ����4����ɫ
 				uint32 lt = Get( int2(left,up) );
 				uint32 t = Get( int2(right,up) );
 				uint32 l = Get( int2(left,down) );
 				uint32 rb =  Get( int2(right,down) );
 
-				// ʹ���ĸ���ɫ��������ƫ��������������ɫ
 				final = SrColorMulFloat(lt,((1.f-du)*(1.f-dv))) + SrColorMulFloat(t , (du*(1.f - dv))) + SrColorMulFloat(l , ((1.f-du)*dv)) + SrColorMulFloat(rb , (du*dv));
 			}
 		}
