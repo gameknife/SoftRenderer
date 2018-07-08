@@ -277,7 +277,6 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec;
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 
-	// srgb��ԭ
 	diffuseAcc.sqrt();
 
 	*out = float4_2_uint32(diffuseAcc);
