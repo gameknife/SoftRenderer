@@ -5,6 +5,8 @@
 #ifndef OS_WIN32
 #define _mm_malloc(a,b) malloc(a)
 #define _mm_free(a) free(a)
+#else
+#include <malloc.h>
 #endif
 //
 
