@@ -91,8 +91,7 @@ respanel.rescan_resources = function () {
         let relpath = path.relative( respanel.basedir, dirname );
         let token = path.normalize( relpath + path.sep + filename );
 
-        //console.log(token);
-
+        // 添加到资源索引
         respanel.add_res(token);
     });
 }
