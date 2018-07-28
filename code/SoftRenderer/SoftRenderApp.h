@@ -32,6 +32,8 @@ public:
 	bool InitRenderers();
 	void ShutdownRenderers();
 
+	void SendEvent(const char* event, const char* argument);
+
 private:
 	SrApps m_tasks;
 	IRenderer* m_renderer;

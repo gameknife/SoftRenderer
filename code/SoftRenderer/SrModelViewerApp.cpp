@@ -7,6 +7,7 @@
 
 SrModelViewerApp::SrModelViewerApp(void)
 {
+	m_ent = NULL;
 	m_ssao = false;
 	m_camdist = 10.0f;
 	m_shade_mode = 0;
@@ -25,15 +26,6 @@ void SrModelViewerApp::OnInit()
 
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
-
-	m_curr_ent = 0;
-
-	float3 poszero = float3(0, 0, 0);
-	Quat rotidtt = Quat::CreateIdentity();
-
-	m_ent = m_scene->CreateEntity("object", "media/modelviewer/head.obj", "media/modelviewer/head.mtl", poszero, rotidtt);
-	m_ents.push_back(m_ent);
-	m_ent->SetScale(float3(40, 40, 40));
 	
 	m_camera = m_scene->CreateCamera("cam0");
 	m_camera->setPos(float3(0,0,-15));
@@ -55,10 +47,11 @@ void SrModelViewerApp::OnInit()
 
 void SrModelViewerApp::OnUpdate()
 {
-	selectEnt(m_curr_ent);
-
-	float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
-	m_ents[m_curr_ent]->RotateLocal(move);
+	if(m_ent != NULL)
+	{
+		float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
+		m_ent->RotateLocal(move);
+	}
 	
 	m_scene->Update();
 
@@ -68,9 +61,40 @@ void SrModelViewerApp::OnUpdate()
 	}
 }
 
+void SrModelViewerApp::OnEvent(const char* event, const char* param)
+{
+	if( !strcmp(event, "set_model") )
+	{
+		if( m_ent != NULL )
+		{
+			m_scene->RemoveEntity(m_ent);
+			m_ent = NULL;
+		}
+
+		if(strlen(param) > 4)
+		{
+			// make mtl file path
+			const char* exstension = param + (strlen(param) - 4);
+			if( !strcmp(exstension, ".obj") )
+			{
+				std::string mtlfile(param);
+				mtlfile.replace( strlen(param) - 4, std::string::npos, ".mtl" );
+
+
+				float3 poszero = float3(0, 0, 0);
+				Quat rotidtt = Quat::CreateIdentity();
+
+				m_ent = m_scene->CreateEntity("object", param, mtlfile.c_str(), poszero, rotidtt);
+				m_ent->SetScale(float3(40, 40, 40));
+				m_ent->SetVisible(true);
+			}
+		}
+
+	}
+}
+
 void SrModelViewerApp::OnDestroy()
 {
-	m_ents.clear();
 	m_ent = NULL;
 	delete m_scene;
 }
@@ -87,42 +111,36 @@ void SrModelViewerApp::updateCam()
 	m_camera->Move( float3(0,0,-m_camdist));
 }
 
-void SrModelViewerApp::selectEnt(int index)
-{
-	for (int i=0; i < m_ents.size(); ++i)
-	{
-		m_ents[i]->SetVisible(false);
-	}
-
-	m_ents[index]->SetVisible(true);
-}
 void SrModelViewerApp::UpdateShader()
 {
-	switch( m_shade_mode )
+	if(m_ent != NULL)
 	{
-	case 0:
-		for (uint32 i=0; i < m_ents[m_curr_ent]->getMaterialCount(); ++i)
+		switch( m_shade_mode )
 		{
-			m_ents[m_curr_ent]->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("default"));
+		case 0:
+			for (uint32 i=0; i < m_ent->getMaterialCount(); ++i)
+			{
+				m_ent->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("default"));
+			}
+			break;
+		case 1:
+			for (uint32 i=0; i < m_ent->getMaterialCount(); ++i)
+			{
+				m_ent->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("fresnel"));
+			}
+			break;
+		case 2:
+			for (uint32 i=0; i < m_ent->getMaterialCount(); ++i)
+			{
+				m_ent->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("default_normal"));
+			}
+			break;
+		case 3:
+			for (uint32 i=0; i < m_ent->getMaterialCount(); ++i)
+			{
+				m_ent->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("skin"));
+			}
+			break;
 		}
-		break;
-	case 1:
-		for (uint32 i=0; i < m_ents[m_curr_ent]->getMaterialCount(); ++i)
-		{
-			m_ents[m_curr_ent]->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("fresnel"));
-		}
-		break;
-	case 2:
-		for (uint32 i=0; i < m_ents[m_curr_ent]->getMaterialCount(); ++i)
-		{
-			m_ents[m_curr_ent]->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("default_normal"));
-		}
-		break;
-	case 3:
-		for (uint32 i=0; i < m_ents[m_curr_ent]->getMaterialCount(); ++i)
-		{
-			m_ents[m_curr_ent]->getMaterial(i)->SetShader(gEnv->resourceMgr->GetShader("skin"));
-		}
-		break;
 	}
 }

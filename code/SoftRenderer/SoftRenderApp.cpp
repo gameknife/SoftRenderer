@@ -199,3 +199,11 @@ void SoftRenderApp::ShutdownRenderers()
 	m_renderer->ShutdownRenderer();
 	delete m_renderer;
 }
+
+void SoftRenderApp::SendEvent(const char* event, const char* argument)
+{
+	if( m_curr_task < m_tasks.size())
+	{
+		m_tasks[m_curr_task]->OnEvent(event, argument);
+	}
+}

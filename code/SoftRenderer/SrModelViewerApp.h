@@ -27,10 +27,10 @@ public:
 
 	virtual void OnDestroy();
 
+	virtual void OnEvent(const char* event, const char* param);
+
 	void updateCam();
-
-	void selectEnt(int index);
-
+	
 private:
 	void SwitchSSAO();
 
@@ -38,15 +38,11 @@ private:
 
 	bool m_ssao;
 	float m_camdist;
-	int m_curr_ent;
 	int m_shade_mode;
 
 	struct SrCamera* m_camera;
 	class SrScene* m_scene;
-	class SrEntity* m_ent;
-
-	class std::vector<SrEntity*> m_ents;
-	
+	class SrEntity* m_ent;	
 };
 
 

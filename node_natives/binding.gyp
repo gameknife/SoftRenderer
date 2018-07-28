@@ -20,12 +20,16 @@
                   'LinkIncremental': 1,       
                 }
               }          
-
-
-
-
             },
-        'OS=="mac"', {}
+        'OS=="mac"', {
+          'xcode_settings': {
+        'OTHER_CFLAGS': [
+              '-msse2',
+              '-Ofast'
+            ],
+          },
+
+        }
         ]
       ]
     }

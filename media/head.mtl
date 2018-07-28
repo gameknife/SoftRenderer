@@ -3,9 +3,9 @@ illum 4
 Kd 0.50 0.50 0.50
 Ka 0.59 0.59 0.59
 Tf 1.00 1.00 1.00
-map_Kd media/modelviewer/tex/barnes.bmp
-bump media/modelviewer/tex/barnes_ddn.bmp -bm 0.02
-map_Kspc0 media/modelviewer/tex/barnes_sss.bmp
+map_Kd media/head/barnes.bmp
+bump media/head/barnes_ddn.bmp -bm 0.02
+map_Kspc0 media/head/barnes_sss.bmp
 alpha_test 0.01
 Ni 1.00
 Ks 0.5 0.6 0.9

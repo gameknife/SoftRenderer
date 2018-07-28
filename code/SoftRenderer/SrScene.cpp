@@ -8,7 +8,7 @@
 
 SrScene::SrScene(void)
 {
-	// ³õÊ¼»¯Ìì¹â
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_skyLightColor = SR_ARGB_F(255, 25, 43, 89);
 }
 
@@ -89,6 +89,7 @@ void SrScene::RemoveEntity( SrEntity* target )
 		if (it->second == target)
 		{
 			m_entityLib.erase(it);
+			break;
 		}
 	}
 }

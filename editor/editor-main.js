@@ -1,5 +1,6 @@
 let addon = require('../node_natives/build/Release/addon.node');
 let path = require('path');
+const resPanel = require('./respanel.js');
 
 window.onload = function(){
 
@@ -24,13 +25,35 @@ window.onload = function(){
 
   let profiledata = bid('profiledata');
 
+  // temporary feature
+  let holder = bid('mesh-holder');
+
+  holder.ondrop = function ( ev ) {
+    ev.preventDefault();
+    let filetoken = ev.dataTransfer.getData("restoken");
+    //console.info(filetoken);
+    let event = "set_model";
+    let ret = addon.sendEvent(event, filetoken);
+    //console.info(ret);
+  }
+
+  holder.ondragover = function (ev) {
+    ev.preventDefault();
+}
+
+  // respanel refresh
+  resPanel.init(bid('res-container'), path.join(__dirname, '../'));
+  resPanel.rescan_resources();
+  resPanel.reconstruct_filetree();
+  resPanel.refresh();
+
   // create render loop
   render_loop();
   function render_loop()
   {
       addon.rendertobuffer(bufferData);
       let data = addon.getprofiledata();
-      //console.log(data);
+      
       profiledata.innerHTML=data;
 
       imageData.data.set(bufferData);

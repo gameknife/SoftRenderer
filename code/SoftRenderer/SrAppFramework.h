@@ -21,6 +21,7 @@ public:
 	virtual void OnInit() =0;
 	virtual void OnUpdate() =0;
 	virtual void OnDestroy() =0;
+	virtual void OnEvent(const char* event, const char* param) =0;
 };
 typedef std::vector<SrAppFramework*> SrApps;
 

@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "ios": "cpp",
+        "algorithm": "cpp",
+        "__split_buffer": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "__bit_reference": "cpp",
+        "__string": "cpp",
+        "future": "cpp",
+        "memory": "cpp",
+        "type_traits": "cpp",
+        "__functional_03": "cpp",
+        "functional": "cpp"
+    }
+}

@@ -2,13 +2,14 @@
 //
 
 #include "stdafx.h"
+
+
+#ifdef OS_WIN32
+
 #include "SoftRenderApp.h"
-#include "SrSponzaApp.h"
 #include "SrModelViewerApp.h"
 
 #include "mmgr.h"
-
-#ifdef OS_WIN32
 
 int main()
 {

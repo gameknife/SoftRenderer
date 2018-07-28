@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "pathutil.h"
 #include "SoftRenderApp.h"
-#include "SrSponzaApp.h"
 #include "SrModelViewerApp.h"
 #include "SrProfiler.h"
 
@@ -51,7 +50,6 @@ SoftRenderApp* g_app;
 NAN_METHOD(initOfflineSystem) {
 	g_app = new SoftRenderApp();
 	g_app->RegisterTask(new SrModelViewerApp);
-    //g_app->RegisterTask(new SrSponzaApp);
 	g_app->Init();
 }
 
@@ -77,6 +75,41 @@ NAN_METHOD(setRootPath)
 	srSetRootPath(str);
 }
 
+NAN_METHOD(sendEvent)
+{
+    if(info.Length() != 2)
+    {
+        return;
+    }
+
+    //double arg0 = info[0]->NumberValue();
+    //double arg1 = info[1]->NumberValue();
+
+    //info.GetReturnValue().Set(Nan::New(arg0+arg1));
+
+    //return;
+
+    //set_model
+    //const char* event = *(String::Utf8Value(info[0]->ToString()));
+    //const char* param = *(String::Utf8Value(info[1]->ToString()));
+    Nan::Utf8String utf8_value0(info[0]);
+    Nan::Utf8String utf8_value1(info[1]);
+    //info.GetReturnValue().Set(Nan::New(*utf8_value1).ToLocalChecked());
+
+
+
+
+    const char* event = *utf8_value0;
+    const char* param = *utf8_value1;
+    
+    g_app->SendEvent(event, param);
+
+    //std::string retval = event;
+    //retval += param;
+
+    //info.GetReturnValue().Set(Nan::New(retval.c_str()).ToLocalChecked());
+}
+
 
 // export funcs
 NAN_MODULE_INIT(Init) {
@@ -97,6 +130,8 @@ NAN_MODULE_INIT(Init) {
 	   GetFunction(New<FunctionTemplate>(shutDown)).ToLocalChecked());
    Nan::Set(target, New<String>("getprofiledata").ToLocalChecked(),
 	   GetFunction(New<FunctionTemplate>(getprofiledata)).ToLocalChecked());
+   Nan::Set(target, New<String>("sendEvent").ToLocalChecked(),
+	   GetFunction(New<FunctionTemplate>(sendEvent)).ToLocalChecked());
 }
 
 NODE_MODULE(addon, Init)
