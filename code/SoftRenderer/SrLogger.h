@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -11,12 +11,16 @@
 #ifndef SrLogger_h__
 #define SrLogger_h__
 
+typedef void (*LogCallback)(const char*);
+
 struct ILogger
 {
 	virtual ~ILogger(void) {}
 
 	virtual void Log(const char* line) =0;
 	virtual void Log(const char* format, va_list args) =0;
+
+	virtual void SetExternalLogCallback( LogCallback callback ) = 0;
 };
 
 class SrLogger : public ILogger
@@ -25,13 +29,16 @@ public:
 	SrLogger(void);
 	~SrLogger(void);
 
-	void Log(const char* line);
-	void Log(const char* format, va_list args);
+	virtual void Log(const char* line);
+	virtual void Log(const char* format, va_list args);
+
+	virtual void SetExternalLogCallback( LogCallback callback );
 
 private:
 	void FlushToFile();
 	char* m_data;
 	uint32 m_size;
+	LogCallback m_logCallback;
 };
 
 //	 Simple logs of data with low verbosity.

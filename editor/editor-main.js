@@ -1,6 +1,7 @@
 let addon = require('../node_natives/build/Release/addon.node');
 let path = require('path');
-const resPanel = require('./respanel.js');
+//const resPanel = require('./respanel.js');
+import EditorResourceManager from './respanel';
 
 window.onload = function(){
 
@@ -17,6 +18,11 @@ window.onload = function(){
 
   // 初始化渲染器
   addon.initrender();
+
+
+  addon.setLogCallback( function(msg) {
+    console.log(msg);
+  } );
 
   // 创建backbuffer
   let bufferData = new Buffer(854*480*4);
@@ -38,6 +44,8 @@ window.onload = function(){
   holder.ondragover = function (ev) {
     ev.preventDefault();
   }
+
+  let resPanel = new EditorResourceManager();
 
   // 刷新project面板
   resPanel.init(bid('res-container'), path.join(__dirname, '../'));

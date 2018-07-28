@@ -8,7 +8,8 @@ SrLogger::SrLogger(void)
 	// 1mb
 	m_data = new char[LOG_FILE_SZIE];
 	m_size = 0;
-
+	m_logCallback = NULL;
+	
 	//AllocConsole();
 	#ifdef OS_WIN32
 	freopen("CONOUT$","w+t",stdout);  
@@ -29,8 +30,18 @@ SrLogger::~SrLogger(void)
 	//FreeConsole();
 }
 
+void SrLogger::SetExternalLogCallback( LogCallback callback )
+{
+	m_logCallback = callback;
+}
+
 void SrLogger::Log( const char* line )
 {
+	if(m_logCallback != NULL)
+	{
+		m_logCallback(line);
+	}
+
 	uint32 length = (uint32)strlen(line);
 	
 	// ����װ�����ˣ�д���ļ�

@@ -82,37 +82,35 @@ NAN_METHOD(sendEvent)
         return;
     }
 
-    //double arg0 = info[0]->NumberValue();
-    //double arg1 = info[1]->NumberValue();
-
-    //info.GetReturnValue().Set(Nan::New(arg0+arg1));
-
-    //return;
-
-    //set_model
-    //const char* event = *(String::Utf8Value(info[0]->ToString()));
-    //const char* param = *(String::Utf8Value(info[1]->ToString()));
     Nan::Utf8String utf8_value0(info[0]);
     Nan::Utf8String utf8_value1(info[1]);
-    //info.GetReturnValue().Set(Nan::New(*utf8_value1).ToLocalChecked());
-
-
-
 
     const char* event = *utf8_value0;
     const char* param = *utf8_value1;
-    
+
     g_app->SendEvent(event, param);
-
-    //std::string retval = event;
-    //retval += param;
-
-    //info.GetReturnValue().Set(Nan::New(retval.c_str()).ToLocalChecked());
 }
 
+Nan::Callback* cbGlobal;
+void LogToElectron(const char* line)
+{
+    const unsigned argc = 1;
+    v8::Local<v8::Value> argv[argc] = { Nan::New(line).ToLocalChecked() };
+    cbGlobal->Call(argc, argv);
+}
+
+NAN_METHOD(setLogCallback)
+{
+    cbGlobal = new Nan::Callback(info[0].As<v8::Function>());
+    gEnv->logger->SetExternalLogCallback(LogToElectron);
+
+    const unsigned argc = 1;
+    v8::Local<v8::Value> argv[argc] = { Nan::New("callback setup to C++").ToLocalChecked() };
+    cbGlobal->Call(argc, argv);
+}
 
 // export funcs
-NAN_MODULE_INIT(Init) {
+NAN_MODULE_INIT(Init) {    
    Nan::Set(target, New<String>("rotate").ToLocalChecked(),
         GetFunction(New<FunctionTemplate>(rotate)).ToLocalChecked());
    Nan::Set(target, New<String>("hello").ToLocalChecked(),
@@ -132,6 +130,8 @@ NAN_MODULE_INIT(Init) {
 	   GetFunction(New<FunctionTemplate>(getprofiledata)).ToLocalChecked());
    Nan::Set(target, New<String>("sendEvent").ToLocalChecked(),
 	   GetFunction(New<FunctionTemplate>(sendEvent)).ToLocalChecked());
+   Nan::Set(target, New<String>("setLogCallback").ToLocalChecked(),
+	   GetFunction(New<FunctionTemplate>(setLogCallback)).ToLocalChecked());
 }
 
 NODE_MODULE(addon, Init)
