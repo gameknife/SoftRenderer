@@ -1,6 +1,8 @@
 # SoftRenderer
 An SoftRenderer for experiment &amp; learn.
 
+![ss](screenshot.png)
+
 ## 重启计划
 2018年，重启softrender工程，旨在重新回归本源，并且将一些新技术应用起来，同时依时间情况构建一系列软渲染教程
 
