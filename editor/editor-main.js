@@ -1,7 +1,8 @@
 let addon = require('../node_natives/build/Release/addon.node');
 let path = require('path');
-//const resPanel = require('./respanel.js');
+
 import EditorResourceManager from './respanel';
+import Logger from './logger';
 
 window.onload = function(){
 
@@ -19,9 +20,10 @@ window.onload = function(){
   // 初始化渲染器
   addon.initrender();
 
+  Logger.init(bid('console-log-container'));
 
   addon.setLogCallback( function(msg) {
-    console.log(msg);
+    Logger.info(msg);
   } );
 
   // 创建backbuffer

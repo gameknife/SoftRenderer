@@ -169,7 +169,7 @@ html, body {
 
 #left .console-frame {
     width: 100%;
-    height: 80px;
+    height: 160px;
     display: flex;
     flex-direction: column;
 }

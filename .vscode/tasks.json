@@ -16,6 +16,11 @@
             "type": "npm",
             "script": "nrebuild",
             "problemMatcher": []
+        },
+        {
+            "type": "npm",
+            "script": "start",
+            "problemMatcher": []
         }
     ]
 }
