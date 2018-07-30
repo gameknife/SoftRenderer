@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrObjLoader.h"
 #include <sstream>
 #include "SrMaterial.h"
@@ -141,10 +141,6 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 
 	bool flushFace = false;
 	std::string currMtlName;
-
-	int vertexIndexStart = 0;
-	int normalIndexStart = 0;
-	int texcoordIndexStart = 0;
 
 	for(; ; )
 	{

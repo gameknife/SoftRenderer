@@ -317,12 +317,12 @@ static inline float SrRandomFloat(float min, float max)
 	return (min + f01 * (max - min));
 }
 
-static float GaussianDistribution1D(float x, float rho)
-{
-	float g = 1.0f / ( rho * sqrtf(2.0f * SR_PI)); 
-	g *= expf( -(x * x)/(2.0f * rho * rho) );
-	return g;
-}
+// static float GaussianDistribution1D(float x, float rho)
+// {
+// 	float g = 1.0f / ( rho * sqrtf(2.0f * SR_PI)); 
+// 	g *= expf( -(x * x)/(2.0f * rho * rho) );
+// 	return g;
+// }
 
 /*}*/
 

@@ -28,12 +28,12 @@ SR_ALIGN struct Quat
 	 Quat() {}
 
 	 Quat( float W, float X, float Y, float Z, bool bNorm = false ) 
-		: w(W),x(X),y(Y),z(Z)	
+		: x(X),y(Y),z(Z),w(W)	
 	{
 		if (bNorm) Normalize();
 		assert(IsValid()); 
 	}
-	 Quat( float angle, const float3 &axis) : wv(angle),v(axis) {};
+	 Quat( float angle, const float3 &axis) : v(axis),wv(angle) {};
 
 	// ��Ԫ�� ����
 	void operator *= (float op) {	w*=op; v*=op;	}

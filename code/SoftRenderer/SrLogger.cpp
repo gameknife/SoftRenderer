@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SrLogger.h"
 
-const int LOG_FILE_SZIE = 1024 * 50;
+const int LOG_FILE_SZIE = 1024 * 1;
 
 SrLogger::SrLogger(void)
 {
@@ -44,8 +44,8 @@ void SrLogger::Log( const char* line )
 
 	uint32 length = (uint32)strlen(line);
 	
-	// ����װ�����ˣ�д���ļ�
-	//if (m_size + length + 2 > LOG_FILE_SZIE)
+	// logfile write
+	if (m_size + length + 2 > LOG_FILE_SZIE)
 	{
 		FlushToFile();
 	}

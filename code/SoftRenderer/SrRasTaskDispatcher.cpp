@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrRasTaskDispatcher.h"
 #include "SrProfiler.h"
 
@@ -16,10 +16,10 @@ SrTaskThread::~SrTaskThread()
 }
 
 /**
- *@brief Ïß³ÌµÄÔËÐÐº¯Êý
+ *@brief ï¿½ß³Ìµï¿½ï¿½ï¿½ï¿½Ðºï¿½ï¿½ï¿½
  *@return int 
- *@remark Ã»ÓÐ±»SetReadyÊ±»áÒ»Ö±wait£¬Ö±µ½±»SetReadyºó£¬
- ¿ªÊ¼´¦ÀíÈÎÎñ£¬´¦ÀíÍê³Éºó½«runningFlagÖÃÎ»£¬Í¨ÖªÍâ²¿´¦ÀíÍê³É£¬Í¬Ê±½øÈëwait×´Ì¬
+ *@remark Ã»ï¿½Ð±ï¿½SetReadyÊ±ï¿½ï¿½Ò»Ö±waitï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½SetReadyï¿½ï¿½
+ ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ñ£¬´ï¿½ï¿½ï¿½ï¿½ï¿½Éºï¿½runningFlagï¿½ï¿½Î»ï¿½ï¿½Í¨Öªï¿½â²¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½Í¬Ê±ï¿½ï¿½ï¿½ï¿½wait×´Ì¬
  */
 int SrTaskThread::Run()
 {
@@ -33,12 +33,12 @@ int SrTaskThread::Run()
 			SrRasTask* task = m_creator->RequestTask();
 			if (!task)
 			{
-				// Ã»ÓÐÈÎÎñÁË£¬ÍË³öÏß³Ì
+				// Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½Ë³ï¿½ï¿½ß³ï¿½
 				break;
 			}
 
 			gEnv->profiler->setIncrement( (EProfilerElement)(ePe_Thread0TaskNum + m_threadId) );
-			// Ö´ÐÐÈÎÎñ
+			// Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			task->Execute();
 		}
 		m_runningFlag->Set();
@@ -58,7 +58,7 @@ SrRasTaskDispatcher::~SrRasTaskDispatcher(void)
 
 
 /**
- *@brief ×÷ÒµÏß³ÌË÷È¡ÈÎÎñµÄ½Ó¿Ú£¬ÀûÓÃÁÙ½çÇø±£Ö¤ÈÎÎñË÷È¡µÄÔ­×ÓÐÔ¡£
+ *@brief ï¿½ï¿½Òµï¿½ß³ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ä½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ô­ï¿½ï¿½ï¿½Ô¡ï¿½
  *@return SrRasTask* 
  */
 SrRasTask* SrRasTaskDispatcher::RequestTask()
@@ -77,9 +77,9 @@ SrRasTask* SrRasTaskDispatcher::RequestTask()
 }
 
 /**
- *@brief ³õÊ¼»¯ÈÎÎñ·Ö·¢Æ÷
+ *@brief ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
  *@return void 
- *@remark ¸ù¾ÝcpuºËÐÄÊý£¬¿ªÆôcpuºËÐÄÊý-1¸ö×÷ÒµÏß³Ì
+ *@remark ï¿½ï¿½ï¿½ï¿½cpuï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½cpuï¿½ï¿½ï¿½ï¿½ï¿½ï¿½-1ï¿½ï¿½ï¿½ï¿½Òµï¿½ß³ï¿½
  */
 void SrRasTaskDispatcher::Init()
 {
@@ -100,7 +100,7 @@ void SrRasTaskDispatcher::Init()
 }
 
 /**
- *@brief ¹Ø±ÕÈÎÎñ·Ö·¢Æ÷£¬¹Ø±Õ×÷ÒµÏß³Ì
+ *@brief ï¿½Ø±ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø±ï¿½ï¿½ï¿½Òµï¿½ß³ï¿½
  *@return void 
  */
 void SrRasTaskDispatcher::Destroy()
@@ -116,7 +116,7 @@ void SrRasTaskDispatcher::Destroy()
 }
 
 /**
- *@brief Ð­×÷flushÄ£Ê½£¬Ö÷Ïß³ÌºÍÆäËûÏß³ÌÒ»Æð´¦ÀítaskÕ»ÖÐÈÎÎñ
+ *@brief Ð­ï¿½ï¿½flushÄ£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ìºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½Ò»ï¿½ï¿½ï¿½ï¿½taskÕ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  *@return void 
  */
 void SrRasTaskDispatcher::FlushCoop()
@@ -136,18 +136,18 @@ void SrRasTaskDispatcher::FlushCoop()
 		SrRasTask* task = RequestTask();
 		if (!task)
 		{
-			// Ã»ÓÐÈÎÎñÁË£¬ÍË³öÏß³Ì
+			// Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½Ë³ï¿½ï¿½ß³ï¿½
 			break;
 		}
 		gEnv->profiler->setIncrement(ePe_MainThreadTaskNum);
 
-		// Ö´ÐÐÈÎÎñ
+		// Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		task->Execute();
 	}
 }
 
 /**
- *@brief ¶ÀÁ¢flushÄ£Ê½£¬Í¨ÖªÏß³Ì¿ªÊ¼´¦Àí¡£
+ *@brief ï¿½ï¿½ï¿½ï¿½flushÄ£Ê½ï¿½ï¿½Í¨Öªï¿½ß³Ì¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
  *@return void 
  */
 void SrRasTaskDispatcher::Flush()
@@ -163,7 +163,7 @@ void SrRasTaskDispatcher::Flush()
 }
 
 /**
- *@brief Ö÷Ïß³ÌµÈ´ýËùÓÐÏß³ÌÍê³É¹¤×÷¡£
+ *@brief ï¿½ï¿½ï¿½ß³ÌµÈ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½
  *@return void 
  */
 void SrRasTaskDispatcher::Wait()
@@ -198,7 +198,7 @@ void SrRasTaskDispatcher::Wait()
 }
 
 /**
- *@brief Ö÷Ïß³ÌÏòÈÎÎñ·Ö·¢Æ÷ÖÐÑ¹ÈëÈÎÎñ
+ *@brief ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  *@return void 
  *@param SrRasTask * task 
  */

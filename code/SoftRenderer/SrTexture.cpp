@@ -1,11 +1,8 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrTexture.h"
 
 #include <fstream>
 
-
-const int MIN_RGB = 0;
-const int MAX_RGB = 255;
 const int BMP_MAGIC_ID = 2;
 
 struct bmpfile_magic
@@ -44,14 +41,17 @@ void SrTexture::WriteToFile(const char* filename)
 	magic.magic[0] = 'B';
 	magic.magic[1] = 'M';
 	file.write((char*)(&magic), sizeof(magic));
-	bmpfile_header header = { 0 };
+
+	bmpfile_header header;
+	memset( &header, 0, sizeof(header) );
 	header.bmp_offset = sizeof(bmpfile_magic)
 		+ sizeof(bmpfile_header) + sizeof(bmpfile_dib_info);
 	header.file_size = header.bmp_offset
-		//	+ m_width * m_height * m_bpp;
 		+ m_width * m_height * m_bpp;
 	file.write((char*)(&header), sizeof(header));
-	bmpfile_dib_info dib_info = { 0 };
+
+	bmpfile_dib_info dib_info;
+	memset( &dib_info, 0, sizeof(dib_info) );
 	dib_info.header_size = sizeof(bmpfile_dib_info);
 	dib_info.width = m_width;
 	dib_info.height = m_height;

@@ -1,6 +1,6 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SoftRenderApp.h"
-#include "resource.h"
+#include "Resource.h"
 #include "SrMesh.h"
 #include "SrProfiler.h"
 #include "SrShader.h"
@@ -106,7 +106,7 @@ bool SoftRenderApp::Update()
 	
 	gEnv->renderer->HwClear();
 
-	if( m_curr_task < m_tasks.size())
+	if( m_curr_task < (int)m_tasks.size())
 	{
 		m_tasks[m_curr_task]->OnUpdate();
 	}
@@ -200,7 +200,7 @@ void SoftRenderApp::ShutdownRenderers()
 
 void SoftRenderApp::SendEvent(const char* event, const char* argument)
 {
-	if( m_curr_task < m_tasks.size())
+	if( m_curr_task < (int)m_tasks.size())
 	{
 		m_tasks[m_curr_task]->OnEvent(event, argument);
 	}

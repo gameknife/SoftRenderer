@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "BasicShaders.h"
 #include "SrFragmentBuffer.h"
 
@@ -428,9 +428,6 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	CalcLights(context, in->worldpos_tx.xyz, normalDir, viewWS, diffuseAcc, specularAcc);
 
 	// calc ssao here
-	
-	//int address = (int)(in->pos.x) % 4 + (int)(in->pos.y) % 4 * 4 ;
-	//address %= 16;
 	float ao = 0;
 
 	bool jit = (gEnv->context->IsFeatureEnable(eRFeature_JitAA));
@@ -441,9 +438,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
  		int x = address % gEnv->context->width;
 		int address = x % 4 + (y % 4) * 4;
 		address %= 16;
-		
-		SrFragment* fragment = (SrFragment*)pIn;
-
+	
 		float2 hTc(in->pos.x / (float) gEnv->context->width, in->pos.y / (float) gEnv->context->height);
 
 		for ( int i=0; i < 8; ++i)

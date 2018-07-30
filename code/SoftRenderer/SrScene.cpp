@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrScene.h"
 #include "SrEntity.h"
 #include "SrCamera.h"

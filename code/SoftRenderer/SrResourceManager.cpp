@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrResourceManager.h"
 #include "SrMesh.h"
 #include "SrRenderTexture.h"
@@ -87,14 +87,14 @@ const SrTexture* SrResourceManager::LoadTexture( const char* filename, bool bump
 
 	if (it != m_textureLibrary.end())
 	{
-		// ÕâÀïÊÇ¿ÉÄÜÕÒµ½ÄÚÖÃÎÆÀíµÄ
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		ret = static_cast<SrTexture*>(it->second);
 	}
 	else
 	{
-		// Èç¹ûÃ»ÓĞ´´½¨£¬È¥´´½¨Íâ²¿bitmap
+		// ï¿½ï¿½ï¿½Ã»ï¿½Ğ´ï¿½ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½â²¿bitmap
 		ret = new SrBitmap(filename);
-		// ÕâÀïÓĞ¿ÉÄÜ´´½¨²»³É¹¦
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¿ï¿½ï¿½Ü´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½
 		if ( !ret || !(ret->getBuffer()) )
 		{
 			delete ret;
@@ -128,7 +128,7 @@ SrMaterial* SrResourceManager::LoadMaterial( const char* filename )
 	}
 	else
 	{
-		// Ä¬ÈÏ²ÄÖÊ
+		// Ä¬ï¿½Ï²ï¿½ï¿½ï¿½
 		ret = LoadMaterial( "$srdefualt" );
 	}
 	return ret;	
@@ -275,7 +275,7 @@ bool SrResourceManager::DeleteVertexBuffer( SrVertexBuffer* target )
 				delete (m_vertexBuffers[i]);
 				m_vertexBuffers[i] = NULL;
 
-				// Ğ¶ÔØÁË¾ÍÌø³ö°¡£¡
+				// Ğ¶ï¿½ï¿½ï¿½Ë¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				return true;
 			}
 		}
@@ -299,7 +299,7 @@ SrIndexBuffer* SrResourceManager::AllocateIndexBuffer( uint32 count )
 			m_indexBuffers[i] = ib;
 			hasEmpty = true;
 
-			// ×°ÈëÁË¾ÍÌø³ö°¡£¡
+			// ×°ï¿½ï¿½ï¿½Ë¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			break;
 		}
 	}
@@ -330,7 +330,7 @@ bool SrResourceManager::DeleteIndexBuffer( SrIndexBuffer* target )
 				delete m_indexBuffers[i];
 				m_indexBuffers[i] = NULL;
 
-				// Ğ¶ÔØÁË¾ÍÌø³ö°¡£¡
+				// Ğ¶ï¿½ï¿½ï¿½Ë¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				return true;
 			}
 		}

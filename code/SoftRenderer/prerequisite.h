@@ -96,8 +96,8 @@
 #endif
 
 // fastcall声明
-#define SRFASTCALL __fastcall
-
+//#define SRFASTCALL __fastcall
+#define SRFASTCALL 
 //////////////////////////////////////////////////////////////////////////
 // 工具包
 #include "math_def.h"

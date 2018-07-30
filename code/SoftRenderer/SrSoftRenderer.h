@@ -66,10 +66,10 @@ private:
 
 	SrRasterizer* m_rasterizer;
 
-	uint32 m_renderState;
-
 	void* m_cachedBuffer;
 	int m_bufferPitch;
+
+	uint32 m_renderState;
 
 	SrBitmapArray m_textureStages;
 

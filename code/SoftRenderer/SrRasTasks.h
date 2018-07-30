@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -15,8 +15,8 @@
 #include "SrRasTaskDispatcher.h"
 
 /**
- @brief ÏñËØ´¦ÀíÈÎÎñ
- @remark ´¦ÀífragBufferÖĞµÄÒ»¸öblock£¬Ö´ĞĞpixelshader¡£
+ @brief ï¿½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ @remark ï¿½ï¿½ï¿½ï¿½fragBufferï¿½Ğµï¿½Ò»ï¿½ï¿½blockï¿½ï¿½Ö´ï¿½ï¿½pixelshaderï¿½ï¿½
  */
 struct SrRasTask_Pixel : public SrRasTask
 {
@@ -33,8 +33,8 @@ struct SrRasTask_Pixel : public SrRasTask
 };
 
 /**
- @brief ¶¥µã´¦ÀíÈÎÎñ
- @remark ´¦ÀívertexBufferÖĞµÄÒ»¸öblock£¬Ö´ĞĞvertexshader¡£
+ @brief ï¿½ï¿½ï¿½ã´¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ @remark ï¿½ï¿½ï¿½ï¿½vertexBufferï¿½Ğµï¿½Ò»ï¿½ï¿½blockï¿½ï¿½Ö´ï¿½ï¿½vertexshaderï¿½ï¿½
  */
 struct SrRasTask_Vertex : public SrRasTask
 {
@@ -50,8 +50,8 @@ struct SrRasTask_Vertex : public SrRasTask
 };
 
 /**
- @brief ¶¶¶¯¿¹¾â³İ´¦ÀíÈÎÎñ
- @remark ´¦ÀíbackBufferºÍbackBuffer1ÖĞµÄÒ»¸öblock£¬»ìºÏÑÕÉ«ºóÊä³öµ½Ó²¼şoutBufferÖĞ¡£
+ @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ @remark ï¿½ï¿½ï¿½ï¿½backBufferï¿½ï¿½backBuffer1ï¿½Ğµï¿½Ò»ï¿½ï¿½blockï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½outBufferï¿½Ğ¡ï¿½
  */
 struct SrRasTask_JitAA : public SrRasTask
 {
@@ -67,8 +67,8 @@ struct SrRasTask_JitAA : public SrRasTask
 };
 
 /**
- @brief ÄÚ´æclearÈÎÎñ
- @remark ÇåÀíÄ¿±êÄÚ´æ
+ @brief ï¿½Ú´ï¿½clearï¿½ï¿½ï¿½ï¿½
+ @remark ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Ú´ï¿½
  */
 struct SrRasTask_Clear : public SrRasTask
 {
@@ -77,8 +77,8 @@ struct SrRasTask_Clear : public SrRasTask
 	virtual void Execute();
 
 	void* m_dst;
-	uint8 m_val;
 	int m_size;
+	uint8 m_val;
 };
 
 struct SrRasTask_Rasterize : public SrRasTask

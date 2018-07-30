@@ -225,6 +225,8 @@ class IEvent
             m_state = false;
         }
         pthread_mutex_unlock(&m_count_mutex);
+
+        return true;
     }
     
 	void Reset()

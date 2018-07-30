@@ -93,7 +93,7 @@ void LogToElectron(const char* line)
 {
     const unsigned argc = 1;
     v8::Local<v8::Value> argv[argc] = { Nan::New(line).ToLocalChecked() };
-    cbGlobal->Call(argc, argv);
+    cbGlobal->Call(argc, argv, NULL);
 }
 
 NAN_METHOD(setLogCallback)
@@ -103,8 +103,9 @@ NAN_METHOD(setLogCallback)
 
     const unsigned argc = 1;
     v8::Local<v8::Value> argv[argc] = { Nan::New("callback setup to C++").ToLocalChecked() };
-    cbGlobal->Call(argc, argv);
+    cbGlobal->Call(argc, argv, NULL);
 }
+
 
 // export funcs
 NAN_MODULE_INIT(Init) {    

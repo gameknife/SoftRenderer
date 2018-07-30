@@ -18,7 +18,7 @@ class SrFragmentBuffer
 {
 	friend SrRendContext;
 public:
-	SrFragmentBuffer(int width, int height, SrSoftRenderer* renderer);
+	SrFragmentBuffer(int width, int height);
 	~SrFragmentBuffer(void);
 
 	// LPCRITICAL_SECTION GetSyncMark(uint32 address)
@@ -53,13 +53,9 @@ public:
 
 private:
 	SrIndexBuffer*			m_fBufferIndices;	///< fragBufferIndices
-	
 	SrFragmentBufferSync*	fragBufferSync;
-
 	uint32					m_width;
 	uint32					m_height;
-
-	SrSoftRenderer*			m_renderer;
 };
 extern SrFragmentBuffer* fBuffer;
 

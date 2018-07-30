@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrRenderTexture.h"
 
 SrRenderTexture::SrRenderTexture( const char* name, int width, int height, int bpp ):SrTexture(name)

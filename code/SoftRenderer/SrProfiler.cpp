@@ -3,11 +3,11 @@
   
   @author Kaiming
 
-  更改日志 history
+  锟斤拷锟斤拷锟斤拷志 history
   ver:1.0
    
  */
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrProfiler.h"
 
 SrProfiler::SrProfiler()

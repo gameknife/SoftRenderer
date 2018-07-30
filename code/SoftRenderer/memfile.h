@@ -107,7 +107,7 @@
 				}
 				size_t BytesRead = fread(pTmp, 1, m_size, pFile);
 
-				if (BytesRead != m_size)
+				if (BytesRead != (size_t)m_size)
 				{
 					delete [] pTmp;
 					m_size = 0;
@@ -159,9 +159,9 @@
 			return m_data;
 		}
 
+		bool m_open;
 		char* m_data;
 		int m_size;
-		bool m_open;
 		bool m_binary;
 		bool m_unicode;
 		int m_encoding;

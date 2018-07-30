@@ -14,6 +14,16 @@
         "type_traits": "cpp",
         "__functional_03": "cpp",
         "functional": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "fstream": "cpp",
+        "__tree": "cpp",
+        "bitset": "cpp",
+        "initializer_list": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "string_view": "cpp",
+        "utility": "cpp"
     }
 }

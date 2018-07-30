@@ -8,13 +8,9 @@
    
  */
 
-#include "StdAfx.h"
-
+#include "stdafx.h"
 #include "SrBitmap.h"
 
-
-const int MIN_RGB = 0;
-const int MAX_RGB = 255;
 const int BMP_MAGIC_ID = 2;
 
 struct bmpfile_magic
@@ -60,7 +56,7 @@ SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 		const char* start = bitmapfile.Data();
 
 		// 获得文件头
-		bmpfile_magic* magic = (bmpfile_magic*)start;
+		//bmpfile_magic* magic = (bmpfile_magic*)start;
 		bmpfile_header* header = (bmpfile_header*)(start + sizeof(bmpfile_magic));
 		bmpfile_dib_info* info = (bmpfile_dib_info*)(start + +sizeof(bmpfile_magic) + sizeof(bmpfile_header));
 

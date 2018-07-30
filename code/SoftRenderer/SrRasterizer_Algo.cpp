@@ -269,7 +269,7 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 	assert(clipStart >= 0 && clipEnd >= 0 && end - start > 0 && clipEnd - clipStart > 0);
 
 	uint32 clipCount = clipEnd - clipStart - 1;
-	uint32 count = end - start;
+	//uint32 count = end - start;
 
 	float ratio_step = 1.f / (fend - fstart + 1);
 	float ratio_start = (clipStart - fstart) * ratio_step;
@@ -316,7 +316,7 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	float x1 = tri.p[0].pos.x;
 	float y1 = tri.p[0].pos.y;
 	float x2 = tri.p[1].pos.x;
-	float y2 = tri.p[1].pos.y;
+	//float y2 = tri.p[1].pos.y;
 	float x3 = tri.p[2].pos.x;
 	float y3 = tri.p[2].pos.y;
 
@@ -512,7 +512,7 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 	float x1 = tri.p[2].pos.x;
 	float y1 = tri.p[2].pos.y;
 	float x2 = tri.p[0].pos.x;
-	float y2 = tri.p[0].pos.y;
+	//float y2 = tri.p[0].pos.y;
 	float x3 = tri.p[1].pos.x;
 	float y3 = tri.p[1].pos.y;
 

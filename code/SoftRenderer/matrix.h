@@ -88,7 +88,6 @@ public:
 	float33 operator *= ( const float33 & p )
 	{
 		float33 tmp;
-		float sum = 0;
 		memset( &tmp , 0 , sizeof( float33 ) );
 		for( int i = 0 ; i < 3 ; ++i )
 		{
@@ -266,7 +265,6 @@ public:
 	float44 operator *= ( const float44 & p )
 	{
 		float44 tmp;
-		float sun = 0;
 		memset( &tmp , 0 , sizeof( float44 ) );
 		for( int i = 0 ; i < 4 ; ++i )
 		{

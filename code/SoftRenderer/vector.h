@@ -5,7 +5,7 @@
 
   @author yikaiming
 
-  ������־ history
+  history
   ver:1.0
    
  */
@@ -181,23 +181,19 @@ public:
 		*this= i - n * (float2::dot(i, n)*2.f);
 		return *this;
 	}
-	inline const float dot( const float2& rhs )
+	inline float dot( const float2& rhs ) const
 	{
 		return x * rhs.x + y * rhs.y;
 	}
-	static inline const float dot( const float2& lhs, const float2& rhs )
+	static inline float dot( const float2& lhs, const float2& rhs )
 	{
 		return lhs.x * rhs.x + lhs.y * rhs.y;
 	}
 };
 
 /**
-	*@brief float3 ��ά�����࣬�ṩ��ά�����Ļ������������
-	*@remark �ṩ���� HLSL ��ȡֵ�͸�ֵ��ʽ����ʹ��v.xyֱ��ȡ��ǰ��λ
-
-	���������: * Ϊ�����˷�������Ϊ������
-			   % Ϊ������̣�����Ϊ������
-			   ���������������أ�ʹ��float3::dot����.dot����ȡ���
+	*@brief float3 
+	hlsl like vector function
 */
 SR_ALIGN struct float3
 {

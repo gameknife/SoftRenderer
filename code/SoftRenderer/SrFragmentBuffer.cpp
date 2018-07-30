@@ -1,10 +1,10 @@
-﻿#include "StdAfx.h"
+﻿#include "stdafx.h"
 #include "SrFragmentBuffer.h"
 #include "SrSoftRenderer.h"
 
 //std::map<const void*, void*> m_align_pt_mapper;
 
-SrFragmentBuffer::SrFragmentBuffer( int width, int height, SrSoftRenderer* renderer):m_width(width), m_height(height), m_renderer(renderer)
+SrFragmentBuffer::SrFragmentBuffer( int width, int height ):m_width(width), m_height(height)
 {
 	uint32 size = width * height;
 	//fragBuffer = new SrFragmentBuffer[size];
