@@ -1,11 +1,7 @@
 #include "StdAfx.h"
 #include "SrTexture.h"
-#include "SrProfiler.h"
 
-#include <iostream>
 #include <fstream>
-
-#include "mmgr.h"
 
 
 const int MIN_RGB = 0;

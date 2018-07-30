@@ -2,8 +2,6 @@
 #include "BasicShaders.h"
 #include "SrFragmentBuffer.h"
 
-#include "mmgr.h"
-
 SrFlatShader g_FlatShadingShader;
 SrPhongShader g_PhongShadingShader;
 SrGourandShader g_GourandShadingShader;

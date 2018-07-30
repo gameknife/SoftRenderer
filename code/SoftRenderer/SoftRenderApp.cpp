@@ -7,8 +7,6 @@
 #include "SrLogger.h"
 #include "SrSoftRenderer.h"
 
-#include "mmgr.h"
-
 
 // 全局变量
 GlobalEnvironment* gEnv = NULL;

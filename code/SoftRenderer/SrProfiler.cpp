@@ -10,8 +10,6 @@
 #include "StdAfx.h"
 #include "SrProfiler.h"
 
-#include "mmgr.h"
-
 SrProfiler::SrProfiler()
 {
 	m_profileElements.assign(ePe_Count, SrProfilerElement());

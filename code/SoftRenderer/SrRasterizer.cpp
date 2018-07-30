@@ -18,7 +18,6 @@
 #include "SrSoftRenderer.h"
 #include "SrFragmentBuffer.h"
 
-#include "mmgr.h"
 
 SrFragmentBuffer* fBuffer = NULL;						/// fragment Buffer
 

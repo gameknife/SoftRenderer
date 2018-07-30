@@ -9,8 +9,6 @@
 #include "SoftRenderApp.h"
 #include "SrModelViewerApp.h"
 
-#include "mmgr.h"
-
 int main()
 {
 	char buffer[MAX_PATH];

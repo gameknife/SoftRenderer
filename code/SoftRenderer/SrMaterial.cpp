@@ -1,14 +1,6 @@
 #include "stdafx.h"
 #include "SrMaterial.h"
 
-#include "SrObjLoader.h"
-
-#include "SrResourceManager.h"
-#include "SrDefaultMedia.h"
-
-#include "mmgr.h"
-
-
 SrMaterial::SrMaterial( const char* name ):SrResource(name,  eRT_Material)
 {
 	m_shader = NULL;

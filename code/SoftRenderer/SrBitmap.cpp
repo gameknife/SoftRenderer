@@ -11,10 +11,6 @@
 #include "StdAfx.h"
 
 #include "SrBitmap.h"
-#include "SrProfiler.h"
-
-#include "mmgr.h"
-
 
 
 const int MIN_RGB = 0;

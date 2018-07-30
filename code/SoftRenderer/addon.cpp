@@ -6,9 +6,6 @@
 #include "SrModelViewerApp.h"
 #include "SrProfiler.h"
 
-#include "mmgr.h"
-
-
 namespace demo {
 
 using namespace Nan;

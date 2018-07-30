@@ -3,8 +3,6 @@
 #include "SrEntity.h"
 #include "SrCamera.h"
 
-#include "mmgr.h"
-
 
 SrScene::SrScene(void)
 {

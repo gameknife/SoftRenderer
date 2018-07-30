@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "SrCamera.h"
 
-#include "mmgr.h"
 SrCamera::SrCamera( const float3& p, const Quat& r, float fov, float zN, float zF ) :m_pos(p)
 	,m_rot(r)
 	,m_fov(fov)

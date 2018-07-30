@@ -142,13 +142,7 @@ inline unsigned int __stdcall IThread::ThreadFunction(void *pV)
 
 	if (pThis)
 	{
-		try
-		{
-			result = pThis->Run();
-		}
-		catch(...)
-		{
-		}
+		result = pThis->Run();
 	}
 
 	return result;

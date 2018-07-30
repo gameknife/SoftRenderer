@@ -2,10 +2,7 @@
 #include "SrMesh.h"
 #include "SrObjLoader.h"
 #include "SrMaterial.h"
-#include "SrResourceManager.h"
 #include "SrDefaultMedia.h"
-
-#include "mmgr.h"
 
 
 SrMesh::SrMesh(const char* filename):SrResource(filename, eRt_Mesh)

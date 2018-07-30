@@ -1,11 +1,8 @@
 #include "stdafx.h"
 #include "SrRasTasks.h"
-#include "SrMaterial.h"
-#include "SrProfiler.h"
 #include "SrRasterizer.h"
 #include "SrSwShader.h"
 
-#include "mmgr.h"
 
 SrRasTask_Pixel::SrRasTask_Pixel( int indexStart, int indexEnd, uint32* indexBuffer, SrFragment* gBuffer, uint32* oBuffer ):
 	m_indexStart(indexStart),

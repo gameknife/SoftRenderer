@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "SrRenderTexture.h"
-#include "mmgr.h"
 
 SrRenderTexture::SrRenderTexture( const char* name, int width, int height, int bpp ):SrTexture(name)
 {

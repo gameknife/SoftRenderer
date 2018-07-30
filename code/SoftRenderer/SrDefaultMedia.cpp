@@ -13,9 +13,6 @@
 #include "SrTexture.h"
 #include "SrObjLoader.h"
 
-#include "mmgr.h"
-
-
 static const char* g_defaultMesh = "\
 	v  -5.0000 0.0000 5.0000\n\
 	v  -5.0000 0.0000 -5.0000\n\

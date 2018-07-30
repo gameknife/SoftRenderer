@@ -4,10 +4,6 @@
 #include "SrMesh.h"
 #include "SrMaterial.h"
 
-#include "mmgr.h"
-
-
-
 
 SrEntity::SrEntity(void)
 {

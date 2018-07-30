@@ -1,11 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SrRasterizer.h"
 #include "SrSwShader.h"
-#include "SrMaterial.h"
-
-
-#include "mmgr.h"
-
 
 /**
 *@brief 光珊化三角形裁剪

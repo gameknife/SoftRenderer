@@ -10,12 +10,9 @@
 #include "stdafx.h"
 #include "SrRasterizer.h"
 #include "SrProfiler.h"
-#include "SrMesh.h"
-#include "SrMaterial.h"
 #include "SrSwShader.h"
 #include "SrFragmentBuffer.h"
 
-#include "mmgr.h"
 
 void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 {

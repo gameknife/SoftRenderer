@@ -11,8 +11,6 @@
 #include "stdafx.h"
 #include "AdvanceShaders.h"
 
-#include "mmgr.h"
-
 SrSkinSimShader g_SkinSimShader;
 SrFresnelNormalShader g_FresnelNormalShader;
 

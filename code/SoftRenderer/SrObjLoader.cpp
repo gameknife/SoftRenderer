@@ -3,8 +3,6 @@
 #include <sstream>
 #include "SrMaterial.h"
 
-#include "mmgr.h"
-
 SrObjLoader::SrObjLoader(void)
 {
 	nullCache = NULL;

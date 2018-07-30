@@ -13,10 +13,8 @@
 #include "SrSoftRenderer.h"
 #include "srBitmap.h"
 #include "SrRasterizer.h"
-#include "SrProfiler.h"
 #include "SrSwShader.h"
 
-#include "mmgr.h"
 #include "BasicShaders.h"
 #include "AdvanceShaders.h"
 

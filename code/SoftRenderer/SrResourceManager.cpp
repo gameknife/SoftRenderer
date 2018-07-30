@@ -8,12 +8,6 @@
 #include "SrObjLoader.h"
 #include "SrShader.h"
 
-#include "mmgr.h"
-
-
-
-
-
 SrResourceManager::SrResourceManager(void)
 {
 	m_textureLibrary.clear();

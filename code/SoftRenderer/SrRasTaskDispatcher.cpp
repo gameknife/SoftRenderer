@@ -2,8 +2,6 @@
 #include "SrRasTaskDispatcher.h"
 #include "SrProfiler.h"
 
-#include "mmgr.h"
-
 SrTaskThread::SrTaskThread( int tileId, SrRasTaskDispatcher* creator ):m_creator(creator),
 	m_threadId(tileId)
 {
