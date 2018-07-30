@@ -282,8 +282,6 @@
     <ClInclude Include="matrix.h" />
     <ClInclude Include="memfile.h" />
     <ClInclude Include="mmalloc.h" />
-    <ClInclude Include="mmgr.h" />
-    <ClInclude Include="nommgr.h" />
     <ClInclude Include="pathutil.h" />
     <ClInclude Include="prerequisite.h" />
     <ClInclude Include="quaternion.h" />
@@ -314,7 +312,6 @@
     <ClInclude Include="SrResource.h" />
     <ClInclude Include="SrResourceManager.h" />
     <ClInclude Include="SrScene.h" />
-    <ClInclude Include="SrSponzaApp.h" />
     <ClInclude Include="SrTexture.h" />
     <ClInclude Include="srtype.h" />
     <ClInclude Include="sr_intrinsic_hack.h" />
@@ -327,12 +324,6 @@
     <ClCompile Include="AdvanceShaders.cpp" />
     <ClCompile Include="BasicShaders.cpp" />
     <ClCompile Include="memfile.cpp" />
-    <ClCompile Include="mmgr.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="SoftRenderApp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SrBitmap.cpp" />
@@ -356,7 +347,6 @@
     <ClCompile Include="SrResourceManager.cpp" />
     <ClCompile Include="SrScene.cpp" />
     <ClCompile Include="SrSoftRenderer.cpp" />
-    <ClCompile Include="SrSponzaApp.cpp" />
     <ClCompile Include="SrTexture.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

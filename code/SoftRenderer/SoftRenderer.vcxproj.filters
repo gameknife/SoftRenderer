@@ -8,9 +8,6 @@
     <Filter Include="util">
       <UniqueIdentifier>{04984f38-1b3e-4ae0-8c05-d46a2751fa75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="mmgr">
-      <UniqueIdentifier>{36e74e30-5701-4a02-bdc0-312e432daf5c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="RenderSys">
       <UniqueIdentifier>{0df6e1fe-4fd7-478e-bc08-e5984d0dc88c}</UniqueIdentifier>
     </Filter>
@@ -106,9 +103,6 @@
     <ClInclude Include="SrAppFramework.h">
       <Filter>AppLayer\App</Filter>
     </ClInclude>
-    <ClInclude Include="SrSponzaApp.h">
-      <Filter>AppLayer\App</Filter>
-    </ClInclude>
     <ClInclude Include="RendererBase.h">
       <Filter>RenderSys</Filter>
     </ClInclude>
@@ -152,12 +146,6 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="memfile.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="mmgr.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="nommgr.h">
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="pathutil.h">
@@ -249,9 +237,6 @@
     <ClCompile Include="SrDefaultMedia.cpp">
       <Filter>RenderSys\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="SrSponzaApp.cpp">
-      <Filter>AppLayer\App</Filter>
-    </ClCompile>
     <ClCompile Include="SrLogger.cpp">
       <Filter>AppLayer\System</Filter>
     </ClCompile>
@@ -286,9 +271,6 @@
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="memfile.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="mmgr.cpp">
       <Filter>util</Filter>
     </ClCompile>
   </ItemGroup>

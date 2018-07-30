@@ -6,7 +6,6 @@
 
 SrScene::SrScene(void)
 {
-	// ��ʼ�����
 	m_skyLightColor = SR_ARGB_F(255, 25, 43, 89);
 }
 
