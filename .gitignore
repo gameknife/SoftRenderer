@@ -44,3 +44,5 @@ bin32/
 bin64/
 .vs/
 .DS_Store
+
+package-lock.json

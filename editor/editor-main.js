@@ -27,7 +27,7 @@ window.onload = function(){
   } );
 
   // 创建backbuffer
-  let bufferData = new Buffer(854*480*4);
+  let bufferData = Buffer.alloc(854*480*4);
   let imageData = context.createImageData(854, 480);
 
   // 取得profile数据显示器
