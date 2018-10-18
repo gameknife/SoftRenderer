@@ -20,15 +20,21 @@ window.onload = function(){
   // 初始化渲染器
   addon.initrender();
 
+  
+
   Logger.init(bid('console-log-container'));
 
-  addon.setLogCallback( function(msg) {
-    Logger.info(msg);
-  } );
+  //addon.setLogCallback( function(msg) {
+    //Logger.info(msg);
+  //} );
+
+
 
   // 创建backbuffer
   let bufferData = Buffer.alloc(854*480*4);
   let imageData = context.createImageData(854, 480);
+
+
 
   // 取得profile数据显示器
   let profiledata = bid('profiledata');
