@@ -2,6 +2,8 @@
 An SoftRenderer for experiment &amp; learn.
 
 ![ss](screenshot.png)
+## 重启计划
+2020年，本人主体工作有部分向前端技术倾斜，故准备重新梳理softrenderer，目前electron更新了很多，原来的node-gyp已经无法编译，准备整体升级并使用typescript重写界面
 
 ## 重启计划
 2018年，重启softrender工程，旨在重新回归本源，并且将一些新技术应用起来，同时依时间情况构建一系列软渲染教程
