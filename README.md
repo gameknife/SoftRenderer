@@ -36,22 +36,23 @@ npm install -g cnpm --registry=https://registry.npm.taobao.org
 * 安装node-gyp
 
 ```
-cnpm install -g node-gyp
+npm install --global node-gyp@latest
+npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 ```
 
 * 部署编译环境
 * windows
 
-安装windows-tool-chain
+安装windows-tool-chain，如果已经安装visual studio的编译环境，可跳过
 
 ```
 cnpm install -g --production windows-build-tools
 ```
 
-将toolchain下载得到的python.exe的目录配置到path里，我的在C:\Users\gameKnife\.windows-build-tools\python27这个位置
+根据node-gyp要求，c:\python27这个位置需要有python
 
 ```
-set PATH=%PATH%;C:\path\to\python
+可拷贝，可设置mklink
 ```
 
 
