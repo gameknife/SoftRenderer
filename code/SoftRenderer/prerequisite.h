@@ -10,8 +10,7 @@
    
  */
 
-#ifndef prerequisite_h__
-#define prerequisite_h__
+#pragma once
 
 // 平台判断
 #if defined(__GNUG__)
@@ -81,9 +80,9 @@
 //////////////////////////////////////////////////////////////////////////
 // assert
 #if defined( SR_PROFILE ) && defined ( NDEBUG )	// 当在RELEASE模式下，开启SR_PROFILE时，打开assert
-#undef NDEBUG
+//#undef NDEBUG
 #include <assert.h>
-#define NDEBUG
+//#define NDEBUG
 #else
 #include <assert.h>
 #endif
@@ -122,7 +121,7 @@
 // 此block大小决定了每次线程TASK分发的task个数
 // 需要多次测试得到一个较好的值
 #define VERTEX_TASK_BLOCK 64			///< VertexShader任务分块大小
-#define PIXEL_TASK_BLOCK 64				///< PixelShader任务分块大小
+#define PIXEL_TASK_BLOCK 512				///< PixelShader任务分块大小
 #define RASTERIZE_TASK_BLOCK 512		///< Rasterize任务分块大小
 
 //////////////////////////////////////////////////////////////////////////
@@ -328,7 +327,7 @@ SR_ALIGN struct SrIndexBuffer
 	void push_back(uint32 index)
 	{
 		data[currAddress++] = index;
-		assert( currAddress <= count );
+		//assert( currAddress <= count );
 	}
 
 	uint32 size()
@@ -424,5 +423,3 @@ struct IResourceManager
 
 	virtual void CleanBufferBinding() =0;
 };
-
-#endif // prerequisite_h__

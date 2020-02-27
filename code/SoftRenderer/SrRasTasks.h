@@ -20,6 +20,7 @@
  */
 struct SrRasTask_Pixel : public SrRasTask
 {
+	SrRasTask_Pixel() {}
 	SrRasTask_Pixel(int indexStart, int indexEnd, uint32* indexBuffer, SrFragment* gBuffer, uint32* oBuffer);
 	~SrRasTask_Pixel() {}
 	virtual void Execute();

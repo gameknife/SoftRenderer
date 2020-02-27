@@ -30,10 +30,21 @@ int SrTaskThread::Run()
 
 		while(true)
 		{
-			SrRasTask* task = m_creator->RequestTask();
+			SrRasTask* task = nullptr;
+			if(!m_internalTasks.empty())
+			{
+				task = m_internalTasks.top();
+				m_internalTasks.pop();
+			}
+
+			if(!task)
+			{
+				task = m_creator->RequestTask();
+			}
+			
 			if (!task)
 			{
-				// û�������ˣ��˳��߳�
+				// 全部任务完成
 				break;
 			}
 
@@ -97,6 +108,8 @@ void SrRasTaskDispatcher::Init()
 	}
 
 	m_resLock = new gkScopedLock<gkMutexLock>(eLGID_Resource, (uint64)this);
+
+	m_preTaskToken = 0;
 }
 
 /**
@@ -206,4 +219,10 @@ void SrRasTaskDispatcher::PushTask( SrRasTask* task )
 {
 	m_taskStack.push(task);
 	m_taskList.push_back(task);
+}
+
+void SrRasTaskDispatcher::PrePushTask(SrRasTask* task)
+{
+	uint32 currWorker = m_preTaskToken++ % m_pool.size();
+	m_pool[currWorker]->PrePushTask(task);
 }

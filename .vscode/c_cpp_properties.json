@@ -5,8 +5,10 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/code/SoftRenderer",
-                "${workspaceFolder}/node_modules/_nan@2.10.0@nan",
-                "/usr/local/include/node"
+                "${workspaceFolder}/node_modules/nan",
+                "C:/Users/gameKnife/AppData/Local/node-gyp/Cache/iojs-3.0.4/src",
+                "C:\\Users\\gameKnife\\AppData\\Local\\node-gyp\\Cache\\iojs-3.0.4\\deps\\uv\\include",
+                "C:\\Users\\gameKnife\\AppData\\Local\\node-gyp\\Cache\\iojs-3.0.4\\deps\\v8\\include"
             ],
             "defines": [
                 "__cdecl=__attribute__((__cdecl__))"
@@ -14,10 +16,10 @@
             "macFrameworkPath": [
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/System/Library/Frameworks"
             ],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.24.28314/bin/Hostx64/x64/cl.exe",
             "cStandard": "c11",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64"
+            "cppStandard": "c++14",
+            "intelliSenseMode": "msvc-x64"
         }
     ],
     "version": 4

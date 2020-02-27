@@ -248,8 +248,10 @@ void SrPhongShader::ProcessRasterize( void* rOut, const void* rInRef0, const voi
 
 void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const
 {
+	//return;
 	SrPhongShading_Vert2Frag* in = (SrPhongShading_Vert2Frag*)pIn;
 	uint32* out = (uint32*)pOut;
+
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
 	float2 tc0( in->worldpos_tx.w, in->normal_ty.w );

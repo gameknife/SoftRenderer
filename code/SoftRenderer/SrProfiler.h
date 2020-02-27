@@ -53,6 +53,14 @@ enum EProfilerElement
 	ePe_Thread13TaskNum,
 	ePe_Thread14TaskNum,
 	ePe_Thread15TaskNum,
+	ePe_Thread16TaskNum,
+	ePe_Thread17TaskNum,
+	ePe_Thread18TaskNum,
+	ePe_Thread19TaskNum,
+	ePe_Thread20TaskNum,
+	ePe_Thread21TaskNum,
+	ePe_Thread22TaskNum,
+	ePe_Thread23TaskNum,
 
 	// hair testing
 	ePe_HairCount,

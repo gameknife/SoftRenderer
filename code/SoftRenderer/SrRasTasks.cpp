@@ -44,10 +44,10 @@ void SrRasTask_Vertex::Execute()
 	for ( uint32 i = m_indexStart; i < m_indexEnd ; ++i)
 	{
 		assert(  i >=0 &&  i < m_vb->elementCount );
-		// È¡µÃ¶¥µãÖ¸Õë
+		// È¡ï¿½Ã¶ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
 		void* vsOut = (void*)(m_vb->data + i * m_vb->elementSize);
 		SrRendVertex tmp = *((SrRendVertex*)vsOut);
-		// ´¦Àí
+		// ï¿½ï¿½ï¿½ï¿½
 		m_primitive->shader->ProcessVertex( vsOut, 0, 0, &tmp, 0, 0, &(m_primitive->shaderConstants) );
 	}
 }
@@ -104,7 +104,7 @@ SrRasTask_Rasterize::SrRasTask_Rasterize( SrRendPrimitve* pri, SrVertexBuffer* v
 
 void SrRasTask_Rasterize::Execute()
 {
-	// ÓÃibË÷Òý£¬¹¹ÔìÈý½ÇÐÎ½øÐÐ¹âÕ¤»¯
+	// ï¿½ï¿½ibï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î½ï¿½ï¿½Ð¹ï¿½Õ¤ï¿½ï¿½
 	if (m_vb && m_ib)
 	{
 		for ( uint32 i=m_indexStart; i < m_indexEnd; ++i )
@@ -115,7 +115,7 @@ void SrRasTask_Rasterize::Execute()
 			tri.p[2] = *(SrRendVertex*)(m_vb->data + m_ib->data[i * 3 + 2] * m_vb->elementSize);
 			tri.primitive = m_primitive;
 
-			// Ìá½»Èý½ÇÐÎ½øÐÐ²Ã¼ô
+			// ï¿½á½»ï¿½ï¿½ï¿½ï¿½ï¿½Î½ï¿½ï¿½Ð²Ã¼ï¿½
 			SrRasterizer::RasterizeTriangle_Clip(tri, g_context->viewport.n, g_context->viewport.f);
 		}
 	}

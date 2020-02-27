@@ -70,7 +70,7 @@ void SrProfiler::Update()
 	sprintf(m_buffer, "SoftRENDERER v0.3(%s)| Fps: %.2f | FT: %.2fms | %d x %d |%s | %s | %s <br> "
 		"DP:%5.2fms | Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | PST:%5.2fms | PPT:%5.2fms <br> "
 		"Batch: %3d | Tri: %6d | Pixel: %6d | Vertex: %6d <br> "
-		"Processor: %d | Task M/0/1/2/3/4/5/6: %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br> ",
+		"Processor: %d | Task PerThread: <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br>",
 		gEnv->renderer->getName(),
 		1000.f / gEnv->profiler->getAverageTime(ePe_FrameTime),
 		gEnv->profiler->getAverageTime(ePe_FrameTime),
@@ -100,7 +100,24 @@ void SrProfiler::Update()
 		gEnv->profiler->getCount(ePe_Thread3TaskNum),
 		gEnv->profiler->getCount(ePe_Thread4TaskNum),
 		gEnv->profiler->getCount(ePe_Thread5TaskNum),
-		gEnv->profiler->getCount(ePe_Thread6TaskNum)
+		gEnv->profiler->getCount(ePe_Thread6TaskNum),
+		gEnv->profiler->getCount(ePe_Thread7TaskNum),
+		gEnv->profiler->getCount(ePe_Thread8TaskNum),
+		gEnv->profiler->getCount(ePe_Thread9TaskNum),
+		gEnv->profiler->getCount(ePe_Thread10TaskNum),
+		gEnv->profiler->getCount(ePe_Thread11TaskNum),
+		gEnv->profiler->getCount(ePe_Thread12TaskNum),
+		gEnv->profiler->getCount(ePe_Thread13TaskNum),
+		gEnv->profiler->getCount(ePe_Thread14TaskNum),
+		gEnv->profiler->getCount(ePe_Thread15TaskNum),
+		gEnv->profiler->getCount(ePe_Thread16TaskNum),
+		gEnv->profiler->getCount(ePe_Thread17TaskNum),
+		gEnv->profiler->getCount(ePe_Thread18TaskNum),
+		gEnv->profiler->getCount(ePe_Thread19TaskNum),
+		gEnv->profiler->getCount(ePe_Thread20TaskNum),
+		gEnv->profiler->getCount(ePe_Thread21TaskNum),
+		gEnv->profiler->getCount(ePe_Thread22TaskNum),
+		gEnv->profiler->getCount(ePe_Thread23TaskNum)
 	);
 
 	// profile resources

@@ -25,6 +25,12 @@ struct SrRasTask
 	virtual void Execute() =0;
 };
 
+class SrTaskThread;
+
+typedef std::vector<SrTaskThread*> SrTaskThreadPool;
+typedef std::stack<SrRasTask*> SrTaskStack;
+typedef std::vector<SrRasTask*> SrTaskList;
+
 /**
  @brief �����߳�
  @remark ��ȡ��ִ�й�դ������Ĵ����̡߳����̴߳�������״̬ʱ��
@@ -49,18 +55,21 @@ public:
 		return m_runningFlag;
 	}
 
+	void PrePushTask(SrRasTask* task)
+	{
+		m_internalTasks.push(task);
+	}
 
 
 private:
 	CManualResetEvent* m_runningFlag;		/// ������ɱ�־
 	CManualResetEvent* m_waitFlag;			/// �ȴ��´����б�־
 	SrRasTaskDispatcher* m_creator;			/// ����ַ���
+	SrTaskStack m_internalTasks;
 	int m_threadId;
 };
 
-typedef std::vector<SrTaskThread*> SrTaskThreadPool;
-typedef std::stack<SrRasTask*> SrTaskStack;
-typedef std::vector<SrRasTask*> SrTaskList;
+
 
 /**
  @brief ����ַ���
@@ -77,6 +86,7 @@ public:
 	void Destroy();
 
 	void PushTask(SrRasTask* task);
+	void PrePushTask(SrRasTask* task);
 	void FlushCoop();
 	void Flush();
 	void Wait();
@@ -84,9 +94,11 @@ public:
 	SrRasTask* RequestTask();
 
 	gkScopedLock<gkMutexLock> *m_resLock;
-	SrTaskThreadPool m_pool;			///< ����������̳߳أ������̸߳���ΪCPU������-1
-	SrTaskStack m_taskStack;			///< ���ڴ�������ջ����ȡ����ֱ�Ӵ�ջ��ȡ����ֱ��ȡ�ꡣ
-	SrTaskList  m_taskList;				///< ���ڴ���������ݵ����飬��������������ڡ�
+	SrTaskThreadPool m_pool;			///< 线程池
+	SrTaskStack m_taskStack;			///< 任务堆栈
+	SrTaskList  m_taskList;			///< 任务列表
+
+	uint32 m_preTaskToken;			///< 任务分配令牌
 };
 
 #endif

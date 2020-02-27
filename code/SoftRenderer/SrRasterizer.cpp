@@ -219,7 +219,7 @@ void SrRasterizer::Flush()
 			{
 				end = primitive.vb->elementCount;
 			}
-			m_rasTaskDispatcher->PushTask( new SrRasTask_Vertex(i, end, primitive.vb, &primitive) );
+			m_rasTaskDispatcher->PrePushTask( new SrRasTask_Vertex(i, end, primitive.vb, &primitive) );
 			gEnv->profiler->setIncrement(ePe_VertexCount, end - i);
 		}
 	}
@@ -264,7 +264,7 @@ void SrRasterizer::Flush()
 				{
 					end = triCount;
 				}
-				m_rasTaskDispatcher->PushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
+				m_rasTaskDispatcher->PrePushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
 			}
 		}
 	}
@@ -287,7 +287,7 @@ void SrRasterizer::Flush()
 				{
 					end = triCount;
 				}
-				m_rasTaskDispatcher->PushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
+				m_rasTaskDispatcher->PrePushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
 			}
 		}
 	}
@@ -303,11 +303,12 @@ void SrRasterizer::Flush()
 	//////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
-	// ���ش���
+	// PS 阶段
 	// every gbuffer pixel -> pshader -> every screenbuffer pixel	
 	gEnv->profiler->setBegin(ePe_PixelShaderTime);
 
-	// ����ͳ��
+	// 剔除不需要渲染的
+	
 	for ( uint32 i=0; i < g_context->width * g_context->height; ++i)
 	{
 		if(fBuffer->zBuffer[i] < 0.f)
@@ -317,22 +318,42 @@ void SrRasterizer::Flush()
 	}
 
 
-	// �������
-	uint32 size = fBuffer->GetPixelIndicesBuffer()->size();
-	for ( uint32 i = 0 ; i < size; i += PIXEL_TASK_BLOCK)
+	
+	// 任务分配
 	{
-		uint32 end =  i + PIXEL_TASK_BLOCK;
-		if ( end > size)
+		uint32 size = fBuffer->GetPixelIndicesBuffer()->size();
+
+		// Task栈上分配 854 x 480 / 512 + 1 = 801
+		// task结构需要精简
+		// 栈上有问题，其他核访问不到
+		static SrRasTask_Pixel tmpTasks[900];
+		uint32 taskAddress = 0;
+
+		for (uint32 i = 0; i < size; i += PIXEL_TASK_BLOCK)
 		{
-			end = size;
+			uint32 end = i + PIXEL_TASK_BLOCK;
+			if (end > size)
+			{
+				end = size;
+			}
+			auto taskptr = &( tmpTasks[taskAddress++] );
+			taskptr->m_indexStart = i;
+			taskptr->m_indexEnd = end;
+			taskptr->m_indexBuffer = fBuffer->GetPixelIndicesBuffer()->data;
+			taskptr->m_gBuffer = fBuffer->fBuffer;
+			taskptr->m_oBuffer = outBuffer;
+			//m_rasTaskDispatcher->PrePushTask(new SrRasTask_Pixel(i, end, fBuffer->GetPixelIndicesBuffer()->data, fBuffer->fBuffer, outBuffer));
+			m_rasTaskDispatcher->PrePushTask(taskptr);
+			gEnv->profiler->setIncrement(ePe_PixelCount, end - i);
 		}
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Pixel( i, end, fBuffer->GetPixelIndicesBuffer()->data, fBuffer->fBuffer, outBuffer ) );
-		gEnv->profiler->setIncrement(ePe_PixelCount, end - i);
+
+		// 优化一下，直接平均预分配到每个线程
+
+
+		m_rasTaskDispatcher->FlushCoop();
+		m_rasTaskDispatcher->Wait();
 	}
 
-	// ִ���������
-	m_rasTaskDispatcher->FlushCoop();
-	m_rasTaskDispatcher->Wait();
 	gEnv->profiler->setEnd(ePe_PixelShaderTime);
 	// ���ش������
 	//////////////////////////////////////////////////////////////////////////

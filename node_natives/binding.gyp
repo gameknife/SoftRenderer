@@ -10,7 +10,7 @@
               "libraries": [ "winmm.lib" ],
               'msvs_settings': {
                 'VCCLCompilerTool': {
-                  'EnableEnhancedInstructionSet': 2,
+                  'EnableEnhancedInstructionSet': 4,
                   'FloatingPointModel': 2,
                 },
                 'VCLinkerTool': {
