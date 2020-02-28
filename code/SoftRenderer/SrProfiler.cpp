@@ -65,8 +65,32 @@ char* SrProfiler::getProfileData()
 	return m_buffer;
 }
 
+char* SrProfiler::getProfileDataBreif()
+{
+	return m_buffer_simple;
+}
+
 void SrProfiler::Update()
 {
+	sprintf(m_buffer_simple, "Fps: %.2f | FT: %.2fms | %d x %d |%s | %s | %s | "
+		"Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | PST:%5.2fms | PPT:%5.2fms | "
+		"Processor: %d",
+		1000.f / gEnv->profiler->getTime(ePe_FrameTime),
+		gEnv->profiler->getTime(ePe_FrameTime),
+		g_context->width, g_context->height,
+		g_context->IsFeatureEnable(eRFeature_MThreadRendering) ? "MT" : "ST",
+		g_context->IsFeatureEnable(eRFeature_JitAA) ? "jitAA on" : "jitAA off",
+		g_context->IsFeatureEnable(eRFeature_LinearFiltering) ? "LinearF" : "PointF",
+
+		gEnv->profiler->getTime(ePe_FlushTime),
+		gEnv->profiler->getTime(ePe_ClearTime),
+		gEnv->profiler->getTime(ePe_VertexShaderTime),
+		gEnv->profiler->getTime(ePe_RasterizeShaderTime),
+		gEnv->profiler->getTime(ePe_PixelShaderTime),
+		gEnv->profiler->getTime(ePe_PostProcessTime),
+		g_context->processorNum
+	);
+	
 	sprintf(m_buffer, "SoftRENDERER v0.3(%s)| Fps: %.2f | FT: %.2fms | %d x %d |%s | %s | %s <br> "
 		"DP:%5.2fms | Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | PST:%5.2fms | PPT:%5.2fms <br> "
 		"Batch: %3d | Tri: %6d | Pixel: %6d | Vertex: %6d <br> "

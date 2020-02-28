@@ -182,17 +182,17 @@ void SrRasterizer::Flush()
 
 		// ���outBuffer
 		uint8* dst = (uint8*)outBuffer;
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, SR_GREYSCALE_CLEARCOLOR ));
 
 		// ���fragBuffer
 		dst = (uint8*)fBuffer->zBuffer;
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, 0 ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, 0 ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, 0 ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, 0 ));
 		
 		// ִ���������
 		m_rasTaskDispatcher->FlushCoop();
@@ -367,10 +367,10 @@ void SrRasterizer::Flush()
 	{
 		int quadsize = g_context->width * g_context->height / 4;
 
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( 0,				quadsize,		aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( 0,				quadsize,		aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	aaBufferWrite, aaBufferRead, memBuffer) );
   
 		 m_rasTaskDispatcher->FlushCoop();
 		 m_rasTaskDispatcher->Wait();

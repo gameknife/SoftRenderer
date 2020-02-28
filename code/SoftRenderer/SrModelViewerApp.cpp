@@ -49,8 +49,8 @@ void SrModelViewerApp::OnUpdate()
 {
 	if(m_ent != NULL)
 	{
-		float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
-		m_ent->RotateLocal(move);
+		//float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
+		//m_ent->RotateLocal(move);
 	}
 	
 	m_scene->Update();

@@ -2,6 +2,8 @@
 #include "SrRasTaskDispatcher.h"
 #include "SrProfiler.h"
 
+#define		MAKEAFFINITYMASK1(x)					(1<<x)
+
 SrTaskThread::SrTaskThread( int tileId, SrRasTaskDispatcher* creator ):m_creator(creator),
 	m_threadId(tileId)
 {
@@ -23,6 +25,9 @@ SrTaskThread::~SrTaskThread()
  */
 int SrTaskThread::Run()
 {
+	::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	::SetThreadAffinityMask(::GetCurrentThread(), (DWORD_PTR)MAKEAFFINITYMASK1(m_threadId));
+	
 	while(true)
 	{
 		m_waitFlag->Wait();
@@ -39,7 +44,7 @@ int SrTaskThread::Run()
 
 			if(!task)
 			{
-				task = m_creator->RequestTask();
+				//task = m_creator->RequestTask();
 			}
 			
 			if (!task)

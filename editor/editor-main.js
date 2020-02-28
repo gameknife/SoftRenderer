@@ -48,6 +48,7 @@ window.onload = function(){
     // 拖拽到meshfilter时，向渲染引擎发送设置模型的消息
     let event = "set_model";
     let ret = addon.sendEvent(event, filetoken);
+    console.info(`${event} - ${filetoken}`);
   }
   holder.ondragover = function (ev) {
     ev.preventDefault();

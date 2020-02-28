@@ -81,6 +81,7 @@ struct IProfiler
 	virtual ~IProfiler() {}
 
 	virtual char* getProfileData() = 0;
+	virtual char* getProfileDataBreif() = 0;
 	virtual void Update() =0;
 
 	virtual void setBegin( EProfilerElement element ) =0;
@@ -163,6 +164,7 @@ public:
 
 	void Update();
 	char* getProfileData();
+	char* getProfileDataBreif();
 
 	void setBegin( EProfilerElement element );
 	void setEnd( EProfilerElement element );
@@ -177,6 +179,7 @@ public:
 
 private:
 	char m_buffer[512];
+	char m_buffer_simple[512];
 	std::vector<SrProfilerElement> m_profileElements;
 };
 
