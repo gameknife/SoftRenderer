@@ -20,7 +20,7 @@
 
 #define SR_NORMALIZE_VB_MAX_SIZE 1024 * 1024 * 10
 
-SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
+SrSoftRenderer::SrSoftRenderer(void):IRenderer(ERendererType::eRt_Software),
 	m_rasterizer(NULL),
 	m_cachedBuffer(NULL),
 	m_bufferPitch(0),

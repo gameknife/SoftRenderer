@@ -29,7 +29,7 @@ struct SrTextLine
 };
 typedef std::vector<SrTextLine> SrTextLines;
 
-enum EHwTimerElement
+enum class EHwTimerElement : uint8
 {
 	eHt_GpuFlushTime = 0,
 	eHt_GpuHairTime,
@@ -38,7 +38,7 @@ enum EHwTimerElement
 	eHt_Count,
 };
 
-enum ERendererType
+enum class ERendererType : uint8
 {
 	eRt_Software,
 	eRt_HardwareD3D9,

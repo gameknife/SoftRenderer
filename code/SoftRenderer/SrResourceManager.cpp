@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "SrResourceManager.h"
 #include "SrMesh.h"
 #include "SrRenderTexture.h"
@@ -87,14 +87,11 @@ const SrTexture* SrResourceManager::LoadTexture( const char* filename, bool bump
 
 	if (it != m_textureLibrary.end())
 	{
-		// �����ǿ����ҵ����������
 		ret = static_cast<SrTexture*>(it->second);
 	}
 	else
 	{
-		// ���û�д�����ȥ�����ⲿbitmap
 		ret = new SrBitmap(filename);
-		// �����п��ܴ������ɹ�
 		if ( !ret || !(ret->getBuffer()) )
 		{
 			delete ret;
@@ -128,7 +125,6 @@ SrMaterial* SrResourceManager::LoadMaterial( const char* filename )
 	}
 	else
 	{
-		// Ĭ�ϲ���
 		ret = LoadMaterial( "$srdefualt" );
 	}
 	return ret;	
@@ -237,7 +233,7 @@ void SrResourceManager::AddShader( SrShader* shader )
 }
 
 
-SrVertexBuffer* SrResourceManager::AllocateVertexBuffer(uint32 elementSize, uint32 count, bool fastmode)
+SrVertexBuffer* SrResourceManager::AllocateVertexBuffer(uint32 elementSize, uint32 count, bool fastMode)
 {
 	SrVertexBuffer* vb = new SrVertexBuffer;
 	vb->elementSize = elementSize;
@@ -275,7 +271,6 @@ bool SrResourceManager::DeleteVertexBuffer( SrVertexBuffer* target )
 				delete (m_vertexBuffers[i]);
 				m_vertexBuffers[i] = NULL;
 
-				// ж���˾���������
 				return true;
 			}
 		}
@@ -299,7 +294,6 @@ SrIndexBuffer* SrResourceManager::AllocateIndexBuffer( uint32 count )
 			m_indexBuffers[i] = ib;
 			hasEmpty = true;
 
-			// װ���˾���������
 			break;
 		}
 	}
@@ -330,7 +324,6 @@ bool SrResourceManager::DeleteIndexBuffer( SrIndexBuffer* target )
 				delete m_indexBuffers[i];
 				m_indexBuffers[i] = NULL;
 
-				// ж���˾���������
 				return true;
 			}
 		}

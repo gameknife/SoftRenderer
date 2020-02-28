@@ -1,11 +1,9 @@
-/**
+﻿/**
   @file SrRasTaskDispatcher.h
   
   @author Kaiming
 
-  ������־ history
   ver:1.0
-   
  */
 
 #ifndef SrRasTaskDispatcher_h__
@@ -15,10 +13,6 @@
 
 class SrRasTaskDispatcher;
 
-/**
- @brief ��դ������ṹ
- @remark ��դ��������࣬�̳�֮�ɹ���������Ҫ�߳���ɵ�����
- */
 struct SrRasTask
 {
 	virtual ~SrRasTask() {}
@@ -31,12 +25,6 @@ typedef std::vector<SrTaskThread*> SrTaskThreadPool;
 typedef std::stack<SrRasTask*> SrTaskStack;
 typedef std::vector<SrRasTask*> SrTaskList;
 
-/**
- @brief �����߳�
- @remark ��ȡ��ִ�й�դ������Ĵ����̡߳����̴߳�������״̬ʱ��
- �̻߳᲻��������ַ�����ȡ�������ִ�У�ֱ��û������ַ����߳�ִ����ϣ�
- ���Լ�״̬��Ϊ�ȴ���
- */
 class SrTaskThread : public IThread
 {
 public:
@@ -62,20 +50,13 @@ public:
 
 
 private:
-	CManualResetEvent* m_runningFlag;		/// ������ɱ�־
-	CManualResetEvent* m_waitFlag;			/// �ȴ��´����б�־
-	SrRasTaskDispatcher* m_creator;			/// ����ַ���
+	CManualResetEvent* m_runningFlag;		
+	CManualResetEvent* m_waitFlag;			
+	SrRasTaskDispatcher* m_creator;			
 	SrTaskStack m_internalTasks;
-	int m_threadId;
+	uint64 m_threadId;
 };
 
-
-
-/**
- @brief ����ַ���
- @remark ���߳̿�������ַ����ύ��Ҫ���������Ȼ�����Flush��ʼִ�У�����Wait�ȴ������߳�ִ����ϡ�
- FlushCoop���ú����߳�Ҳ��Ϊ��ҵ�߳�֮һ���������̹߳�ͬ����Task��
- */
 class SrRasTaskDispatcher
 {
 public:
@@ -87,7 +68,6 @@ public:
 
 	void PushTask(SrRasTask* task);
 	void PrePushTask(SrRasTask* task);
-	void FlushCoop();
 	void Flush();
 	void Wait();
 
@@ -96,9 +76,9 @@ public:
 	gkScopedLock<gkMutexLock> *m_resLock;
 	SrTaskThreadPool m_pool;			///< 线程池
 	SrTaskStack m_taskStack;			///< 任务堆栈
-	SrTaskList  m_taskList;			///< 任务列表
+	SrTaskList  m_taskList;				///< 任务列表
 
-	uint32 m_preTaskToken;			///< 任务分配令牌
+	uint32 m_preTaskToken;				///< 任务分配令牌
 };
 
 #endif

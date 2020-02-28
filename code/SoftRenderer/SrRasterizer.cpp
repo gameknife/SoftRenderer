@@ -1,11 +1,8 @@
-/**
+﻿/**
   @file SrRasterizer.cpp
   
   @author yikaiming
 
-  ������־ history
-  ver:1.0
-   
  */
 
 #include "stdafx.h"
@@ -28,10 +25,6 @@ SrRasterizer::SrRasterizer(void)
 	m_BackS2Buffer = NULL;
 }
 
-/**
- *@brief ��ʼ����դ��������ʼ��TaskDispatcher������rendertexture
- *@return void 
- */
 void SrRasterizer::Init(SrSoftRenderer* renderer)
 {
 	fBuffer = new SrFragmentBuffer(g_context->width, g_context->height);
@@ -54,14 +47,6 @@ SrRasterizer::~SrRasterizer(void)
 	delete m_rasTaskDispatcher;
 }
 
-/**
- *@brief ����primitive
- *@return bool �����ύ�ɹ�������true������false
- *@param SrPrimitve * primitive ��Ҫ���Ƶ�primitive
- *@remark �����ڲ�����primitive��vb��ib������rendPrimitive�ڡ�\
- �����浱ǰ��textureStage��matrixStack��lightList��\
- ΪrendPrimitve����shaderContext���Է�����shader�ڲ����ʡ�
- */
 bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 {
 	if (!primitive)
@@ -103,20 +88,18 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 
 
 	memcpy(transformed->vb->data, primitive->cachedVb->data, primitive->cachedVb->elementSize * primitive->cachedVb->elementCount);
-	
-	// ���ib
 	//memcpy(transformed.ib->data, primitive->ib->data, primitive->ib->count * sizeof(uint32));
 	
-	// ���shaderConstants
+	// shaderConstants
 	transformed->shader = m_renderer->m_currShader;
-	transformed->shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStack����
-	transformed->shaderConstants.textureStage = m_renderer->m_textureStages; // ����stage����
-	transformed->shaderConstants.lightList =gEnv->sceneMgr->m_lightList; // lightList����
+	transformed->shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStack
+	transformed->shaderConstants.textureStage = m_renderer->m_textureStages; // stage
+	transformed->shaderConstants.lightList =gEnv->sceneMgr->m_lightList; // lightList
 	memcpy( transformed->shaderConstants.shaderConstants, m_renderer->m_shaderConstants, eSC_ShaderConstantCount * sizeof(float4) );
 	transformed->shaderConstants.alphaTest = primitive->material->m_alphaTest;
 	transformed->shaderConstants.culling = true;
 
-	// �ύ��Ⱦprimitive
+	// primitive
 	m_rendPrimitives.push_back( transformed );
 	
 	gEnv->profiler->IncreaseTime(ePe_DrawCallTime, gEnv->timer->getRealTime() - start);
@@ -124,30 +107,17 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 	return true;
 }
 
-/**
- *@brief ��դ�����Ĺ������
-
- *@return void 
- *@remark ÿһ֡ĩβ���Ի����rendPrimitive���д���
- 0.buffer��Clear����
- 1.���еĴ������ж���,
- 2.���߳�ִ�и���primitive�Ĺ�դ��,
- 3.���еĴ������еõ�������,
- 4.����
- 5.���rendPrimitive��
- */
 void SrRasterizer::Flush()
 {
 	gEnv->profiler->setBegin(ePe_FlushTime);
 	gEnv->profiler->setBegin(ePe_ClearTime);
 
 	//////////////////////////////////////////////////////////////////////////
-	// 0. Clear����
+	// 0. Clear
 
-	// clear ��������
 	fBuffer->GetPixelIndicesBuffer()->Clear();
 
-	// Fragment Buffer �� OutBaffer��Clear
+	// Fragment Buffer OutBaffer Clear
 	uint32* memBuffer = (uint32*)m_MemSBuffer->getBuffer();
 
 
@@ -164,53 +134,45 @@ void SrRasterizer::Flush()
 	//uint32* gpuBuffer = (uint32*)m_renderer->getBuffer();
 	uint32* outBuffer = memBuffer;// (uint32*)m_renderer->getBuffer();
 
-	// VIDEO MEM 2 SYSTEM MEM, VERY VERY VERY SLOW!!!
-	//memcpy(m_prevSBuffer->getBuffer(), g_context->GetSBuffer(), 4 * g_context->width * g_context->height);
-	// FAST, SO WE USE A MEM BACKBUFFER, ALL THINGS WRITE TO MEM BACKBUFFER, THEN JIT AA WRITE TO GPU BUFFER
-	// �������Jit AA����д��memBuffer��
+
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 	{
 		outBuffer = aaBufferWrite;
 	}
 
-	// clear the OutBuffer
-	// ʹ�� SR_GREYSCALE_CLEARCOLOR ����ջ���
 	{
-		// ���߳����
 		int quadsize = g_context->width * g_context->height;
 		
 
-		// ���outBuffer
+		// outBuffer
 		uint8* dst = (uint8*)outBuffer;
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, SR_GREYSCALE_CLEARCOLOR ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, SR_GREYSCALE_CLEARCOLOR ));
 
-		// ���fragBuffer
+		// fragBuffer
 		dst = (uint8*)fBuffer->zBuffer;
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, 0 ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, 0 ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, 0 ));
-		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, 0 ));
+		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, 0 ));
 		
-		// ִ���������
-		m_rasTaskDispatcher->FlushCoop();
+		// 
+		m_rasTaskDispatcher->Flush();
 		m_rasTaskDispatcher->Wait();
 	}
 	gEnv->profiler->setEnd(ePe_ClearTime);
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ���㴦��
+	//
 	// every vertex -> sshader -> every vertex
 	gEnv->profiler->setBegin(ePe_VertexShaderTime);
 	
-	// ����������
-
 	for ( std::list<SrRendPrimitve*>::iterator it = m_rendPrimitives.begin(); it != m_rendPrimitives.end(); ++it)
 	{
-		SrRendPrimitve& primitive = (**it);//m_rendPrimitives[i];
+		SrRendPrimitve& primitive = (**it);
 
 		for (uint32 i = 0; i < primitive.vb->elementCount; i += VERTEX_TASK_BLOCK )
 		{
@@ -224,17 +186,15 @@ void SrRasterizer::Flush()
 		}
 	}
 
-	// ִ���������
-	m_rasTaskDispatcher->FlushCoop();
+	m_rasTaskDispatcher->Flush();
 	m_rasTaskDispatcher->Wait();
 
 	gEnv->profiler->setEnd(ePe_VertexShaderTime);
-	// ���㴦�����
+
 	//////////////////////////////////////////////////////////////////////////
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ��դ��
 	// all vertex -> rasterization -> gbuffer
 	gEnv->profiler->setBegin(ePe_RasterizeShaderTime);
 #if 0
@@ -294,12 +254,11 @@ void SrRasterizer::Flush()
 
 	// RHZ PRIMITIVE
 	
-	// ִ���������
-	m_rasTaskDispatcher->FlushCoop();
+	m_rasTaskDispatcher->Flush();
 	m_rasTaskDispatcher->Wait();
 #endif
 	gEnv->profiler->setEnd(ePe_RasterizeShaderTime);
-	// ��դ������
+
 	//////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
@@ -326,7 +285,7 @@ void SrRasterizer::Flush()
 		// Task栈上分配 854 x 480 / 512 + 1 = 801
 		// task结构需要精简
 		// 栈上有问题，其他核访问不到
-		static SrRasTask_Pixel tmpTasks[900];
+		static SrRasTask_Pixel tmpTasks[1800];
 		uint32 taskAddress = 0;
 
 		for (uint32 i = 0; i < size; i += PIXEL_TASK_BLOCK)
@@ -350,16 +309,15 @@ void SrRasterizer::Flush()
 		// 优化一下，直接平均预分配到每个线程
 
 
-		m_rasTaskDispatcher->FlushCoop();
+		m_rasTaskDispatcher->Flush();
 		m_rasTaskDispatcher->Wait();
 	}
 
 	gEnv->profiler->setEnd(ePe_PixelShaderTime);
-	// ���ش������
 	//////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
-	// ���ڴ���
+	// 
 	gEnv->profiler->setBegin(ePe_PostProcessTime);
 
 	// jit AA
@@ -367,25 +325,22 @@ void SrRasterizer::Flush()
 	{
 		int quadsize = g_context->width * g_context->height / 4;
 
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( 0,				quadsize,		aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( 0,				quadsize,		aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	aaBufferWrite, aaBufferRead, memBuffer) );
+		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	aaBufferWrite, aaBufferRead, memBuffer) );
   
-		 m_rasTaskDispatcher->FlushCoop();
+		 m_rasTaskDispatcher->Flush();
 		 m_rasTaskDispatcher->Wait();
 
 		//memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);
 	}
 	
-	// ���ڴ������
 	//////////////////////////////////////////////////////////////////////////
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ������
-
-	// �����Ⱦprimitives
+	// 
 	for(std::list<SrRendPrimitve*>::iterator it = m_rendPrimitives.begin(); it != m_rendPrimitives.end(); ++it)
 	{
 		delete (*it);
@@ -399,18 +354,11 @@ void SrRasterizer::Flush()
 	gEnv->profiler->setEnd(ePe_FlushTime);
 }
 
-/**
- *@brief ��դ��һ��rendPrimitive
- *@return void 
- *@param SrRendPrimitves * in_primitive �����rendPrimitive 
- *@param SrFragmentBuffer * out_gBuffer �����fragBuffer
- */
 void SrRasterizer::ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* out_gBuffer )
 {
 	SrVertexBuffer* vb = in_primitive->vb;
 	SrIndexBuffer* ib = in_primitive->ib;
 
-	// ��ib���������������ν��й�դ��
 	if (vb && ib)
 	{
 		uint32 triCount = ib->count / 3;
@@ -426,7 +374,6 @@ void SrRasterizer::ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* 
 			tri.p[2] = *(SrRendVertex*)(vb->data + ib->data[i * 3 + 2] * vb->elementSize);
 			tri.primitive = in_primitive;
 
-			// �ύ�����ν��вü�
 			RasterizeTriangle_Clip(tri, g_context->viewport.n, g_context->viewport.f);
 		}
 	}
@@ -441,14 +388,6 @@ bool SrRasterizer::DrawLine( const float3& from, const float3& to )
 
 bool SrRasterizer::DrawRHZPrimitive( SrRendPrimitve& rendPrimitive )
 {
-	// ���shaderConstants
-// 	rendPrimitive.shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStack����
-// 	rendPrimitive.shaderConstants.textureStage = m_renderer->m_textureStages; // ����stage����
-// 	rendPrimitive.shaderConstants.lightList = gEnv->sceneMgr->m_lightList; // lightList����
-// 	rendPrimitive.shaderConstants.cBuffer = rendPrimitive.material->m_cbuffer; // ���ʵ�cBuffer����
-// 	rendPrimitive.shaderConstants.alphaTest = true;
-// 	rendPrimitive.shaderConstants.culling = false;
-
 	m_rendPrimitivesRHZ.push_back(&rendPrimitive);
 	return true;
 }

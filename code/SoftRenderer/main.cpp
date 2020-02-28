@@ -3,11 +3,11 @@
 
 #include "stdafx.h"
 
-
 #ifdef OS_WIN32
 
 #include "SoftRenderApp.h"
 #include "SrModelViewerApp.h"
+#include "SrProfiler.h"
 
 int main()
 {
@@ -32,11 +32,15 @@ int main()
 
 	app.RegisterTask(new SrModelViewerApp);
 	app.Init();
-	app.Update();
-	app.Update();
-	app.Update();
-	app.Update();
-	app.Destroy();
+
+	app.SendEvent("set_model", "media\\sponza.obj");
+	
+	for(int i = 0 ; i < 100000; ++i)
+	{
+		app.Update();
+		gEnv->logger->Log(gEnv->profiler->getProfileDataBreif());
+	}
+	//app.Destroy();
 
 	return 0;
 }

@@ -22,15 +22,16 @@ void SrModelViewerApp::OnInit()
 {
 	g_context->OpenFeature(eRFeature_MThreadRendering);
 	//g_context->OpenFeature(eRFeature_JitAA);
-	//g_context->OpenFeature(eRFeature_LinearFiltering);
+	g_context->OpenFeature(eRFeature_LinearFiltering);
+	g_context->OpenFeature(eRFeature_JitAA);
 
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 	
 	m_camera = m_scene->CreateCamera("cam0");
-	m_camera->setPos(float3(0,0,-15));
+	m_camera->setPos(float3(0,4,-20));
 	m_camera->setFov(68.0f);
-	m_camera->Rotate( 0.1f, 0.3f );
+	m_camera->Rotate( 0.0f, 0.0f );
 	m_scene->PushCamera(m_camera);
 	m_camdist = 15.0f;
 	updateCam();
@@ -41,7 +42,7 @@ void SrModelViewerApp::OnInit()
 	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
 
-	m_shade_mode = 0;
+	m_shade_mode = 2;
 	UpdateShader();
 }
 
@@ -49,8 +50,8 @@ void SrModelViewerApp::OnUpdate()
 {
 	if(m_ent != NULL)
 	{
-		float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
-		m_ent->RotateLocal(move);
+		//float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
+		//m_ent->RotateLocal(move);
 	}
 	
 	m_scene->Update();
@@ -85,8 +86,10 @@ void SrModelViewerApp::OnEvent(const char* event, const char* param)
 				Quat rotidtt = Quat::CreateIdentity();
 
 				m_ent = m_scene->CreateEntity("object", param, mtlfile.c_str(), poszero, rotidtt);
-				m_ent->SetScale(float3(40, 40, 40));
+				m_ent->SetScale(float3(1, 1, 1));
 				m_ent->SetVisible(true);
+
+				UpdateShader();
 			}
 		}
 
@@ -107,8 +110,8 @@ void SrModelViewerApp::SwitchSSAO()
 }
 void SrModelViewerApp::updateCam()
 {
-	m_camera->setPos( float3(0,0,0) );
-	m_camera->Move( float3(0,0,-m_camdist));
+	//m_camera->setPos( float3(0,150,-600) );
+	//m_camera->Move( float3(0,0,-m_camdist));
 }
 
 void SrModelViewerApp::UpdateShader()

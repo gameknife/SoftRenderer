@@ -22,44 +22,41 @@ public:
 	SrResourceManager(void);
 	virtual ~SrResourceManager(void);
 
-	virtual SrMesh*				LoadMesh(const char* filename);
-	virtual const SrTexture*	LoadTexture(const char* filename, bool bump = false);
-	virtual SrMaterial*			LoadMaterial(const char* filename);
-	virtual SrMaterial*			CreateMaterial(const char* filename);
-	virtual void				LoadMaterialLib(const char* filename);
-	virtual SrShader*			GetShader(const char* name);
-	virtual void				AddShader(SrShader* shader);
+	SrMesh* LoadMesh(const char* filename) override;
+	const SrTexture* LoadTexture(const char* filename, bool bump = false) override;
+	SrMaterial* LoadMaterial(const char* filename) override;
+	SrMaterial* CreateMaterial(const char* filename) override;
+	void LoadMaterialLib(const char* filename) override;
+	SrShader* GetShader(const char* name) override;
+	void AddShader(SrShader* shader) override;
 
-	virtual SrTexture*			CreateRenderTexture(const char* name, int width, int height, int bpp);
-	virtual SrMaterial*			CreateManmualMaterial(const char* name);
+	SrTexture* CreateRenderTexture(const char* name, int width, int height, int bpp) override;
+	SrMaterial* CreateManmualMaterial(const char* name) override;
 
-	virtual void				InitDefaultMedia();
-	virtual SrDefaultMediaPack*	getDefaultMediaPack() {return m_defaultMediaPack;}
+	void InitDefaultMedia() override;
+	SrDefaultMediaPack* getDefaultMediaPack() override { return m_defaultMediaPack; }
 
-	virtual void				LoadShaderList();
+	void LoadShaderList() override;
 
-// render resource move here
-	// Buffer����
-	virtual SrVertexBuffer* AllocateVertexBuffer(uint32 elementSize, uint32 count, bool fastmode = false);
-	virtual bool DeleteVertexBuffer(SrVertexBuffer* target);
-	virtual SrIndexBuffer*	AllocateIndexBuffer(uint32 count);
-	virtual bool DeleteIndexBuffer(SrIndexBuffer* target);
+	// render resource move here
+	// Buffer access
+	SrVertexBuffer* AllocateVertexBuffer(uint32 elementSize, uint32 count, bool fastMode = false) override;
+	bool DeleteVertexBuffer(SrVertexBuffer* target) override;
+	SrIndexBuffer* AllocateIndexBuffer(uint32 count) override;
+	bool DeleteIndexBuffer(SrIndexBuffer* target) override;
 
-	virtual void CleanBufferBinding();
+	void CleanBufferBinding() override;
 
-	SrResourceLibrary	m_shaderLibrary;
+	SrResourceLibrary m_shaderLibrary;
 private:
-	SrResourceLibrary	m_meshLibrary;
-	SrResourceLibrary	m_textureLibrary;
-	SrResourceLibrary	m_materialLibrary;
+	SrResourceLibrary m_meshLibrary;
+	SrResourceLibrary m_textureLibrary;
+	SrResourceLibrary m_materialLibrary;
 
 	SrDefaultMediaPack* m_defaultMediaPack;
 
 	SrVertexBufferArray m_vertexBuffers;
-	SrIndexBufferArray	m_indexBuffers;
+	SrIndexBufferArray m_indexBuffers;
 };
 
 #endif // SrResourceManager_h__
-
-
-
