@@ -68,8 +68,10 @@ NAN_METHOD(shutDown){
 
 NAN_METHOD(setRootPath) 
 {
-	const char* str = *(String::Utf8Value(info[0]->ToString()));
-	srSetRootPath(str);
+	Nan::Utf8String utf8_value0(info[0]);
+	
+	//const char* str = *(String::Utf8Value(info[0]->ToString()));
+	srSetRootPath(*utf8_value0);
 }
 
 NAN_METHOD(sendEvent)

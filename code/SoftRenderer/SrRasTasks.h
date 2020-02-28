@@ -3,7 +3,6 @@
   
   @author Kaiming
 
-  ������־ history
   ver:1.0
    
  */
@@ -14,10 +13,6 @@
 #include "prerequisite.h"
 #include "SrRasTaskDispatcher.h"
 
-/**
- @brief ���ش�������
- @remark ����fragBuffer�е�һ��block��ִ��pixelshader��
- */
 struct SrRasTask_Pixel : public SrRasTask
 {
 	SrRasTask_Pixel() {}
@@ -33,10 +28,6 @@ struct SrRasTask_Pixel : public SrRasTask
 	uint32*	m_oBuffer;
 };
 
-/**
- @brief ���㴦������
- @remark ����vertexBuffer�е�һ��block��ִ��vertexshader��
- */
 struct SrRasTask_Vertex : public SrRasTask
 {
 	SrRasTask_Vertex(int indexStart, int indexEnd, SrVertexBuffer* vb, SrRendPrimitve* primitive );
@@ -50,10 +41,6 @@ struct SrRasTask_Vertex : public SrRasTask
 	SrRendPrimitve* m_primitive;
 };
 
-/**
- @brief ��������ݴ�������
- @remark ����backBuffer��backBuffer1�е�һ��block�������ɫ�������Ӳ��outBuffer�С�
- */
 struct SrRasTask_JitAA : public SrRasTask
 {
 	SrRasTask_JitAA(int indexStart, int indexEnd, uint32* inBufferA, uint32* inBufferB, uint32* oBuffer);
@@ -67,10 +54,6 @@ struct SrRasTask_JitAA : public SrRasTask
 	uint32*	m_oBuffer;
 };
 
-/**
- @brief �ڴ�clear����
- @remark ����Ŀ���ڴ�
- */
 struct SrRasTask_Clear : public SrRasTask
 {
 	SrRasTask_Clear(void* dst, int size, uint8 val = 0);

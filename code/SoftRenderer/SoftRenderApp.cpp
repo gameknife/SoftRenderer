@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "SoftRenderApp.h"
 #include "Resource.h"
 #include "SrMesh.h"
@@ -7,24 +7,19 @@
 #include "SrLogger.h"
 #include "SrSoftRenderer.h"
 
-
 // 全局变量
-GlobalEnvironment* gEnv = NULL;
-SrLogger* g_logger = NULL;
-SrRendContext* g_context = NULL;
-std::map<const void*, void*> m_align_pt_mapper;
+GlobalEnvironment *gEnv = NULL;
+SrLogger *g_logger = NULL;
+SrRendContext *g_context = NULL;
+std::map<const void *, void *> m_align_pt_mapper;
 std::string g_rootPath;
 
-
-
-
-typedef IRenderer* (*fnLoadRenderer)(GlobalEnvironment* pgEnv);
+typedef IRenderer *(*fnLoadRenderer)(GlobalEnvironment *pgEnv);
 typedef void (*fnFreeRenderer)();
 
 SoftRenderApp::SoftRenderApp(void)
 {
 }
-
 
 SoftRenderApp::~SoftRenderApp(void)
 {
@@ -40,10 +35,10 @@ bool SoftRenderApp::Init()
 	GtLogInfo("///////////////////////////////////\n");
 	GtLogInfo("SoftRenderer Init...\n\n");
 
-	const int createWidth = 854;
-	const int createHeight = 480;
+	const int createWidth = 1280;
+	const int createHeight = 720;
 
-	// ������Դ������
+	// 初始化资源管理器
 	GtLogInfo("Creating ResourceManger...");
 	gEnv->resourceMgr = new SrResourceManager;
 	GtLog("- Loading Shader List...");
@@ -51,13 +46,13 @@ bool SoftRenderApp::Init()
 	GtLog("- Creating Default Procedura Medias...");
 	gEnv->resourceMgr->InitDefaultMedia();
 
-	// ����Render������
+	// 初始化渲染环境
 	GtLogInfo("Creating Render Context...");
 	g_context = new SrRendContext(createWidth, createHeight, 32);
 	gEnv->context = g_context;
 
 	InitRenderers();
-	
+
 	gEnv->timer = new SrTimer;
 	gEnv->timer->Init();
 	GtLogInfo("[Timer] initialized.");
@@ -66,26 +61,27 @@ bool SoftRenderApp::Init()
 	GtLogInfo("[Profiler] initialized.");
 
 	GtLogInfo("Math Lib Struct Size:");
-#define OUTPUT_SIZE( x ) \
-	GtLog("-"#x" size: %d", sizeof(x));
+#define OUTPUT_SIZE(x) \
+	GtLog("-" #x " size: %d", sizeof(x));
 
-	OUTPUT_SIZE( float2 )
-	OUTPUT_SIZE( float3 )
-	OUTPUT_SIZE( float4 )
-	OUTPUT_SIZE( float33 )
-	OUTPUT_SIZE( float44 )
-	OUTPUT_SIZE( Quat )
-
+	OUTPUT_SIZE(float2)
+	OUTPUT_SIZE(float3)
+	OUTPUT_SIZE(float4)
+	OUTPUT_SIZE(float33)
+	OUTPUT_SIZE(float44)
+	OUTPUT_SIZE(Quat)
 
 	GtLogInfo("Base system initialized.");
 	GtLogInfo("///////////////////////////////////\n\n");
-
 
 	if (m_tasks.size() > 0)
 	{
 		m_tasks[m_curr_task]->OnInit();
 	}
 
+	GtLogInfo("Tasks initialized.");
+
+	
 	return true;
 }
 
@@ -101,12 +97,12 @@ bool SoftRenderApp::Update()
 	if (!gEnv->renderer)
 	{
 		return false;
-	}	
+	}
 	gEnv->renderer->BeginFrame();
-	
+
 	gEnv->renderer->HwClear();
 
-	if( m_curr_task < (int)m_tasks.size())
+	if (m_curr_task < (int)m_tasks.size())
 	{
 		m_tasks[m_curr_task]->OnUpdate();
 	}
@@ -145,15 +141,15 @@ void SoftRenderApp::Destroy()
 
 	delete gEnv->logger;
 
-	delete gEnv;	
+	delete gEnv;
 }
 
-void SoftRenderApp::RegisterTask( SrAppFramework* task )
+void SoftRenderApp::RegisterTask(SrAppFramework *task)
 {
 	SrApps::iterator it = m_tasks.begin();
 	for (; it != m_tasks.end(); ++it)
 	{
-		if ( *it == task)
+		if (*it == task)
 		{
 			return;
 		}
@@ -173,12 +169,12 @@ void SoftRenderApp::UnRegisterTasks()
 
 void SoftRenderApp::LoadShaderList()
 {
-	gEnv->resourceMgr->AddShader( new SrShader( "default", eVd_F4F4F4  ));
-	gEnv->resourceMgr->AddShader( new SrShader( "skin", eVd_F4F4F4F4U4  ));
-	gEnv->resourceMgr->AddShader( new SrShader( "hair", eVd_F4F4F4  ));
-	gEnv->resourceMgr->AddShader( new SrShader( "fresnel", eVd_F4F4F4  ));
+	gEnv->resourceMgr->AddShader(new SrShader("default", eVd_F4F4F4));
+	gEnv->resourceMgr->AddShader(new SrShader("skin", eVd_F4F4F4F4U4));
+	gEnv->resourceMgr->AddShader(new SrShader("hair", eVd_F4F4F4));
+	gEnv->resourceMgr->AddShader(new SrShader("fresnel", eVd_F4F4F4));
 
-	gEnv->resourceMgr->AddShader( new SrShader( "default_normal", eVd_F4F4F4  ));
+	gEnv->resourceMgr->AddShader(new SrShader("default_normal", eVd_F4F4F4));
 	//gEnv->resourceMgr->AddShader( new SrShader( "default_normal_ssao", eVd_F4F4F4  ));
 }
 
@@ -198,9 +194,9 @@ void SoftRenderApp::ShutdownRenderers()
 	delete m_renderer;
 }
 
-void SoftRenderApp::SendEvent(const char* event, const char* argument)
+void SoftRenderApp::SendEvent(const char *event, const char *argument)
 {
-	if( m_curr_task < (int)m_tasks.size())
+	if (m_curr_task < (int)m_tasks.size())
 	{
 		m_tasks[m_curr_task]->OnEvent(event, argument);
 	}

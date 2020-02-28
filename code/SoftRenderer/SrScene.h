@@ -1,11 +1,7 @@
 /**
   @file SrScene.h
   
-  @author yikaiming
-
-  ������־ history
-  ver:1.0
-   
+  @author yikaiming   
  */
 
 #ifndef SrScene_h__
@@ -22,7 +18,7 @@ public:
 	SrScene(void);
 	~SrScene(void);
 
-	// ʵ��access
+	// access
 	SrEntity* CreateEntity(const char* name, const char* meshFilename, 
 		const char* matFilename, 
 		float3& pos, 
@@ -34,7 +30,7 @@ public:
 	void RemoveEntity(SrEntity* target);
 	void RemoveEntity(const char* name);
 
-	// ���access
+	// access
 	SrCamera* CreateCamera(const char* name);
 	SrCamera* GetCamera(const char* name);
 
@@ -45,7 +41,7 @@ public:
 	void RenderVisbility(SrCamera* cam);
 
 
-	// �ƹ�
+	// 
 	SrLight* AddLight();
 	void RemoveLight(SrLight* tgt);
 	void ClearLight();
@@ -57,8 +53,6 @@ private:
 	SrEntityLibrary m_entityLib;
 	SrCameraLibrary m_cameraLib;
 	SrCameraStack	m_cameraStack;
-
-	
 
 	float4 m_skyLightColor;
 };

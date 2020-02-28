@@ -117,7 +117,7 @@ void SrProfiler::Update()
 		gEnv->profiler->getCount(ePe_VertexCount),
 
 		g_context->processorNum,
-		gEnv->profiler->getCount(ePe_MainThreadTaskNum),
+		//gEnv->profiler->getCount(ePe_MainThreadTaskNum),
 		gEnv->profiler->getCount(ePe_Thread0TaskNum),
 		gEnv->profiler->getCount(ePe_Thread1TaskNum),
 		gEnv->profiler->getCount(ePe_Thread2TaskNum),

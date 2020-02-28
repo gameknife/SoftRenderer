@@ -83,24 +83,22 @@ inline void IEvent::Wait()
 
 inline bool IEvent::Wait(DWORD timeoutMillis)
 {
-	bool ok;
-
 	DWORD result = ::WaitForSingleObject(m_hEvent, timeoutMillis);
 
 	if (result == WAIT_TIMEOUT)
 	{
-		ok = false;
+		return false;
 	}
 	else if (result == WAIT_OBJECT_0)
 	{
-		ok = true;
+		return true;
 	}
 	else
 	{
 
 	}
 
-	return ok;
+	return false;
 }
 
 inline void IEvent::Reset()

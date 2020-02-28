@@ -114,24 +114,21 @@ inline void IThread::Wait() const
 
 inline bool IThread::Wait(DWORD timeoutMillis) const
 {
-
-	bool ok;
-
 	DWORD result = ::WaitForSingleObject(m_hThread, timeoutMillis);
 	if (result == WAIT_TIMEOUT)
 	{
-		ok = false;
+		return false;
 	}
 	else if (result == WAIT_OBJECT_0)
 	{
-		ok = true;
+		return true;
 	}
 	else
 	{
 		//throw CWin32Exception(_T("CThread::Wait() - WaitForSingleObject"), ::GetLastError());
 	}
 
-	return ok;
+	return false;
 }
 
 inline unsigned int __stdcall IThread::ThreadFunction(void *pV)
@@ -151,7 +148,7 @@ inline unsigned int __stdcall IThread::ThreadFunction(void *pV)
 inline void IThread::Terminate(
 						DWORD exitCode /* = 0 */)
 {
-	if (!::TerminateThread(m_hThread, exitCode))
+	if (!TerminateThread(m_hThread, exitCode))
 	{
 		// TODO we could throw an exception here...
 	}

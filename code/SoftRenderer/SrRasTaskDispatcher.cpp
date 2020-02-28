@@ -2,7 +2,7 @@
 #include "SrRasTaskDispatcher.h"
 #include "SrProfiler.h"
 
-#define		MAKEAFFINITYMASK1(x)					(1<<x)
+#define		MAKEAFFINITYMASK1(x)					(1i64<<x)
 
 SrTaskThread::SrTaskThread( int tileId, SrRasTaskDispatcher* creator ):m_creator(creator),
 	m_threadId(tileId)
@@ -17,16 +17,12 @@ SrTaskThread::~SrTaskThread()
 	delete m_waitFlag;
 }
 
-/**
- *@brief �̵߳����к���
- *@return int 
- *@remark û�б�SetReadyʱ��һֱwait��ֱ����SetReady��
- ��ʼ�������񣬴�����ɺ�runningFlag��λ��֪ͨ�ⲿ������ɣ�ͬʱ����wait״̬
- */
 int SrTaskThread::Run()
 {
+#ifdef OS_WIN32
 	::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 	::SetThreadAffinityMask(::GetCurrentThread(), (DWORD_PTR)MAKEAFFINITYMASK1(m_threadId));
+#endif
 	
 	while(true)
 	{
@@ -44,7 +40,8 @@ int SrTaskThread::Run()
 
 			if(!task)
 			{
-				//task = m_creator->RequestTask();
+				// 目前dispatcher里面已经不会有任务了
+				// task = m_creator->RequestTask();
 			}
 			
 			if (!task)
@@ -54,7 +51,7 @@ int SrTaskThread::Run()
 			}
 
 			gEnv->profiler->setIncrement( (EProfilerElement)(ePe_Thread0TaskNum + m_threadId) );
-			// ִ������
+			// ִ执行任务
 			task->Execute();
 		}
 		m_runningFlag->Set();
@@ -72,11 +69,6 @@ SrRasTaskDispatcher::~SrRasTaskDispatcher(void)
 {
 }
 
-
-/**
- *@brief ��ҵ�߳���ȡ����Ľӿڣ������ٽ�����֤������ȡ��ԭ���ԡ�
- *@return SrRasTask* 
- */
 SrRasTask* SrRasTaskDispatcher::RequestTask()
 {
 	SrRasTask* ret =  NULL;
@@ -92,14 +84,9 @@ SrRasTask* SrRasTaskDispatcher::RequestTask()
 	return ret;
 }
 
-/**
- *@brief ��ʼ������ַ���
- *@return void 
- *@remark ����cpu������������cpu������-1����ҵ�߳�
- */
 void SrRasTaskDispatcher::Init()
 {
-	int threadCount = g_context->processorNum - 1;
+	int threadCount = g_context->processorNum;
 
 	for (int i=0; i < threadCount; ++i)
 	{
@@ -117,10 +104,6 @@ void SrRasTaskDispatcher::Init()
 	m_preTaskToken = 0;
 }
 
-/**
- *@brief �ر�����ַ������ر���ҵ�߳�
- *@return void 
- */
 void SrRasTaskDispatcher::Destroy()
 {
 	SAFE_DELETE(m_resLock);
@@ -133,41 +116,6 @@ void SrRasTaskDispatcher::Destroy()
 	}
 }
 
-/**
- *@brief Э��flushģʽ�����̺߳������߳�һ����taskջ������
- *@return void 
- */
-void SrRasTaskDispatcher::FlushCoop()
-{
-	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
-	{
-		SrTaskThreadPool::iterator it = m_pool.begin();
-		for ( ; it != m_pool.end(); ++it)
-		{
-			(*it)->SetReady();
-		}
-	}
-	
-	// main thread also begin
-	while(true)
-	{
-		SrRasTask* task = RequestTask();
-		if (!task)
-		{
-			// û�������ˣ��˳��߳�
-			break;
-		}
-		gEnv->profiler->setIncrement(ePe_MainThreadTaskNum);
-
-		// ִ������
-		task->Execute();
-	}
-}
-
-/**
- *@brief ����flushģʽ��֪ͨ�߳̿�ʼ����
- *@return void 
- */
 void SrRasTaskDispatcher::Flush()
 {
 	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
@@ -180,24 +128,11 @@ void SrRasTaskDispatcher::Flush()
 	}
 }
 
-/**
- *@brief ���̵߳ȴ������߳���ɹ�����
- *@return void 
- */
+
 void SrRasTaskDispatcher::Wait()
 {
 	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
 	{
-		// std::vector<HANDLE> handles;
-		// SrTaskThreadPool::iterator it = m_pool.begin();
-		// for ( ; it != m_pool.end(); ++it)
-		// {
-		// 	handles.push_back( (*it)->getWaitingHandle() );
-		// }
-  //
-		// ::WaitForMultipleObjects(handles.size(), &(handles[0]), TRUE, INFINITE);
-
-
 		SrTaskThreadPool::iterator it = m_pool.begin();
 		for ( ; it != m_pool.end(); ++it)
 		{
@@ -215,11 +150,6 @@ void SrRasTaskDispatcher::Wait()
 
 }
 
-/**
- *@brief ���߳�������ַ�����ѹ������
- *@return void 
- *@param SrRasTask * task 
- */
 void SrRasTaskDispatcher::PushTask( SrRasTask* task )
 {
 	m_taskStack.push(task);
