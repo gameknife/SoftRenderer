@@ -61,6 +61,10 @@ window.onload = function(){
   resPanel.reconstruct_filetree();
   resPanel.refresh();
 
+  // 默认打开sponza
+  let event = "set_model";
+  let ret = addon.sendEvent(event, 'media\\sponza.obj');
+
   // 创建逻辑循环
   render_loop();
   function render_loop()

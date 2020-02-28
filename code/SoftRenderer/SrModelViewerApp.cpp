@@ -53,6 +53,13 @@ void SrModelViewerApp::OnUpdate()
 		//float3 move(0,0.5f * gEnv->timer->getElapsedTime(),0);
 		//m_ent->RotateLocal(move);
 	}
+
+	//m_camera->setPos( float3(0,150,-600) );
+	m_camera->Move( float3(0,0,gEnv->timer->getElapsedTime() * 0.1f));
+	if(m_camera->getPos().z > 10.0f)
+	{
+		m_camera->setPos(float3(0,4,-20));
+	}
 	
 	m_scene->Update();
 

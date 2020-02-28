@@ -27,6 +27,8 @@ SR_ALIGN struct SrCamera
 	void Rotate( float yaw, float roll );
 	void MarkDirty();
 
+	float3 getPos() {return m_pos;}
+
 	float getZnear() {return m_zNear;}
 	float getZfar() {return m_zFar;}
 
