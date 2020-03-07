@@ -63,7 +63,7 @@ window.onload = function(){
 
   // 默认打开sponza
   let event = "set_model";
-  let ret = addon.sendEvent(event, 'media\\sponza.obj');
+  let ret = addon.sendEvent(event, 'media/sponza.obj');
 
   // 创建逻辑循环
   render_loop();
