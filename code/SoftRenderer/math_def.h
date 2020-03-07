@@ -33,7 +33,7 @@ typedef unsigned char uint8;
 // {
 static inline float isqrtf(float x) {return 1.f/sqrtf(x);}
 
-#ifndef OS_LINUX
+#ifndef OS_UBUNTU
 static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = float(sin(angle));	*pCos = float(cos(angle));	}
 #endif
 
