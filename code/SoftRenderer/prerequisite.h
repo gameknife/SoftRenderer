@@ -38,6 +38,7 @@
 #	define OS_ANDROID
 #else
 #	define OS_LINUX
+#	define OS_UBUNTU
 #endif
 
 #if defined (OS_ANDROID) || defined( OS_IOS ) || defined( OS_APPLE )

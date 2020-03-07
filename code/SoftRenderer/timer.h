@@ -15,7 +15,7 @@
 
 #ifdef OS_WIN32
 #include <MMSystem.h>
-#elif OS_APPLE
+#elif defined( OS_APPLE )
 #include <mach/mach_time.h>
 
 inline unsigned long timeGetTime()
