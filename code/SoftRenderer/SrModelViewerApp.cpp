@@ -29,7 +29,7 @@ void SrModelViewerApp::OnInit()
 	gEnv->sceneMgr = m_scene;
 	
 	m_camera = m_scene->CreateCamera("cam0");
-	m_camera->setPos(float3(0,4,-20));
+	m_camera->setPos(float3::make(0,4,-20));
 	m_camera->setFov(68.0f);
 	m_camera->Rotate( 0.0f, 0.0f );
 	m_scene->PushCamera(m_camera);
@@ -39,7 +39,7 @@ void SrModelViewerApp::OnInit()
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
-	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
+	lt->worldPos = float3::make( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
 
 	m_shade_mode = 2;
@@ -55,10 +55,10 @@ void SrModelViewerApp::OnUpdate()
 	}
 
 	//m_camera->setPos( float3(0,150,-600) );
-	m_camera->Move( float3(0,0,gEnv->timer->getElapsedTime() * 0.1f));
+	m_camera->Move( float3::make(0,0,gEnv->timer->getElapsedTime() * 0.1f));
 	if(m_camera->getPos().z > 10.0f)
 	{
-		m_camera->setPos(float3(0,4,-20));
+		m_camera->setPos(float3::make(0,4,-20));
 	}
 	
 	m_scene->Update();
@@ -89,11 +89,11 @@ void SrModelViewerApp::OnEvent(const char* event, const char* param)
 				mtlfile.replace( strlen(param) - 4, std::string::npos, ".mtl" );
 
 
-				float3 poszero = float3(0, 0, 0);
+				float3 poszero = float3::make(0, 0, 0);
 				Quat rotidtt = Quat::CreateIdentity();
 
 				m_ent = m_scene->CreateEntity("object", param, mtlfile.c_str(), poszero, rotidtt);
-				m_ent->SetScale(float3(1, 1, 1));
+				m_ent->SetScale(float3::make(1, 1, 1));
 				m_ent->SetVisible(true);
 
 				UpdateShader();

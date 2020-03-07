@@ -36,9 +36,9 @@ void SrSkinSimShader::ProcessPatch( void* vOut, void* vOut1, void* vOut2, const 
 	float3 pos2 = inTHREE[1]->tangent.xyz;
 	float3 pos3 = inTHREE[2]->tangent.xyz;
 
-	float2 uv1(inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w);
-	float2 uv2(inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w);
-	float2 uv3(inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w);
+	float2 uv1 = float2::make(inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w);
+	float2 uv2 = float2::make(inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w);
+	float2 uv3 = float2::make(inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w);
 
 	outTHREE[0]->tangent = CalculateTangentSpaceVector(pos1, pos2, pos3, uv1, uv2, uv3);
 	outTHREE[1]->tangent = CalculateTangentSpaceVector(pos2, pos1, pos3, uv2, uv1, uv3);
@@ -61,7 +61,7 @@ void SrSkinSimShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
 
-	out->normal_ty = float4( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
+	out->normal_ty = float4::make( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 
 	out->tangent.xyz = in->pos.xyz;// * out->pos.w;
 }
@@ -101,7 +101,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	float2 tc0(in->worldpos_tx.w, in->normal_ty.w);
+	float2 tc0 = float2::make(in->worldpos_tx.w, in->normal_ty.w);
 
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
@@ -123,7 +123,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;
-	normalTangent = (normalTangent - float3(0.5f)) * 2.f;
+	normalTangent = (normalTangent - float3::make(0.5f)) * 2.f;
 
 	normalDir = tangent2world * normalTangent;
 	normalDir.normalize();
@@ -134,12 +134,12 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	float3 viewReflWS;
 	viewReflWS.reflect(viewWS, normalDir);
 
-	float2 calcTexcoord = viewReflWS.xy * 0.5f + float2(0.5f, 0.5f);
+	float2 calcTexcoord = viewReflWS.xy * 0.5f + float2::make(0.5f, 0.5f);
 	uint32 refl = context->Tex2D( calcTexcoord, 3 );
 	float4 reflf = uint32_2_float4(refl);
 
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
-	float4 specularAcc(0.f);
+	float4 specularAcc = float4::make(0.f);
 
 	CalcLightsSkin(context, in->worldpos_tx.xyz, normalDir, viewWS, matSSS, diffuseAcc, specularAcc);
 
@@ -172,9 +172,9 @@ void SrFresnelNormalShader::ProcessPatch( void* vOut, void* vOut1, void* vOut2, 
 	float3 pos2 = inTHREE[1]->tangent.xyz;
 	float3 pos3 = inTHREE[2]->tangent.xyz;
 
-	float2 uv1(inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w);
-	float2 uv2(inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w);
-	float2 uv3(inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w);
+	float2 uv1 = float2::make(inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w);
+	float2 uv2 = float2::make(inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w);
+	float2 uv3 = float2::make(inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w);
 
 	outTHREE[0]->tangent = CalculateTangentSpaceVector(pos1, pos2, pos3, uv1, uv2, uv3);
 	outTHREE[1]->tangent = CalculateTangentSpaceVector(pos2, pos1, pos3, uv2, uv1, uv3);
@@ -195,7 +195,7 @@ void SrFresnelNormalShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2,
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
 
-	out->normal_ty = float4( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
+	out->normal_ty = float4::make( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 
 	out->tangent.xyz = in->pos.xyz;
 }
@@ -227,7 +227,7 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
-	float2 tc0(in->worldpos_tx.w, in->normal_ty.w);
+	float2 tc0 = float2::make(in->worldpos_tx.w, in->normal_ty.w);
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 
@@ -245,7 +245,7 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;
-	normalTangent = (normalTangent - float3(0.5f)) * 2.f;
+	normalTangent = (normalTangent - float3::make(0.5f)) * 2.f;
 
 	normalDir = tangent2world * normalTangent;
 	normalDir.normalize();
@@ -256,13 +256,13 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	float3 viewReflWS;
 	viewReflWS.reflect(viewWS, normalDir);
 
-	float2 calcTexcoord = viewReflWS.xy * 0.5f + float2(0.5f, 0.5f);
+	float2 calcTexcoord = viewReflWS.xy * 0.5f + float2::make(0.5f, 0.5f);
 	uint32 refl = context->Tex2D( calcTexcoord, 3 );
 	float4 reflf = uint32_2_float4(refl) * 0.25f;
 
 
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
-	float4 specularAcc(0.f);
+	float4 specularAcc = float4::make(0.f);
 
 	CalcLights(context, in->worldpos_tx.xyz, normalDir, viewWS, diffuseAcc, specularAcc);
 

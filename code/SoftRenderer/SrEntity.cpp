@@ -7,12 +7,12 @@
 
 SrEntity::SrEntity(void)
 {
-	m_pos = float3(0.f);
+	m_pos = float3::make(0.f);
 	m_rot = Quat::CreateIdentity();
 	m_worldMatrix = float44::CreateIdentity();
 	m_mesh = NULL;
 	m_visible = true;
-	m_scale = float3(1.f);
+	m_scale = float3::make(1.f);
 }
 
 SrEntity::~SrEntity(void)

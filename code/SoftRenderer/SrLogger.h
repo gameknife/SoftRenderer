@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  ������־ history
+	 history
   ver:1.0
    
  */
@@ -44,6 +44,7 @@ private:
 //	 Simple logs of data with low verbosity.
 inline void GtLog(const char* format, ...)
 {
+	#ifndef OS_LINUX
 	if (gEnv->logger)
 	{
 		va_list args;
@@ -54,10 +55,12 @@ inline void GtLog(const char* format, ...)
 		gEnv->logger->Log(buffer, args);
 		va_end(args);
 	}
+	#endif
 }
 
 inline void GtLogInfo(const char* format, ...)
 {
+	#ifndef OS_LINUX
 	if (gEnv->logger)
 	{
 		va_list args;
@@ -68,10 +71,12 @@ inline void GtLogInfo(const char* format, ...)
 		gEnv->logger->Log(buffer, args);
 		va_end(args);
 	}
+	#endif
 }
 
 inline void GtLogWarning(const char* format, ...)
 {
+	#ifndef OS_LINUX
 	if (gEnv->logger)
 	{
 		va_list args;
@@ -82,10 +87,12 @@ inline void GtLogWarning(const char* format, ...)
 		gEnv->logger->Log(buffer, args);
 		va_end(args);
 	}
+	#endif
 }
 
 inline void GtLogError(const char* format, ...)
 {
+	#ifndef OS_LINUX
 	if (gEnv->logger)
 	{
 		va_list args;
@@ -96,6 +103,7 @@ inline void GtLogError(const char* format, ...)
 		gEnv->logger->Log(buffer, args);
 		va_end(args);
 	}
+	#endif
 }
 
 #endif

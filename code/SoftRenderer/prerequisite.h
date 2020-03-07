@@ -37,7 +37,7 @@
 #elif defined(__ANDROID__)
 #	define OS_ANDROID
 #else
-#	error "Could not determine OS"
+#	define OS_LINUX
 #endif
 
 #if defined (OS_ANDROID) || defined( OS_IOS ) || defined( OS_APPLE )

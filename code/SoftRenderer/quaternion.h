@@ -57,12 +57,12 @@ SR_ALIGN struct Quat
 	 void SetRotationZ( float r );
 	static Quat CreateRotationZ( float r );
 
-	float3 GetColumn0() const {return float3(2*(v.x*v.x+w*w)-1,2*(v.y*v.x+v.z*w),2*(v.z*v.x-v.y*w));}
-	float3 GetColumn1() const {return float3(2*(v.x*v.y-v.z*w),2*(v.y*v.y+w*w)-1,2*(v.z*v.y+v.x*w));}
-	float3 GetColumn2() const {return float3(2*(v.x*v.z+v.y*w),2*(v.y*v.z-v.x*w),2*(v.z*v.z+w*w)-1);}
-	float3 GetRow0() const {return float3(2*(v.x*v.x+w*w)-1,2*(v.x*v.y-v.z*w),2*(v.x*v.z+v.y*w));}
-	float3 GetRow1() const {return float3(2*(v.y*v.x+v.z*w),2*(v.y*v.y+w*w)-1,2*(v.y*v.z-v.x*w));}
-	float3 GetRow2() const	{return float3(2*(v.z*v.x-v.y*w),2*(v.z*v.y+v.x*w),2*(v.z*v.z+w*w)-1);}
+	float3 GetColumn0() const {return float3::make(2*(v.x*v.x+w*w)-1,2*(v.y*v.x+v.z*w),2*(v.z*v.x-v.y*w));}
+	float3 GetColumn1() const {return float3::make(2*(v.x*v.y-v.z*w),2*(v.y*v.y+w*w)-1,2*(v.z*v.y+v.x*w));}
+	float3 GetColumn2() const {return float3::make(2*(v.x*v.z+v.y*w),2*(v.y*v.z-v.x*w),2*(v.z*v.z+w*w)-1);}
+	float3 GetRow0() const {return float3::make(2*(v.x*v.x+w*w)-1,2*(v.x*v.y-v.z*w),2*(v.x*v.z+v.y*w));}
+	float3 GetRow1() const {return float3::make(2*(v.y*v.x+v.z*w),2*(v.y*v.y+w*w)-1,2*(v.y*v.z-v.x*w));}
+	float3 GetRow2() const	{return float3::make(2*(v.z*v.x-v.y*w),2*(v.z*v.y+v.x*w),2*(v.z*v.z+w*w)-1);}
 
 	 void Invert( void );
 	 Quat GetInverted() const;

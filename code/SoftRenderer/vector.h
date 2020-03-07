@@ -50,21 +50,33 @@ public:
 		struct { float x; float y; };
 	};
 
-	float2()
+	static float2 make(const float * const p)
 	{
+		float2 ret;
+		ret.x = p[0];
+		ret.y = p[1];
+		return ret;
 	}
 
-	float2( const float * const p )
+	static float2 make( const float px , const float py )
 	{
-		x = p[0];
-		y = p[1];
+		float2 ret;
+		ret.x = px;
+		ret.y = py;
+		return ret;
 	}
 
-	float2( const float px , const float py )
-	{
-		x = px;
-		y = py;
-	}
+	// float2( const float * const p )
+	// {
+	// 	x = p[0];
+	// 	y = p[1];
+	// }
+
+	// float2( const float px , const float py )
+	// {
+	// 	x = px;
+	// 	y = py;
+	// }
 
 	inline float2 & operator += ( const float2 & p )
 	{
@@ -99,13 +111,11 @@ public:
 
 	inline float2 operator + ( const float2 & p ) const
 	{
-		float2 tmp( x + p.x , y + p.y );
-		return tmp;
+		return float2::make( x + p.x , y + p.y );
 	}
 	inline float2 operator - ( const float2 & p ) const
 	{
-		float2 tmp( x - p.x , y - p.y );
-		return tmp;
+		return float2::make( x - p.x , y - p.y );
 	}
 	inline float operator % ( const float2 & p ) const
 	{
@@ -113,18 +123,15 @@ public:
 	}
 	inline float2 operator * ( const float2 & p ) const
 	{
-		float2 tmp( x * p.x , y * p.y );
-		return tmp;
+		return float2::make( x * p.x , y * p.y );
 	}
 	inline float2 operator * ( const float p ) const
 	{
-		float2 tmp( x * p , y * p );
-		return tmp;
+		return float2::make( x * p , y * p );
 	}
 	inline float2 operator / ( const float p ) const
 	{
-		float2 tmp( x / p , y / p );
-		return tmp;
+		return float2::make( x / p , y / p );
 	}
 
 	bool operator == ( const float2 & p ) const
@@ -209,47 +216,43 @@ public:
 #endif
 	};
 
-	float3()
+	static float3 make( const float px , const float py , const float pz )
 	{
-	}
-
-	float3( const float px , const float py , const float pz )
-	{
+		float3 ret;
 // #ifdef SR_USE_SIMD
 // 		m128 = _mm_set_ps(0, pz, py, px);
 // #else
-		x = px;
-		y = py;
-		z = pz;
+		ret.x = px;
+		ret.y = py;
+		ret.z = pz;
 //#endif
+		return ret;
 	}
 
-	/**
-	 *@brief float3�Ŀ�ݽ�����ʽ float3( float2(x,y),z );
-	 *@return  
-	 *@param const float2 pxy 
-	 *@param const float pz 
-	 */
-	float3( const float2& pxy , const float pz )
+	static float3 make( const float2& pxy , const float pz )
 	{
+		float3 ret;
 #ifdef SR_USE_SIMD
 		m128 = _mm_set_ps(0, pz, pxy.x, pxy.y);
 #else
-		x = pxy.x;
-		y = pxy.y;
-		z = pz;
+		ret.x = pxy.x;
+		ret.y = pxy.y;
+		ret.z = pz;
 #endif
+		return ret;
 	}
 
-	float3( const float px)
+	static float3 make( const float px)
 	{
+		float3 ret;
 #ifdef SR_USE_SIMD
 		m128 = _mm_set_ps1(px);
 #else
-		x = px;
-		y = px;
-		z = px;
+		ret.x = px;
+		ret.y = px;
+		ret.z = px;
 #endif
+		return ret;
 	}
 
 	inline float3 & operator += ( const float3 & p )
@@ -315,10 +318,10 @@ public:
 #ifdef SR_USE_SIMD
 		float3 tmp;
 		tmp.m128 = _mm_add_ps( m128, p.m128 );
+		return ret;
 #else
-		float3 tmp( x + p.x , y + p.y , z + p.z );
+		return float3::make( x + p.x , y + p.y , z + p.z );
 #endif
-		return tmp;
 	}
 	inline float3 operator - ( const float3 & p ) const
 	{
@@ -326,7 +329,7 @@ public:
 		float3 tmp;
 		tmp.m128 = _mm_sub_ps( m128, p.m128 );
 #else
-		float3 tmp( x - p.x , y - p.y , z - p.z );
+		float3 tmp = float3::make( x - p.x , y - p.y , z - p.z );
 #endif
 		return tmp;
 	}
@@ -336,10 +339,10 @@ public:
 		float3 tmp;
 		tmp.m128 = _mm_setzero_ps();
 		tmp.m128 = _mm_sub_ps( tmp.m128, m128 );
-#else
-		float3 tmp( -x , -y , -z );
-#endif
 		return tmp;
+#else
+		return float3::make( -x , -y , -z );
+#endif
 	}
 
 	inline float3 operator %= ( const float3 & p )
@@ -347,7 +350,7 @@ public:
 #ifdef SR_USE_SIMD
  		m128 = _mm_cross3_ps( m128, p.m128 );
 #else
-		float3 tmp( y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x );
+		float3 tmp = float3::make( y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x );
 		x = tmp.x;
 		y = tmp.y;
 		z = tmp.z;
@@ -360,7 +363,7 @@ public:
 		float3 tmp;
  		tmp.m128 = _mm_cross3_ps( m128, p.m128 );
  #else
-		float3 tmp( y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x );
+		float3 tmp = float3::make( y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x );
 #endif
 		return tmp;
 	}
@@ -370,7 +373,7 @@ public:
 		float3 tmp;
 		tmp.m128 = _mm_mul_ps( m128, p.m128 );
 #else
-		float3 tmp( x * p.x , y * p.y , z * p.z );
+		float3 tmp = float3::make( x * p.x , y * p.y , z * p.z );
 #endif
 		return tmp;
 	}
@@ -382,7 +385,7 @@ public:
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_mul_ps( m128, tmp.m128 );
 #else
-		float3 tmp( x * p , y * p , z * p );
+		float3 tmp = float3::make( x * p , y * p , z * p );
 #endif
 		return tmp;
 	}
@@ -393,7 +396,7 @@ public:
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_div_ps( m128, tmp.m128 );
 #else
-		float3 tmp( x / p , y / p , z / p );
+		float3 tmp = float3::make( x / p , y / p , z / p );
 #endif
 		return tmp;
 	}
@@ -516,51 +519,59 @@ public:
 #endif
 	};
 
-	float4()
-	{
-	}
+	// float4()
+	// {
+	// }
 
-	float4( const float * const p )
+	static float4 make( const float * const p )
 	{
+		float4 tmp;
 #ifdef SR_USE_SIMD
  		m128 = _mm_loadr_ps( p );
 #else
-		x = p[0];
-		y = p[1];
-		z = p[2];
-		w = p[3];
+		tmp.x = p[0];
+		tmp.y = p[1];
+		tmp.z = p[2];
+		tmp.w = p[3];
 #endif
+		return tmp;
 	}
 
-	float4( const float px , const float py , const float pz , const float pw )
+	static float4 make( const float px , const float py , const float pz , const float pw )
 	{
+		float4 tmp;
 // #ifdef SR_USE_SIMD
 // 		m128 = _mm_set_ps(pw, pz, py, px);
 // #else
-		x = px;
-		y = py;
-		z = pz;
-		w = pw;
+		tmp.x = px;
+		tmp.y = py;
+		tmp.z = pz;
+		tmp.w = pw;
 //#endif
+		return tmp;
 	}
 
-	float4( const float px )
+	static float4 make( const float px )
 	{
+		float4 tmp;
 #ifdef SR_USE_SIMD
 		m128 = _mm_set_ps1(px);
 #else
-		x = px;y = px;z = px;w = px;
+		tmp.x = px;tmp.y = px;tmp.z = px;tmp.w = px;
 #endif
+		return tmp;
 	}
 
-	float4( const float3& v, const float pw )
+	static float4 make( const float3& v, const float pw )
 	{
+		float4 tmp;
 #ifdef SR_USE_SIMD
 			m128 = v.m128;
 			w = pw;
 #else
-			x = v.x;y = v.y; z = v.z; w = pw;
+			tmp.x = v.x;tmp.y = v.y; tmp.z = v.z; tmp.w = pw;
 #endif
+		return tmp;
 	}
 
 	inline float4 & operator += ( const float4 & p )
@@ -589,7 +600,7 @@ public:
 	}
 	inline float4 & operator %= ( const float4 & p )
 	{
-		float4 tmp	( w * p.x + x * p.w - z * p.y + y * p.z
+		float4 tmp = float4::make( w * p.x + x * p.w - z * p.y + y * p.z
 			, w * p.y + y * p.w - x * p.z + z * p.x
 			, w * p.z + z * p.w - y * p.x + x * p.y
 			, w * p.w - x * p.x - y * p.y - z * p.z );
@@ -646,7 +657,7 @@ public:
 		float4 tmp;
 		tmp.m128 = _mm_add_ps( m128, p.m128 );
 #else
-		float4 tmp( x + p.x , y + p.y , z + p.z , w + p.w );
+		float4 tmp = float4::make( x + p.x , y + p.y , z + p.z , w + p.w );
 #endif
 		return tmp;
 	}
@@ -656,14 +667,14 @@ public:
 		float4 tmp;
 		tmp.m128 = _mm_sub_ps( m128, p.m128 );
 #else
-		float4 tmp( x - p.x , y - p.y , z - p.z , w - p.w );
+		float4 tmp = float4::make( x - p.x , y - p.y , z - p.z , w - p.w );
 #endif		
 		return tmp;
 	}
 
 	inline float4 operator % ( const float4 & p ) const
 	{
-		float4 tmp	( w * p.x + x * p.w - z * p.y + y * p.z
+		float4 tmp = float4::make( w * p.x + x * p.w - z * p.y + y * p.z
 			, w * p.y + y * p.w - x * p.z + z * p.x
 			, w * p.z + z * p.w - y * p.x + x * p.y
 			, w * p.w - x * p.x - y * p.y - z * p.z );
@@ -676,7 +687,7 @@ public:
 		float4 tmp;
 		tmp.m128 = _mm_mul_ps( m128, p.m128 );
 #else
-		float4 tmp( x * p.x , y * p.y , z * p.z , w * p.w );
+		float4 tmp = float4::make( x * p.x , y * p.y , z * p.z , w * p.w );
 #endif
 		return tmp;
 	}
@@ -688,7 +699,7 @@ public:
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_mul_ps( m128, tmp.m128 );
 		#else
-		float4 tmp( x * p , y * p , z * p , w * p );
+		float4 tmp = float4::make( x * p , y * p , z * p , w * p );
 		#endif
 		
 		return tmp;
@@ -700,7 +711,7 @@ public:
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_div_ps( m128, tmp.m128 );
 #else
-		float4 tmp( x / p , y / p , z / p , w / p );
+		float4 tmp = float4::make( x / p , y / p , z / p , w / p );
 #endif		
 		return tmp;
 	}

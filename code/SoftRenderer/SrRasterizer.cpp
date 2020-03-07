@@ -381,8 +381,8 @@ void SrRasterizer::ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* 
 
 bool SrRasterizer::DrawLine( const float3& from, const float3& to )
 {
-	m_rendDynamicVertex.push_back( float4(from, 1.f) );
-	m_rendDynamicVertex.push_back( float4(to, 1.f) );
+	m_rendDynamicVertex.push_back( float4::make(from, 1.f) );
+	m_rendDynamicVertex.push_back( float4::make(to, 1.f) );
 	return true;
 }
 

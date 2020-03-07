@@ -15,7 +15,7 @@
 
 #ifdef OS_WIN32
 #include <MMSystem.h>
-#else
+#elif OS_APPLE
 #include <mach/mach_time.h>
 
 inline unsigned long timeGetTime()
@@ -28,6 +28,16 @@ inline unsigned long timeGetTime()
 	return static_cast<unsigned long>(millis);
 	return 0;
 
+}
+#else
+#include <time.h> 
+inline unsigned int timeGetTime()
+{
+        unsigned int uptime = 0;
+        struct timespec on;
+        if(clock_gettime(CLOCK_MONOTONIC, &on) == 0)
+                 uptime = on.tv_sec*1000 + on.tv_nsec/1000000;
+        return uptime;
 }
 #endif
 class SrTimer

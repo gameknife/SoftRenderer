@@ -32,7 +32,10 @@ typedef unsigned char uint8;
 // namespace srmath
 // {
 static inline float isqrtf(float x) {return 1.f/sqrtf(x);}
+
+#ifndef OS_LINUX
 static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = float(sin(angle));	*pCos = float(cos(angle));	}
+#endif
 
 #ifdef SR_USE_SIMD
 // SSE3 including
@@ -231,7 +234,7 @@ static inline float4 uint32_2_float4( uint32 p )
 #else
 
 #ifdef SR_COLOR_RGBA
-	return float4(  (float)( ( p & 0xFF0000 ) >> 16 ) / (float)0xFF
+	return float4::make(  (float)( ( p & 0xFF0000 ) >> 16 ) / (float)0xFF
 		, (float)( ( p & 0xFF00 ) >> 8 ) / (float)0xFF
 		, (float)( ( p & 0xFF ) >> 0 )  / (float)0xFF
 		,(float)( ( p & 0xFF000000 ) >> 24 ) / (float)0xFF
@@ -306,9 +309,9 @@ static inline uint32 SrColorMulFloat( uint32& color1, float ratio )
 }
 
 #ifdef SR_COLOR_RGBA
-#define SR_ARGB_F( a, r, g, b ) float4( r / 255.f, g / 255.f, b / 255.f, a / 255.f )
+#define SR_ARGB_F( a, r, g, b ) float4::make( r / 255.f, g / 255.f, b / 255.f, a / 255.f )
 #else
-#define SR_ARGB_F( a, r, g, b ) float4( a / 255.f, r / 255.f, g / 255.f, b / 255.f )
+#define SR_ARGB_F( a, r, g, b ) float4::make( a / 255.f, r / 255.f, g / 255.f, b / 255.f )
 #endif
 
 static inline float SrRandomFloat(float min, float max)

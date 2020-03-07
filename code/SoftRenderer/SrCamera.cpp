@@ -19,7 +19,7 @@ void SrCamera::Update()
 {
 	m_rot.Normalize();
 
-	cachedView.LookatLH( m_pos, m_pos + m_rot.GetRow2(), float3(0,1,0) );
+	cachedView.LookatLH( m_pos, m_pos + m_rot.GetRow2(), float3::make(0,1,0) );
 	float aspect = (float)(g_context->width) / ((float)g_context->height);
 	cachedProj.PerspectiveFovLH( m_fov / 180.f * SR_PI, aspect, m_zNear, m_zFar );
 
@@ -40,7 +40,7 @@ void SrCamera::Update()
 	float3 lookDir = (m_rot.GetRow2());
 	lookDir.normalize();
 	float3 m_farCenter = lookDir * m_zFar;
-	float3 rightDir = float3(0,1,0) % lookDir;
+	float3 rightDir = float3::make(0,1,0) % lookDir;
 	rightDir.normalize();
 	float3 headDir = lookDir % rightDir;
 	headDir.normalize();
