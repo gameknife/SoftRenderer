@@ -4,7 +4,10 @@ An SoftRenderer for experiment &amp; learn.
 ![ss](screenshot.png)
 ## 重启计划2020
 ---
-2020年，本人主体工作有部分向前端技术倾斜，故准备重新梳理softrenderer，目前electron更新了很多，原来的node-gyp已经无法编译，准备整体升级并使用typescript重写界面
+2020年，本人主体工作有部分向前端技术倾斜，故准备重新梳理softrenderer，目前electron更新了很多，原来的node-gyp已经无法编译，准备整体升级并使用typescript重写界面。
+
+同时，老旧的代码如今看起来已经不堪一击，多年来，cpp规范也各种升级，准备在此实验一番。
+
 
 ### 关键实现
 * 翻新数学库实现
@@ -41,7 +44,7 @@ An SoftRenderer for experiment &amp; learn.
 
 #### ubuntu
 
-```
+```shell
 # 安装依赖
 sudo apt install npm
 sudo apt install ubuntu-make
@@ -62,7 +65,7 @@ npm start
 确保安装了node, 直接下载pkg或通过brew安装
 确保安装了xcode以及已经应用xcode command tools
 
-```
+```shell
 # npm初始化
 npm install
 npm install -g node-gyp
@@ -77,41 +80,22 @@ npm start
 
 #### windows
 
-安装windows-tool-chain，如果已经安装visual studio的编译环境，可跳过
+确保安装了node, 
+确保安装visual studio的cpp编译环境
+根据node-gyp要求，c:\python27这个位置需要有python的二进制
 
-```
-cnpm install -g --production windows-build-tools
-```
+```shell
+# 安装node-gyp
+npm install --global node-gyp@latest
+npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 
-根据node-gyp要求，c:\python27这个位置需要有python
+# npm初始化
+npm install
 
-```
-可拷贝，可设置mklink
-```
+# 编译native addon
+npm run nconfig
+npm run nbuild
 
-
-
-
-npm环境初始化
-
-```
-cnpm install
-```
-
-使用node-gyp配置工程
-
-```
-npm nconfig
-```
-
-编译native库
-
-```
-npm nbuild
-```
-
-编译js库 & 运行
-
-```
+# 运行
 npm start
 ```
