@@ -79,7 +79,7 @@ public:
 	//SrTaskStack m_taskStack;			///< 任务堆栈
 	//SrTaskList  m_taskList;				///< 任务列表
 
-	atomic_queue::AtomicQueue<SrRasTask*, 2048> m_taskQueue;
+	atomic_queue::AtomicQueue2<SrRasTask*, 2048> m_taskQueue;
 	
 	uint32 m_preTaskToken;				///< 任务分配令牌
 };

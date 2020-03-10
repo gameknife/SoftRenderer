@@ -84,7 +84,7 @@ SrRasTaskDispatcher::~SrRasTaskDispatcher(void)
 
 SrRasTask* SrRasTaskDispatcher::RequestTask()
 {
-	SrRasTask* ret =  NULL;
+	SrRasTask* ret = nullptr;
 
 	// m_resLock->Lock();
 	// if (!m_taskStack.empty())
@@ -151,7 +151,7 @@ void SrRasTaskDispatcher::Wait()
 	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
 	{
 		HANDLE handles[24];
-
+		
 		uint32 count = 0;
 		
 		SrTaskThreadPool::iterator it = m_pool.begin();
@@ -159,18 +159,8 @@ void SrRasTaskDispatcher::Wait()
 		{
 			handles[count++] = (*it)->getWaitingEvent()->GetEvent();
 		}
-
+		
 		::WaitForMultipleObjects(m_pool.size(), handles, TRUE,  INFINITE);
-
-		// 不等同步对象，直接数queue数量
-		// while(true)
-		// {
-		// 	if( m_taskQueue.was_empty() )
-		// 	{
-		// 		break;
-		// 	}
-		// 	::Sleep(0);
-		// }
 	}
 
 	elapsedTime = gEnv->timer->getRealTime() - elapsedTime;

@@ -254,8 +254,11 @@ void SrRasterizer::Flush()
 
 	// RHZ PRIMITIVE
 	
+	gEnv->profiler->setBegin(ePe_RasterizeShaderFlushTime);
 	m_rasTaskDispatcher->Flush();
 	m_rasTaskDispatcher->Wait();
+	gEnv->profiler->setEnd(ePe_RasterizeShaderFlushTime);
+	
 #endif
 	gEnv->profiler->setEnd(ePe_RasterizeShaderTime);
 
@@ -308,9 +311,10 @@ void SrRasterizer::Flush()
 
 		// 优化一下，直接平均预分配到每个线程
 
-
+		gEnv->profiler->setBegin(ePe_PixelShaderFlushTime);
 		m_rasTaskDispatcher->Flush();
 		m_rasTaskDispatcher->Wait();
+		gEnv->profiler->setEnd(ePe_PixelShaderFlushTime);
 	}
 
 	gEnv->profiler->setEnd(ePe_PixelShaderTime);
@@ -335,7 +339,7 @@ void SrRasterizer::Flush()
 
 		//memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);
 	}
-	
+	gEnv->profiler->setEnd(ePe_PostProcessTime);
 	//////////////////////////////////////////////////////////////////////////
 
 
@@ -350,7 +354,7 @@ void SrRasterizer::Flush()
 	m_rendDynamicVertex.clear();
 
 	//////////////////////////////////////////////////////////////////////////
-	gEnv->profiler->setEnd(ePe_PostProcessTime);
+	
 	gEnv->profiler->setEnd(ePe_FlushTime);
 }
 

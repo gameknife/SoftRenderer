@@ -38,7 +38,7 @@ int main()
 	for(int i = 0 ; i < 100000; ++i)
 	{
 		app.Update();
-		gEnv->logger->Log(gEnv->profiler->getProfileDataBreif());
+		gEnv->logger->Log(gEnv->profiler->getProfileDataConsole());
 	}
 	//app.Destroy();
 

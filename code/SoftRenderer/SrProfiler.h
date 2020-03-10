@@ -18,8 +18,11 @@ enum EProfilerElement
 	ePe_FlushTime = 0,
 	ePe_ClearTime,
 	ePe_VertexShaderTime,
+	ePe_VertexShaderFlushTime,
 	ePe_RasterizeShaderTime,
+	ePe_RasterizeShaderFlushTime,
 	ePe_PixelShaderTime,
+	ePe_PixelShaderFlushTime,
 	ePe_FrameTime,
 	ePe_FlushTextTime,
 	ePe_PostProcessTime,
@@ -107,7 +110,7 @@ struct IProfiler
 	virtual ~IProfiler() {}
 
 	virtual char* getProfileData() = 0;
-	virtual char* getProfileDataBreif() = 0;
+	virtual char* getProfileDataConsole() = 0;
 	virtual void Update() =0;
 
 	virtual void setBegin( EProfilerElement element ) =0;
@@ -190,7 +193,7 @@ public:
 
 	void Update();
 	char* getProfileData();
-	char* getProfileDataBreif();
+	char* getProfileDataConsole();
 
 	void setBegin( EProfilerElement element );
 	void setEnd( EProfilerElement element );
@@ -204,8 +207,8 @@ public:
 	void setGPUEnd( EProfilerElement element );
 
 private:
-	char m_buffer[512];
-	char m_buffer_simple[512];
+	char m_buffer[2048];
+	char m_buffer_simple[2048];
 	std::vector<SrProfilerElement> m_profileElements;
 };
 
