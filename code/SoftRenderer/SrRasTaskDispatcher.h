@@ -10,6 +10,7 @@
 #define SrRasTaskDispatcher_h__
 
 #include "prerequisite.h"
+#include "atomic_queue.h"
 
 class SrRasTaskDispatcher;
 
@@ -67,7 +68,7 @@ public:
 	void Destroy();
 
 	void PushTask(SrRasTask* task);
-	void PrePushTask(SrRasTask* task);
+	//void PrePushTask(SrRasTask* task);
 	void Flush();
 	void Wait();
 
@@ -75,9 +76,11 @@ public:
 
 	gkScopedLock<gkMutexLock> *m_resLock;
 	SrTaskThreadPool m_pool;			///< 线程池
-	SrTaskStack m_taskStack;			///< 任务堆栈
-	SrTaskList  m_taskList;				///< 任务列表
+	//SrTaskStack m_taskStack;			///< 任务堆栈
+	//SrTaskList  m_taskList;				///< 任务列表
 
+	atomic_queue::AtomicQueue<SrRasTask*, 2048> m_taskQueue;
+	
 	uint32 m_preTaskToken;				///< 任务分配令牌
 };
 

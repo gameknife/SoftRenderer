@@ -26,22 +26,31 @@ int SrTaskThread::Run()
 	
 	while(true)
 	{
+		//float waitElpased = gEnv->timer->getRealTime();
 		m_waitFlag->Wait();
+		//waitElpased = gEnv->timer->getRealTime() - waitElpased;
+
+		//gEnv->profiler->IncreaseTime((EProfilerElement)(ePe_Thread0IdleTime + m_threadId), waitElpased);
+		
 		m_waitFlag->Reset();
 
+		float waitElpased = gEnv->timer->getRealTime();
+		
 		while(true)
 		{
+			
+			
 			SrRasTask* task = nullptr;
-			if(!m_internalTasks.empty())
-			{
-				task = m_internalTasks.top();
-				m_internalTasks.pop();
-			}
+			// if(!m_internalTasks.empty())
+			// {
+			// 	task = m_internalTasks.top();
+			// 	m_internalTasks.pop();
+			// }
 
 			if(!task)
 			{
-				// 目前dispatcher里面已经不会有任务了
-				// task = m_creator->RequestTask();
+				// 目前dispatcher里面只有在RS阶段会有任务
+				task = m_creator->RequestTask();
 			}
 			
 			if (!task)
@@ -54,6 +63,10 @@ int SrTaskThread::Run()
 			// ִ执行任务
 			task->Execute();
 		}
+
+		waitElpased = gEnv->timer->getRealTime() - waitElpased;
+		gEnv->profiler->IncreaseTime((EProfilerElement)(ePe_Thread0IdleTime + m_threadId), waitElpased);
+		
 		m_runningFlag->Set();
 	}
 	return 0;	
@@ -73,13 +86,16 @@ SrRasTask* SrRasTaskDispatcher::RequestTask()
 {
 	SrRasTask* ret =  NULL;
 
-	m_resLock->Lock();
-	if (!m_taskStack.empty())
-	{
-		ret = m_taskStack.top();
-		m_taskStack.pop();
-	}
-	m_resLock->UnLock();
+	// m_resLock->Lock();
+	// if (!m_taskStack.empty())
+	// {
+	// 	ret = m_taskStack.top();
+	// 	m_taskStack.pop();
+	// }
+	// m_resLock->UnLock();
+
+
+	m_taskQueue.try_pop(ret);
 
 	return ret;
 }
@@ -131,33 +147,46 @@ void SrRasTaskDispatcher::Flush()
 
 void SrRasTaskDispatcher::Wait()
 {
+	float elapsedTime = gEnv->timer->getRealTime();
 	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
 	{
+		HANDLE handles[24];
+
+		uint32 count = 0;
+		
 		SrTaskThreadPool::iterator it = m_pool.begin();
 		for ( ; it != m_pool.end(); ++it)
 		{
-			(*it)->getWaitingEvent()->Wait();
+			handles[count++] = (*it)->getWaitingEvent()->GetEvent();
 		}
+
+		::WaitForMultipleObjects(m_pool.size(), handles, TRUE,  INFINITE);
+
+		// 不等同步对象，直接数queue数量
+		// while(true)
+		// {
+		// 	if( m_taskQueue.was_empty() )
+		// 	{
+		// 		break;
+		// 	}
+		// 	::Sleep(0);
+		// }
 	}
 
-	// destroy tasks
-	SrTaskList::iterator itList = m_taskList.begin();
-	for ( ; itList != m_taskList.end(); ++itList)
-	{
-		delete (*itList);
-	}
-	m_taskList.clear();
-
+	elapsedTime = gEnv->timer->getRealTime() - elapsedTime;
+	gEnv->profiler->IncreaseTime(ePe_DispatcherWaitTime, elapsedTime);
 }
 
 void SrRasTaskDispatcher::PushTask( SrRasTask* task )
 {
-	m_taskStack.push(task);
-	m_taskList.push_back(task);
+	//m_taskStack.push(task);
+	//m_taskList.push_back(task);
+	//
+	m_taskQueue.push(task);
 }
 
-void SrRasTaskDispatcher::PrePushTask(SrRasTask* task)
-{
-	uint32 currWorker = m_preTaskToken++ % m_pool.size();
-	m_pool[currWorker]->PrePushTask(task);
-}
+// void SrRasTaskDispatcher::PrePushTask(SrRasTask* task)
+// {
+// 	uint32 currWorker = m_preTaskToken++ % m_pool.size();
+// 	m_pool[currWorker]->PrePushTask(task);
+// }

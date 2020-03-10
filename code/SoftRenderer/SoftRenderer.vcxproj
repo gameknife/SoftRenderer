@@ -220,7 +220,7 @@
       <GenerateAlternateCodePaths>None</GenerateAlternateCodePaths>
       <UseProcessorExtensions>None</UseProcessorExtensions>
       <UseMSVC>true</UseMSVC>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
