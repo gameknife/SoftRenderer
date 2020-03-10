@@ -25,7 +25,7 @@ SR_ALIGN struct SrRendContext
 			//SYSTEM_INFO siSysInfo;
 			//GetSystemInfo(&siSysInfo); 
 
-			processorNum = 4;//siSysInfo.dwNumberOfProcessors;
+			processorNum = 23;//siSysInfo.dwNumberOfProcessors;
 	}
 
 	void OpenFeature( ERenderFeature feature )

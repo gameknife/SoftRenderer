@@ -40,8 +40,8 @@ bool SoftRenderApp::Init()
 	GtLogInfo("///////////////////////////////////\n");
 	GtLogInfo("SoftRenderer Init...\n\n");
 
-	const int createWidth = 854;
-	const int createHeight = 480;
+	const int createWidth = 1280;
+	const int createHeight = 720;
 
 	// ������Դ������
 	GtLogInfo("Creating ResourceManger...");
