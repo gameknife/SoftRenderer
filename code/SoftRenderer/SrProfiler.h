@@ -18,11 +18,16 @@ enum EProfilerElement
 	ePe_FlushTime = 0,
 	ePe_ClearTime,
 	ePe_VertexShaderTime,
+	ePe_VertexShaderFlushTime,
 	ePe_RasterizeShaderTime,
+	ePe_RasterizeShaderFlushTime,
 	ePe_PixelShaderTime,
+	ePe_PixelShaderFlushTime,
 	ePe_FrameTime,
 	ePe_FlushTextTime,
 	ePe_PostProcessTime,
+	ePe_PostClearTime,
+	ePe_DispatcherWaitTime,
 
 	ePe_DrawCallTime,
 	ePe_DrawCallAllocTime,
@@ -62,6 +67,31 @@ enum EProfilerElement
 	ePe_Thread22TaskNum,
 	ePe_Thread23TaskNum,
 
+	ePe_Thread0IdleTime,
+	ePe_Thread1IdleTime,
+	ePe_Thread2IdleTime,
+	ePe_Thread3IdleTime,
+	ePe_Thread4IdleTime,
+	ePe_Thread5IdleTime,
+	ePe_Thread6IdleTime,
+	ePe_Thread7IdleTime,
+	ePe_Thread8IdleTime,
+	ePe_Thread9IdleTime,
+	ePe_Thread10IdleTime,
+	ePe_Thread11IdleTime,
+	ePe_Thread12IdleTime,
+	ePe_Thread13IdleTime,
+	ePe_Thread14IdleTime,
+	ePe_Thread15IdleTime,
+	ePe_Thread16IdleTime,
+	ePe_Thread17IdleTime,
+	ePe_Thread18IdleTime,
+	ePe_Thread19IdleTime,
+	ePe_Thread20IdleTime,
+	ePe_Thread21IdleTime,
+	ePe_Thread22IdleTime,
+	ePe_Thread23IdleTime,
+
 	// hair testing
 	ePe_HairCount,
 	ePe_HairColliderCount,
@@ -81,7 +111,7 @@ struct IProfiler
 	virtual ~IProfiler() {}
 
 	virtual char* getProfileData() = 0;
-	virtual char* getProfileDataBreif() = 0;
+	virtual char* getProfileDataConsole() = 0;
 	virtual void Update() =0;
 
 	virtual void setBegin( EProfilerElement element ) =0;
@@ -164,7 +194,7 @@ public:
 
 	void Update();
 	char* getProfileData();
-	char* getProfileDataBreif();
+	char* getProfileDataConsole();
 
 	void setBegin( EProfilerElement element );
 	void setEnd( EProfilerElement element );
@@ -178,8 +208,8 @@ public:
 	void setGPUEnd( EProfilerElement element );
 
 private:
-	char m_buffer[512];
-	char m_buffer_simple[512];
+	char m_buffer[2048];
+	char m_buffer_simple[2048];
 	std::vector<SrProfilerElement> m_profileElements;
 };
 

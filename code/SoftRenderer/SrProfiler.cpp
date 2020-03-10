@@ -65,15 +65,15 @@ char* SrProfiler::getProfileData()
 	return m_buffer;
 }
 
-char* SrProfiler::getProfileDataBreif()
+char* SrProfiler::getProfileDataConsole()
 {
 	return m_buffer_simple;
 }
 
 void SrProfiler::Update()
 {
-	sprintf(m_buffer_simple, "Fps: %.2f | FT: %.2fms | %d x %d |%s | %s | %s | "
-		"Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | PST:%5.2fms | PPT:%5.2fms | "
+	sprintf(m_buffer_simple, "  Fps: %.2f | FT: %.2fms | %d x %d |%s | %s | %s | "
+		"Wait:%5.2fms | Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | PST:%5.2fms | PPT:%5.2fms | "
 		"Processor: %d",
 		1000.f / gEnv->profiler->getTime(ePe_FrameTime),
 		gEnv->profiler->getTime(ePe_FrameTime),
@@ -82,6 +82,7 @@ void SrProfiler::Update()
 		g_context->IsFeatureEnable(eRFeature_JitAA) ? "jitAA on" : "jitAA off",
 		g_context->IsFeatureEnable(eRFeature_LinearFiltering) ? "LinearF" : "PointF",
 
+		gEnv->profiler->getTime(ePe_DispatcherWaitTime),
 		gEnv->profiler->getTime(ePe_FlushTime),
 		gEnv->profiler->getTime(ePe_ClearTime),
 		gEnv->profiler->getTime(ePe_VertexShaderTime),
@@ -92,9 +93,10 @@ void SrProfiler::Update()
 	);
 	
 	sprintf(m_buffer, "SoftRENDERER v0.3(%s)| Fps: %.2f | FT: %.2fms | %d x %d |%s | %s | %s <br> "
-		"DP:%5.2fms | Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | PST:%5.2fms | PPT:%5.2fms <br> "
+		"DP:%5.2fms | DispWait: %5.2fms | Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | RSFT:%5.2fms | PST:%5.2fms | PSFT:%5.2fms | PPT:%5.2fms | PCT:%5.2fms <br> "
 		"Batch: %3d | Tri: %6d | Pixel: %6d | Vertex: %6d <br> "
-		"Processor: %d | Task PerThread: <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br>",
+		"Processor: %d | Task PerThread: <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br>"
+		"Processor: %d | Task Idle: <br> %5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f <br> %5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f <br>",
 		gEnv->renderer->getName(),
 		1000.f / gEnv->profiler->getAverageTime(ePe_FrameTime),
 		gEnv->profiler->getAverageTime(ePe_FrameTime),
@@ -104,12 +106,17 @@ void SrProfiler::Update()
 		g_context->IsFeatureEnable(eRFeature_LinearFiltering) ? "LinearF" : "PointF",
 
 		gEnv->profiler->getAverageTime(ePe_DrawCallTime),
+		gEnv->profiler->getAverageTime(ePe_DispatcherWaitTime),
 		gEnv->profiler->getAverageTime(ePe_FlushTime),
 		gEnv->profiler->getAverageTime(ePe_ClearTime),
 		gEnv->profiler->getAverageTime(ePe_VertexShaderTime),
 		gEnv->profiler->getAverageTime(ePe_RasterizeShaderTime),
+		gEnv->profiler->getAverageTime(ePe_RasterizeShaderFlushTime),
 		gEnv->profiler->getAverageTime(ePe_PixelShaderTime),
+		gEnv->profiler->getAverageTime(ePe_PixelShaderFlushTime),
 		gEnv->profiler->getAverageTime(ePe_PostProcessTime),
+		gEnv->profiler->getAverageTime(ePe_PostClearTime),
+		
 
 		gEnv->profiler->getCount(ePe_BatchCount),
 		gEnv->profiler->getCount(ePe_TriangleCount),
@@ -141,7 +148,33 @@ void SrProfiler::Update()
 		gEnv->profiler->getCount(ePe_Thread20TaskNum),
 		gEnv->profiler->getCount(ePe_Thread21TaskNum),
 		gEnv->profiler->getCount(ePe_Thread22TaskNum),
-		gEnv->profiler->getCount(ePe_Thread23TaskNum)
+		gEnv->profiler->getCount(ePe_Thread23TaskNum),
+
+		g_context->processorNum,
+		gEnv->profiler->getAverageTime(ePe_Thread0IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread1IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread2IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread3IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread4IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread5IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread6IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread7IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread8IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread9IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread10IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread11IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread12IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread13IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread14IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread15IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread16IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread17IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread18IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread19IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread20IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread21IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread22IdleTime),
+		gEnv->profiler->getAverageTime(ePe_Thread23IdleTime)
 	);
 
 	// profile resources

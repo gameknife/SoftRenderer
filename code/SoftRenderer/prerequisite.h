@@ -121,9 +121,9 @@
 // 软件光栅化分块策略
 // 此block大小决定了每次线程TASK分发的task个数
 // 需要多次测试得到一个较好的值
-#define VERTEX_TASK_BLOCK 64			///< VertexShader任务分块大小
+#define VERTEX_TASK_BLOCK 1024			///< VertexShader任务分块大小
 #define PIXEL_TASK_BLOCK 512				///< PixelShader任务分块大小
-#define RASTERIZE_TASK_BLOCK 512		///< Rasterize任务分块大小
+#define RASTERIZE_TASK_BLOCK 256		///< Rasterize任务分块大小
 
 //////////////////////////////////////////////////////////////////////////
 // UI显示色彩

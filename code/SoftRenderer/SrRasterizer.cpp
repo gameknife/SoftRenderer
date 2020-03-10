@@ -115,7 +115,7 @@ void SrRasterizer::Flush()
 	//////////////////////////////////////////////////////////////////////////
 	// 0. Clear
 
-	fBuffer->GetPixelIndicesBuffer()->Clear();
+	//fBuffer->GetPixelIndicesBuffer()->Clear();
 
 	// Fragment Buffer OutBaffer Clear
 	uint32* memBuffer = (uint32*)m_MemSBuffer->getBuffer();
@@ -141,22 +141,21 @@ void SrRasterizer::Flush()
 	}
 
 	{
-		int quadsize = g_context->width * g_context->height;
-		
+		int quadsize = g_context->width * g_context->height * 4 / g_context->processorNum;
 
 		// outBuffer
 		uint8* dst = (uint8*)outBuffer;
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, SR_GREYSCALE_CLEARCOLOR ));
-
+		for(int i=0; i < g_context->processorNum; ++i)
+		{
+			m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * i,quadsize,	SR_GREYSCALE_CLEARCOLOR) );
+		}
+  
 		// fragBuffer
 		dst = (uint8*)fBuffer->zBuffer;
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, 0 ));
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, 0 ));
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, 0 ));
-		m_rasTaskDispatcher->PrePushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, 0 ));
+		for(int i=0; i < g_context->processorNum; ++i)
+		{
+			m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * i,quadsize,	0) );
+		}
 		
 		// 
 		m_rasTaskDispatcher->Flush();
@@ -181,7 +180,7 @@ void SrRasterizer::Flush()
 			{
 				end = primitive.vb->elementCount;
 			}
-			m_rasTaskDispatcher->PrePushTask( new SrRasTask_Vertex(i, end, primitive.vb, &primitive) );
+			m_rasTaskDispatcher->PushTask( new SrRasTask_Vertex(i, end, primitive.vb, &primitive) );
 			gEnv->profiler->setIncrement(ePe_VertexCount, end - i);
 		}
 	}
@@ -224,7 +223,7 @@ void SrRasterizer::Flush()
 				{
 					end = triCount;
 				}
-				m_rasTaskDispatcher->PrePushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
+				m_rasTaskDispatcher->PushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
 			}
 		}
 	}
@@ -247,15 +246,18 @@ void SrRasterizer::Flush()
 				{
 					end = triCount;
 				}
-				m_rasTaskDispatcher->PrePushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
+				m_rasTaskDispatcher->PushTask( new SrRasTask_Rasterize(&(**it), vb, ib, j, end ) );
 			}
 		}
 	}
 
 	// RHZ PRIMITIVE
 	
+	gEnv->profiler->setBegin(ePe_RasterizeShaderFlushTime);
 	m_rasTaskDispatcher->Flush();
 	m_rasTaskDispatcher->Wait();
+	gEnv->profiler->setEnd(ePe_RasterizeShaderFlushTime);
+	
 #endif
 	gEnv->profiler->setEnd(ePe_RasterizeShaderTime);
 
@@ -267,20 +269,22 @@ void SrRasterizer::Flush()
 	gEnv->profiler->setBegin(ePe_PixelShaderTime);
 
 	// 剔除不需要渲染的
-	
-	for ( uint32 i=0; i < g_context->width * g_context->height; ++i)
-	{
-		if(fBuffer->zBuffer[i] < 0.f)
-		{
-			fBuffer->GetPixelIndicesBuffer()->push_back(i);
-		}
-	}
+
+	// 这里有点浪费时间了，主线程花了2ms，z的判断可以直接在ps中做
+	// for ( uint32 i=0; i < g_context->width * g_context->height; ++i)
+	// {
+	// 	if(fBuffer->zBuffer[i] < 0.f)
+	// 	{
+	// 		fBuffer->GetPixelIndicesBuffer()->push_back(i);
+	// 	}
+	// }
 
 
 	
 	// 任务分配
 	{
-		uint32 size = fBuffer->GetPixelIndicesBuffer()->size();
+		//uint32 size = fBuffer->GetPixelIndicesBuffer()->size();
+		uint32 size =  g_context->width * g_context->height;
 
 		// Task栈上分配 854 x 480 / 512 + 1 = 801
 		// task结构需要精简
@@ -298,19 +302,20 @@ void SrRasterizer::Flush()
 			auto taskptr = &( tmpTasks[taskAddress++] );
 			taskptr->m_indexStart = i;
 			taskptr->m_indexEnd = end;
-			taskptr->m_indexBuffer = fBuffer->GetPixelIndicesBuffer()->data;
+			//taskptr->m_indexBuffer = fBuffer->GetPixelIndicesBuffer()->data;
 			taskptr->m_gBuffer = fBuffer->fBuffer;
 			taskptr->m_oBuffer = outBuffer;
 			//m_rasTaskDispatcher->PrePushTask(new SrRasTask_Pixel(i, end, fBuffer->GetPixelIndicesBuffer()->data, fBuffer->fBuffer, outBuffer));
-			m_rasTaskDispatcher->PrePushTask(taskptr);
+			m_rasTaskDispatcher->PushTask(taskptr);
 			gEnv->profiler->setIncrement(ePe_PixelCount, end - i);
 		}
 
 		// 优化一下，直接平均预分配到每个线程
 
-
+		gEnv->profiler->setBegin(ePe_PixelShaderFlushTime);
 		m_rasTaskDispatcher->Flush();
 		m_rasTaskDispatcher->Wait();
+		gEnv->profiler->setEnd(ePe_PixelShaderFlushTime);
 	}
 
 	gEnv->profiler->setEnd(ePe_PixelShaderTime);
@@ -323,24 +328,28 @@ void SrRasterizer::Flush()
 	// jit AA
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 	{
-		int quadsize = g_context->width * g_context->height / 4;
+		// 这个要分发到每个线程中去
+		int quadsize = g_context->width * g_context->height / g_context->processorNum;
 
-		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( 0,				quadsize,		aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize,		quadsize * 2,	aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize * 2,	quadsize * 3,	aaBufferWrite, aaBufferRead, memBuffer) );
-		 m_rasTaskDispatcher->PrePushTask( new SrRasTask_JitAA( quadsize * 3,	quadsize * 4,	aaBufferWrite, aaBufferRead, memBuffer) );
+		int currAddress = 0;
+		for(int i=0; i < g_context->processorNum; ++i)
+		{
+			m_rasTaskDispatcher->PushTask( new SrRasTask_JitAA( currAddress,				currAddress + quadsize,		aaBufferWrite, aaBufferRead, memBuffer) );
+			currAddress += quadsize;
+		}
   
 		 m_rasTaskDispatcher->Flush();
 		 m_rasTaskDispatcher->Wait();
-
-		//memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);
 	}
+	gEnv->profiler->setEnd(ePe_PostProcessTime);
+	//////////////////////////////////////////////////////////////////////////
 	
-	//////////////////////////////////////////////////////////////////////////
-
 
 	//////////////////////////////////////////////////////////////////////////
-	// 
+	//
+	//
+	//
+	gEnv->profiler->setBegin(ePe_PostClearTime);
 	for(std::list<SrRendPrimitve*>::iterator it = m_rendPrimitives.begin(); it != m_rendPrimitives.end(); ++it)
 	{
 		delete (*it);
@@ -348,9 +357,10 @@ void SrRasterizer::Flush()
 	m_rendPrimitives.clear();
 	m_rendPrimitivesRHZ.clear();
 	m_rendDynamicVertex.clear();
-
+	gEnv->profiler->setEnd(ePe_PostClearTime);
+	
 	//////////////////////////////////////////////////////////////////////////
-	gEnv->profiler->setEnd(ePe_PostProcessTime);
+	
 	gEnv->profiler->setEnd(ePe_FlushTime);
 }
 
