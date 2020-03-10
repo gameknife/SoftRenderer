@@ -26,15 +26,14 @@ int SrTaskThread::Run()
 	
 	while(true)
 	{
-		//float waitElpased = gEnv->timer->getRealTime();
+		float waitElpased = gEnv->timer->getRealTime();
 		m_waitFlag->Wait();
-		//waitElpased = gEnv->timer->getRealTime() - waitElpased;
-
-		//gEnv->profiler->IncreaseTime((EProfilerElement)(ePe_Thread0IdleTime + m_threadId), waitElpased);
+		waitElpased = gEnv->timer->getRealTime() - waitElpased;
+		gEnv->profiler->IncreaseTime((EProfilerElement)(ePe_Thread0IdleTime + m_threadId), waitElpased);
 		
 		m_waitFlag->Reset();
 
-		float waitElpased = gEnv->timer->getRealTime();
+		//float waitElpased = gEnv->timer->getRealTime();
 		
 		while(true)
 		{
@@ -64,8 +63,8 @@ int SrTaskThread::Run()
 			task->Execute();
 		}
 
-		waitElpased = gEnv->timer->getRealTime() - waitElpased;
-		gEnv->profiler->IncreaseTime((EProfilerElement)(ePe_Thread0IdleTime + m_threadId), waitElpased);
+		//waitElpased = gEnv->timer->getRealTime() - waitElpased;
+		//gEnv->profiler->IncreaseTime((EProfilerElement)(ePe_Thread0IdleTime + m_threadId), waitElpased);
 		
 		m_runningFlag->Set();
 	}

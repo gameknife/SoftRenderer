@@ -2,7 +2,7 @@
 #include "SrRasTasks.h"
 #include "SrRasterizer.h"
 #include "SrSwShader.h"
-
+#include "SrFragmentBuffer.h"
 
 SrRasTask_Pixel::SrRasTask_Pixel( int indexStart, int indexEnd, uint32* indexBuffer, SrFragment* gBuffer, uint32* oBuffer ):
 	m_indexStart(indexStart),
@@ -18,15 +18,18 @@ void SrRasTask_Pixel::Execute()
 {
 	for ( uint32 i = m_indexStart; i < m_indexEnd; ++i)
 	{
-		assert(  m_indexBuffer[i] >=0 &&  m_indexBuffer[i] < g_context->width * g_context->height );
-		int index = m_indexBuffer[i];
-		SrFragment* in = m_gBuffer + index;
-		uint32* out = m_oBuffer + index;
+		//assert(  m_indexBuffer[i] >=0 &&  m_indexBuffer[i] < g_context->width * g_context->height );
+		//int index = m_indexBuffer[i];
+		SrFragment* in = m_gBuffer + i;
+		uint32* out = m_oBuffer + i;
 		assert( in->primitive );
 		//assert( in->primitive->material );
 		assert( in->primitive->shader );
 
-		in->primitive->shader->ProcessPixel( out, in, &(in->primitive->shaderConstants), m_indexBuffer[i] );
+		if(gEnv->context->fBuffer->zBuffer[i] < 0.f)
+		{
+			in->primitive->shader->ProcessPixel( out, in, &(in->primitive->shaderConstants), i );
+		}
 	}
 }
 

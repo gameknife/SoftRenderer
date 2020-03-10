@@ -123,7 +123,7 @@
 // 需要多次测试得到一个较好的值
 #define VERTEX_TASK_BLOCK 1024			///< VertexShader任务分块大小
 #define PIXEL_TASK_BLOCK 512				///< PixelShader任务分块大小
-#define RASTERIZE_TASK_BLOCK 512		///< Rasterize任务分块大小
+#define RASTERIZE_TASK_BLOCK 256		///< Rasterize任务分块大小
 
 //////////////////////////////////////////////////////////////////////////
 // UI显示色彩

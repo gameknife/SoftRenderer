@@ -93,7 +93,7 @@ void SrProfiler::Update()
 	);
 	
 	sprintf(m_buffer, "SoftRENDERER v0.3(%s)| Fps: %.2f | FT: %.2fms | %d x %d |%s | %s | %s <br> "
-		"DP:%5.2fms | DispWait: %5.2fms | Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | RSFT:%5.2fms | PST:%5.2fms | PSFT:%5.2fms  | PPT:%5.2fms <br> "
+		"DP:%5.2fms | DispWait: %5.2fms | Flush:%5.2fms | CLT:%5.2fms | VST:%5.2fms | RST:%5.2fms | RSFT:%5.2fms | PST:%5.2fms | PSFT:%5.2fms | PPT:%5.2fms | PCT:%5.2fms <br> "
 		"Batch: %3d | Tri: %6d | Pixel: %6d | Vertex: %6d <br> "
 		"Processor: %d | Task PerThread: <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br> %4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d/%4d <br>"
 		"Processor: %d | Task Idle: <br> %5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f <br> %5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f/%5.2f <br>",
@@ -115,6 +115,8 @@ void SrProfiler::Update()
 		gEnv->profiler->getAverageTime(ePe_PixelShaderTime),
 		gEnv->profiler->getAverageTime(ePe_PixelShaderFlushTime),
 		gEnv->profiler->getAverageTime(ePe_PostProcessTime),
+		gEnv->profiler->getAverageTime(ePe_PostClearTime),
+		
 
 		gEnv->profiler->getCount(ePe_BatchCount),
 		gEnv->profiler->getCount(ePe_TriangleCount),

@@ -26,6 +26,7 @@ enum EProfilerElement
 	ePe_FrameTime,
 	ePe_FlushTextTime,
 	ePe_PostProcessTime,
+	ePe_PostClearTime,
 	ePe_DispatcherWaitTime,
 
 	ePe_DrawCallTime,
