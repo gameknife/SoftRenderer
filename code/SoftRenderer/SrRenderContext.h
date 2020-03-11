@@ -24,10 +24,8 @@ SR_ALIGN struct SrRendContext
 			bpp = obpp / 8;
 			viewport = SrViewport(0.f,0.f,(float)width,(float)height,1.f,1000.f);
 
-			//SYSTEM_INFO siSysInfo;
-			//GetSystemInfo(&siSysInfo); 
-
-			processorNum = 8;//siSysInfo.dwNumberOfProcessors;
+			processorNum = 8;
+			// use std thread in c++11
 			unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
 			if(concurentThreadsSupported != 0)
 			{
