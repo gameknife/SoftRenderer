@@ -10,6 +10,8 @@
 #ifndef SrRenderContext_h__
 #define SrRenderContext_h__
 
+#include <thread>
+
 class SrFragmentBuffer;
 
 SR_ALIGN struct SrRendContext
@@ -25,7 +27,12 @@ SR_ALIGN struct SrRendContext
 			//SYSTEM_INFO siSysInfo;
 			//GetSystemInfo(&siSysInfo); 
 
-			processorNum = 24;//siSysInfo.dwNumberOfProcessors;
+			processorNum = 8;//siSysInfo.dwNumberOfProcessors;
+			unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
+			if(concurentThreadsSupported != 0)
+			{
+				processorNum = concurentThreadsSupported;
+			}
 	}
 
 	void OpenFeature( ERenderFeature feature )
