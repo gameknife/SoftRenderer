@@ -149,17 +149,17 @@ void SrRasTaskDispatcher::Wait()
 	float elapsedTime = gEnv->timer->getRealTime();
 	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
 	{
-		HANDLE handles[24];
-		
-		uint32 count = 0;
+		//HANDLE handles[24];
+		//uint32 count = 0;
 		
 		SrTaskThreadPool::iterator it = m_pool.begin();
 		for ( ; it != m_pool.end(); ++it)
 		{
-			handles[count++] = (*it)->getWaitingEvent()->GetEvent();
+			//handles[count++] = (*it)->getWaitingEvent()->GetEvent();
+			(*it)->getWaitingEvent()->Wait();
 		}
 		
-		::WaitForMultipleObjects(m_pool.size(), handles, TRUE,  INFINITE);
+		//::WaitForMultipleObjects(m_pool.size(), handles, TRUE,  INFINITE);
 	}
 
 	elapsedTime = gEnv->timer->getRealTime() - elapsedTime;
