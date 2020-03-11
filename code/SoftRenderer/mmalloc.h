@@ -3,8 +3,9 @@
 /////////////////////////////
 // mm_malloc for mac
 #ifndef OS_WIN32
-#define _mm_malloc(a,b) malloc(a)
-#define _mm_free(a) free(a)
+//#define _mm_malloc(a,b) malloc(a)
+//#define _mm_free(a) free(a)
+#include <emmintrin.h>
 #else
 #include <malloc.h>
 #endif
