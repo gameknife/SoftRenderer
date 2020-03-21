@@ -233,7 +233,7 @@ public:
 	{
 		float3 ret;
 #ifdef SR_USE_SIMD
-		m128 = _mm_set_ps(0, pz, pxy.x, pxy.y);
+		ret.m128 = _mm_set_ps(0, pz, pxy.x, pxy.y);
 #else
 		ret.x = pxy.x;
 		ret.y = pxy.y;
@@ -246,7 +246,7 @@ public:
 	{
 		float3 ret;
 #ifdef SR_USE_SIMD
-		m128 = _mm_set_ps1(px);
+		ret.m128 = _mm_set_ps1(px);
 #else
 		ret.x = px;
 		ret.y = px;
@@ -318,7 +318,7 @@ public:
 #ifdef SR_USE_SIMD
 		float3 tmp;
 		tmp.m128 = _mm_add_ps( m128, p.m128 );
-		return ret;
+		return tmp;
 #else
 		return float3::make( x + p.x , y + p.y , z + p.z );
 #endif
@@ -527,7 +527,7 @@ public:
 	{
 		float4 tmp;
 #ifdef SR_USE_SIMD
- 		m128 = _mm_loadr_ps( p );
+ 		tmp.m128 = _mm_loadr_ps( p );
 #else
 		tmp.x = p[0];
 		tmp.y = p[1];
@@ -555,7 +555,7 @@ public:
 	{
 		float4 tmp;
 #ifdef SR_USE_SIMD
-		m128 = _mm_set_ps1(px);
+		tmp.m128 = _mm_set_ps1(px);
 #else
 		tmp.x = px;tmp.y = px;tmp.z = px;tmp.w = px;
 #endif
@@ -566,8 +566,8 @@ public:
 	{
 		float4 tmp;
 #ifdef SR_USE_SIMD
-			m128 = v.m128;
-			w = pw;
+			tmp.m128 = v.m128;
+			tmp.w = pw;
 #else
 			tmp.x = v.x;tmp.y = v.y; tmp.z = v.z; tmp.w = pw;
 #endif

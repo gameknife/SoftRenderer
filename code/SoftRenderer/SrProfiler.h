@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  更改日志 history
+  锟斤拷锟斤拷锟斤拷志 history
   ver:1.0
    
  */
@@ -11,7 +11,7 @@
 #ifndef SrProfiler_h__
 #define SrProfiler_h__
 
-#define AVGTIME_COUNT 300
+#define AVGTIME_COUNT 30
 
 enum EProfilerElement
 {
@@ -160,7 +160,7 @@ struct SrProfilerElement
 		}		
 
 		// TODO: average frametime set
-		// 每0.25秒一次？
+		// 每0.25锟斤拷一锟轿ｏ拷
 		
 		prevElapsedTime[nextTimeIdx] = elapsedTime;
 		if (++nextTimeIdx == AVGTIME_COUNT)
@@ -168,7 +168,7 @@ struct SrProfilerElement
 			nextTimeIdx = 0;
 		}
 
-		// 计算平均时间
+		// 锟斤拷锟斤拷平锟斤拷时锟斤拷
 		avgElapsedTime = 0;
 		for ( int i=0; i < AVGTIME_COUNT; ++i )
 		{

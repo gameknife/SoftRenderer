@@ -181,16 +181,16 @@ static inline uint32 float4_2_uint32( const float4& f )
 #ifdef SR_USE_SIMD
 	__m128 fMul = _mm_set_ps1( 255.f );
 	__m128 m128 = _mm_mul_ps( f.m128, fMul );
-	__m128i dword128 = _mm_cvtps_epi32(m128);
+	__m128i dword128 = _mm_cvttps_epi32(m128);
 	uint32* dword4 = (uint32*)(&dword128);
 
 #ifdef SR_COLOR_RGBA
-	uint32 ret = ( dword4[0] << 16  )
+	uint32 ret = ( dword4[0] << 0  )
 		| ( dword4[1] << 8 )
-		| ( dword4[2] << 0 )
-		| ( dword4[3] << 24 );
+		| ( dword4[2] << 16 )
+		| ( 0xFF << 24 );
 #else
-	uint32 ret = ( dword4[0] << 24 )
+	uint32 ret = ( 0xFF << 24 )
 		| ( dword4[1] << 16 )
 		| ( dword4[2] << 8 )
 		| ( dword4[3] );

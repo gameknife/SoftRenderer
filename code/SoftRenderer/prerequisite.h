@@ -54,7 +54,7 @@
 // 固定函数光栅化调用
 //#define FIXED_FUNCTION_RASTERIZOR
 // SIMD加速
-//#define SR_USE_SIMD
+#define SR_USE_SIMD
 
 
 
