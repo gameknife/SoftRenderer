@@ -215,6 +215,36 @@ SR_ALIGN struct SrRendVertex
 	float4 channel3;
 };
 
+#ifdef SR_USE_SIMD
+struct SrRendVertexAVX
+{
+	__m256 channel_0_1;
+	__m256 channel_2_3;
+};
+struct SrRendVertexSSE
+{
+	// union
+	// {
+	// 	__m128 c0;
+	// 	float4 pos;
+	// };
+
+	union 
+	{
+		float4 pos;
+		struct 
+		{
+			__m128 c0;
+			__m128 c1;
+		};
+		__m256 c0_1;
+	};
+	//__m128 c1;
+	__m128 c2;
+	__m128 c3;
+};
+#endif
+
 /**
  *@brief 像素buffer的结构定义
  */
@@ -230,6 +260,20 @@ SR_ALIGN struct SrFragment
 			float4 normal_ty;
 			float4 preserve;
 		};
+#ifdef SR_USE_SIMD
+		struct
+		{
+			__m128 c0;
+			__m128 c1;
+			__m128 c2;
+			__m128 c3;
+		};
+		// struct
+		// {
+		// 	__m256 c01;
+		// 	__m256 c02;
+		// };
+#endif
 	};	
 	///< 4 x float4 的数据范围
 	SrRendPrimitve*	primitive;	///< primitive索引
