@@ -34,7 +34,7 @@ inline void FastRasterizeSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRendVer
 {
 	//__m128 inv_ratio128 = _mm_set1_ps(inv_ratio);
 	__m128 ratio128 = _mm_set1_ps(ratio);
-	//__m256 ratio256 = _mm256_set1_ps(ratio);
+	__m256 ratio256 = _mm256_set1_ps(ratio);
 	//__m128 nratio128 = _mm_set1_ps(-ratio);
 
 	// a * (1-t) + b * t
@@ -54,11 +54,12 @@ inline void FastRasterizeSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRendVer
 	// https://devblogs.nvidia.com/lerp-faster-cuda/
 	// fma(t, b, fnma(t, a, a));
 	out->c0 = _mm_fmadd_ps(ratio128, b->c0, _mm_fnmadd_ps(ratio128, a->c0, a->c0));
-	if (channelMax > 1) out->c1 = _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1));
-	if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
-	if (channelMax > 3) out->c3 = _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3));
+	// if (channelMax > 1) out->c1 = _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1));
+	// if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
+	// if (channelMax > 3) out->c3 = _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3));
 
-	//out->c1_2 = _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2));
+	out->c1_2 = _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2));
+	//if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
 }
 
 
@@ -66,7 +67,7 @@ inline void FastRasterizeFinalSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRe
 {
 	//__m128 inv_ratio128 = _mm_set1_ps(inv_ratio);
 	__m128 ratio128 = _mm_set1_ps(ratio);
-	//__m256 ratio256 = _mm256_set1_ps(ratio);
+	__m256 ratio256 = _mm256_set1_ps(ratio);
 	//__m128 nratio128 = _mm_set1_ps(-ratio);
 
 	// a * (1-t) + b * t
@@ -88,14 +89,14 @@ inline void FastRasterizeFinalSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRe
 	// // b*t - a*t + a
 	out->c0 = _mm_fmadd_ps(ratio128, b->c0, _mm_fnmadd_ps(ratio128, a->c0, a->c0));
 
-	__m128 w128 = _mm_set1_ps(1.0f / out->pos.w);
+	//__m128 w128 = _mm_set1_ps(1.0f / out->pos.w);
 	
-	if (channelMax > 1) out->c1 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1)));
-	if (channelMax > 2) out->c2 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2)));
-	if (channelMax > 3) out->c3 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3)));
+	// if (channelMax > 1) out->c1 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1)));
+	// if (channelMax > 2) out->c2 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2)));
+	// if (channelMax > 3) out->c3 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3)));
 	//
-	//__m256 w256 = _mm256_set1_ps(1.0f / out->pos.w);
-	//out->c1_2 = _mm256_mul_ps(w256, _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2)));
+	__m256 w256 = _mm256_set1_ps(1.0f / out->pos.w);
+	out->c1_2 = _mm256_mul_ps(w256, _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2)));
 }
 
 inline void FastFinalRasterizeSSE(SrRendVertexSSE* out, float w, int channelMax)

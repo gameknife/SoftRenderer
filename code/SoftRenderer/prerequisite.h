@@ -207,11 +207,11 @@ SR_ALIGN struct SrVertexP3N3T2
  */
 SR_ALIGN struct SrRendVertex
 {
-	float4 pos;
-
 	// vertex shader usage
 	float4 channel1;
 	float4 channel2;
+
+	float4 pos;
 	float4 channel3;
 };
 
@@ -231,16 +231,20 @@ struct SrRendVertexSSE
 
 	union 
 	{
-		float4 pos;
 		struct 
 		{
-			__m128 c0;
 			__m128 c1;
+			__m128 c2;
 		};
-		__m256 c0_1;
+		__m256 c1_2;
 	};
 	//__m128 c1;
-	__m128 c2;
+	union
+	{
+		float4 pos;
+		__m128 c0;
+	};
+	
 	__m128 c3;
 };
 #endif

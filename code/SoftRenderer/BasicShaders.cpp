@@ -11,10 +11,9 @@ SrPhongWithNormalShader g_PhongShadingWithNormalShader;
 // local data format
 SR_ALIGN struct SrPhongShading_Vert2Frag
 {
-	float4 pos;				// channel0
-
 	float4 worldpos_tx;		// channel1:xyz
 	float4 normal_ty;		// channel1:w channel2:xy
+	float4 pos;				// channel0
 	float4 tangent;			// channel2:zw channel3:x
 	
 };
