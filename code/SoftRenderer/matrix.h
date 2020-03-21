@@ -117,9 +117,13 @@ public:
 		__m128 line2 = _mm_set_ps( 0, m[7], m[4], m[1] );
 		__m128 line3 = _mm_set_ps( 0, m[8], m[5], m[2] );
 
-		tmp.x = *((float*)&_mm_dot_ps( p.m128, line1));
-		tmp.y = *((float*)&_mm_dot_ps( p.m128, line2));
-		tmp.z = *((float*)&_mm_dot_ps( p.m128, line3));
+		__m128 x = _mm_dot_ps( p.m128, line1 );
+		__m128 y = _mm_dot_ps( p.m128, line2 );
+		__m128 z = _mm_dot_ps( p.m128, line3 );
+
+		tmp.x = *(reinterpret_cast<float*>(&x));
+		tmp.y = *(reinterpret_cast<float*>(&y));
+		tmp.z = *(reinterpret_cast<float*>(&z));
 #else
 		float3 tmp = float3::make( p.x * m[0] + p.y * m[3] + p.z * m[6]
 		, p.x * m[1] + p.y * m[4] + p.z * m[7]
@@ -421,9 +425,13 @@ public:
 		__m128 line2 = _mm_set_ps( 0, m[9], m[5], m[1] );
 		__m128 line3 = _mm_set_ps( 0, m[10], m[6], m[2] );
 
-		tmp.x = *((float*)&_mm_dot_ps( p.m128, line1));
-		tmp.y = *((float*)&_mm_dot_ps( p.m128, line2));
-		tmp.z = *((float*)&_mm_dot_ps( p.m128, line3));
+		__m128 x = _mm_dot_ps( p.m128, line1 );
+		__m128 y = _mm_dot_ps( p.m128, line2 );
+		__m128 z = _mm_dot_ps( p.m128, line3 );
+		
+		tmp.x = *(reinterpret_cast<float*>(&x));
+		tmp.y = *(reinterpret_cast<float*>(&y));
+		tmp.z = *(reinterpret_cast<float*>(&z));
 #else
 		float3 tmp = float3::make( m[0] * p.x + m[4] * p.y + m[8] * p.z
 			, m[1] * p.x + m[5] * p.y + m[9] * p.z

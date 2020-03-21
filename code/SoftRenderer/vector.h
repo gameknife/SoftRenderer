@@ -464,7 +464,8 @@ public:
 	inline float dot( const float3& rhs )
 	{
 #ifdef SR_USE_SIMD
-	return *(float*)(&_mm_dot_ps( m128, rhs.m128 ));
+	__m128 value = _mm_dot_ps( m128, rhs.m128 );
+	return *(reinterpret_cast<float*>(&value));
  #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
 #endif
@@ -473,7 +474,8 @@ public:
 	static inline float dot( const float3& lhs, const float3& rhs )
 	{
 #ifdef SR_USE_SIMD
-		return *(float*)(&_mm_dot_ps( lhs.m128, rhs.m128 ));
+		__m128 value = _mm_dot_ps( lhs.m128, rhs.m128 );
+		return *(reinterpret_cast<float*>(&value));
 #else
 		return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
 #endif

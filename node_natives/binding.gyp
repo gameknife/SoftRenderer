@@ -27,7 +27,7 @@
         'OS=="mac"', {
           'xcode_settings': {
         'OTHER_CFLAGS': [
-              '-msse2',
+              '-mavx',
               '-Ofast'
             ],
           },
