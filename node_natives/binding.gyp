@@ -28,6 +28,7 @@
           'xcode_settings': {
         'OTHER_CFLAGS': [
               '-mavx',
+              '-mfma',
               '-Ofast'
             ],
           },

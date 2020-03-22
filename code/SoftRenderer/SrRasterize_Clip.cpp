@@ -249,8 +249,8 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 
 				// 这里，由于三角形还在3D空间，因此直接插值，不需要透视矫正
 #ifdef FIXED_FUNCTION_RASTERIZOR
-				FixedRasterize(&p1, &tri.p[v0], &tri.p[v1], NULL, ratio1, &(tri.primitive->shaderConstants));
-				FixedRasterize(&p2, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants));
+				FixedRasterize(&p1, &tri.p[v0], &tri.p[v1], NULL, ratio1, &(tri.primitive->shaderConstants), tri.primitive->shader->m_maxChannel, false);
+				FixedRasterize(&p2, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants), tri.primitive->shader->m_maxChannel, false);
 #else
 				tri.primitive->shader->ProcessRasterize(&p1, &tri.p[v0], &tri.p[v1], NULL, ratio1, &(tri.primitive->shaderConstants));
 				tri.primitive->shader->ProcessRasterize(&p2, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants));
@@ -306,8 +306,8 @@ void SrRasterizer::RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, flo
 				float ratio2 = (zNear - p0.pos.w) / (p2.pos.w - p0.pos.w);
 
 #ifdef FIXED_FUNCTION_RASTERIZOR
-				FixedRasterize(&p3, &tri.p[v0], &tri.p[v1], NULL, ratio1, &(tri.primitive->shaderConstants));
-				FixedRasterize(&p4, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants));
+				FixedRasterize(&p3, &tri.p[v0], &tri.p[v1], NULL, ratio1, &(tri.primitive->shaderConstants), tri.primitive->shader->m_maxChannel, false);
+				FixedRasterize(&p4, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants), tri.primitive->shader->m_maxChannel, false);
 #else
 				tri.primitive->shader->ProcessRasterize(&p3, &tri.p[v0], &tri.p[v1], NULL, ratio1, &(tri.primitive->shaderConstants));
 				tri.primitive->shader->ProcessRasterize(&p4, &tri.p[v0], &tri.p[v2], NULL, ratio2, &(tri.primitive->shaderConstants));

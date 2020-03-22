@@ -52,7 +52,7 @@
 // 光栅化同步_修正多线程光栅化可能造成的Z冲突
 #define RASTERIZER_SYNC
 // 固定函数光栅化调用
-//#define FIXED_FUNCTION_RASTERIZOR
+#define FIXED_FUNCTION_RASTERIZOR
 // SIMD加速
 #define SR_USE_SIMD
 
@@ -207,13 +207,47 @@ SR_ALIGN struct SrVertexP3N3T2
  */
 SR_ALIGN struct SrRendVertex
 {
-	float4 pos;
-
 	// vertex shader usage
 	float4 channel1;
 	float4 channel2;
+
+	float4 pos;
 	float4 channel3;
 };
+
+#ifdef SR_USE_SIMD
+struct SrRendVertexAVX
+{
+	__m256 channel_0_1;
+	__m256 channel_2_3;
+};
+struct SrRendVertexSSE
+{
+	// union
+	// {
+	// 	__m128 c0;
+	// 	float4 pos;
+	// };
+
+	union 
+	{
+		struct 
+		{
+			__m128 c1;
+			__m128 c2;
+		};
+		__m256 c1_2;
+	};
+	//__m128 c1;
+	union
+	{
+		float4 pos;
+		__m128 c0;
+	};
+	
+	__m128 c3;
+};
+#endif
 
 /**
  *@brief 像素buffer的结构定义
@@ -225,11 +259,25 @@ SR_ALIGN struct SrFragment
 		SR_ALIGN float data[FBUFFER_CHANNEL_SIZE * 4];
 		struct  
 		{
-			float4 hpos;
 			float4 worldpos_tx;
 			float4 normal_ty;
+			float4 hpos;
 			float4 preserve;
 		};
+#ifdef SR_USE_SIMD
+		struct
+		{
+			__m128 c1;
+			__m128 c2;
+			__m128 c0;
+			__m128 c3;
+		};
+		struct
+		{
+			__m256 c12;
+			__m256 c03;
+		};
+#endif
 	};	
 	///< 4 x float4 的数据范围
 	SrRendPrimitve*	primitive;	///< primitive索引

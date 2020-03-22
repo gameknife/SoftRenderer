@@ -168,7 +168,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 		if ( calTri.primitive->shader )
 		{
 #ifdef FIXED_FUNCTION_RASTERIZOR
-			FixedRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, false );
+			FixedRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, NULL, calTri.primitive->shader->m_maxChannel, false );
 #else
 			calTri.primitive->shader->ProcessRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, NULL, false );
 #endif
@@ -184,6 +184,56 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 
 		RasterizeTriangle(topTri, true);
 		RasterizeTriangle(bottomTri, true);
+	}
+}
+
+void SrRasterizer::WriteLine(const void* vertA, const void* vertB, SrRendPrimitve* primitive, uint32 count, float ratio_step, float ratio_start, uint32 address_start)
+{
+	__m128 pos[2];
+	float4 channel1[2];
+	float4 channel2[2];
+	float4 channel3[3];
+	//__m256 channel12[2];
+
+	pos[0] = ((SrRendVertexSSE*)vertA)->c0;
+	pos[1] = ((SrRendVertexSSE*)vertB)->c0;
+
+	channel1[0] = ((SrRendVertex*)vertA)->channel1;
+	channel1[1] = ((SrRendVertex*)vertB)->channel1;
+
+	channel2[0] = ((SrRendVertex*)vertA)->channel2;
+	channel2[1] = ((SrRendVertex*)vertB)->channel2;
+
+	channel3[0] = ((SrRendVertex*)vertA)->channel3;
+	channel3[1] = ((SrRendVertex*)vertB)->channel3;
+
+	// channel12[0] = ((SrRendVertexSSE*)vertA)->c1_2;
+	// channel12[1] = ((SrRendVertexSSE*)vertB)->c1_2;
+	
+	uint32 address = address_start;
+	float ratio = ratio_start;
+	float4 outHolder;
+	for (uint32 i = 0; i < count; ++i, ++address, ratio += ratio_step)
+	{
+		SrFragment* thisBuffer = fBuffer->fBuffer + address;
+		outHolder.m128 = FastLerp128(pos[0], pos[1], ratio);
+
+		if (outHolder.z - 1.f > fBuffer->zBuffer[address])
+		{
+			continue;
+		}
+		fBuffer->zBuffer[address] = outHolder.z - 1.f;
+
+		thisBuffer->c0 = outHolder.m128;
+		thisBuffer->primitive = primitive;
+
+		thisBuffer->c1 = FastLerp128W(channel1[0].m128, channel1[1].m128, ratio, outHolder.w);
+		thisBuffer->c2 = FastLerp128W(channel2[0].m128, channel2[1].m128, ratio, outHolder.w);
+		if(primitive->shader->m_maxChannel > 3)
+		{
+			thisBuffer->c3 = FastLerp128W(channel3[0].m128, channel3[1].m128, ratio, outHolder.w);
+		}
+		//thisBuffer->c12 = FastLerp256W(channel12[0], channel12[1], ratio, outHolder.w);
 	}
 }
 
@@ -213,31 +263,20 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 	float ratio_start = (start - fstart) * ratio_step;
 
 	uint32 address_start = line * g_context->width + start;
-	
-	for ( uint32 i = 0; i < count; ++i )
-	{
-		uint32 address = address_start + i;
-		// dotRendering
-		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
-		{
-			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
-			if (omitThisFrame)
-			{
-				// TODO
-				// set back to black
-				continue;
-			}
-		}
-		float ratio = ratio_start + ratio_step * i;
 
-		// rasterize this
-		assert( address >=0 && address < g_context->width * g_context->height );
-		SrFragment* thisBuffer = fBuffer->fBuffer + address;
-		{
-			// ztest
-			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
-		}
-	}
+
+
+	// old array of struct method
+	// for ( uint32 i = 0; i < count; ++i )
+	// {
+	// 	uint32 address = address_start + i;
+	// 	float ratio = ratio_start + ratio_step * i;
+	// 	SrFragment* thisBuffer = fBuffer->fBuffer + address;
+	// 	Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
+	// }
+
+	// new struct of array method
+	WriteLine(vertA, vertB, primitive, count, ratio_step, ratio_start, address_start);
 }
 
 void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float fend, float fclipStart, float fclipEnd, const void* vertA, const void* vertB, SrRendPrimitve* primitive, ERasterizeMode rMode /*= eRm_Solid */ )
@@ -276,30 +315,35 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 
 	uint32 address_start = line * g_context->width + clipStart;
 
-	for ( uint32 i = 0; i < clipCount; ++i )
-	{
-		uint32 address = address_start + i;
-		// dotRendering
-		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
-		{
-			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
-			if (omitThisFrame)
-			{
-				// TODO
-				// set back to black
-				continue;
-			}
-		}
+	// for ( uint32 i = 0; i < clipCount; ++i )
+	// {
+	// 	uint32 address = address_start + i;
+	// 	// dotRendering
+	// 	if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
+	// 	{
+	// 		bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
+	// 		if (omitThisFrame)
+	// 		{
+	// 			// TODO
+	// 			// set back to black
+	// 			continue;
+	// 		}
+	// 	}
+	//
+	// 	float ratio = ratio_start + ratio_step * i;
+	//
+	// 	// rasterize this
+	// 	assert( address >=0 && address < g_context->width * g_context->height );
+	// 	SrFragment* thisBuffer = fBuffer->fBuffer + address;
+	// 	{
+	// 		Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
+	//
+	// 		
+	// 	}
+	// }
 
-		float ratio = ratio_start + ratio_step * i;
-
-		// rasterize this
-		assert( address >=0 && address < g_context->width * g_context->height );
-		SrFragment* thisBuffer = fBuffer->fBuffer + address;
-		{
-			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
-		}
-	}
+	// new struct of array method
+	WriteLine(vertA, vertB, primitive, clipCount, ratio_step, ratio_start, address_start);
 }
 
 void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
@@ -418,8 +462,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			if ( tri.primitive->shader ) 
 			{
 #ifdef FIXED_FUNCTION_RASTERIZOR
-				FixedRasterize(  leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
-				FixedRasterize(  rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
+				FixedRasterize(  leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
+				FixedRasterize(  rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
 #else
 				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, NULL, false );
 				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, NULL, false );
@@ -483,8 +527,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			if ( tri.primitive->shader )
 			{
 #ifdef FIXED_FUNCTION_RASTERIZOR
-				FixedRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
-				FixedRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
+				FixedRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
+				FixedRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
 #else
 				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, NULL, false );
 				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, NULL, false );
@@ -602,8 +646,8 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 			if ( tri.primitive->shader )
 			{
 #ifdef FIXED_FUNCTION_RASTERIZOR
-				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
-				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
+				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
+				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
 #else
 				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, NULL, false );
 				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, NULL, false );
@@ -670,8 +714,8 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 			if ( tri.primitive->shader )
 			{
 #ifdef FIXED_FUNCTION_RASTERIZOR
-				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
-				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
+				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
+				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, NULL, tri.primitive->shader->m_maxChannel, false );
 #else
 				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, NULL, false );
 				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, NULL, false );
@@ -686,96 +730,46 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 
 void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, float ratio, SrFragment* thisBuffer, SrRendPrimitve* primitive, uint32 address )
 {
-	float4* posA = (float4*)vertA;
-	float4* posB = (float4*)vertB;
-
-	if ( !primitive->shaderConstants.alphaTest )
-	{
+	SrRendVertex* posA = (SrRendVertex*)vertA;
+	SrRendVertex* posB = (SrRendVertex*)vertB;
 
 
-		// lerp z ��Ԥ��
-		float z = posA->z * (1.f - ratio) + posB->z * ratio;
-		z = (z - 1.f);
+	// lerp z
+	float z = posA->pos.z * (1.f - ratio) + posB->pos.z * ratio;
+	z = (z - 1.f);
 
-		// cs
-		assert(address < g_context->width * g_context->height && address >=0 );
+	// cs
+	//assert(address < g_context->width * g_context->height && address >=0 );
 
 #ifdef RASTERIZER_SYNC
-		//LPCRITICAL_SECTION csptr = fBuffer->GetSyncMark(address);
-		//EnterCriticalSection( csptr );
+	//LPCRITICAL_SECTION csptr = fBuffer->GetSyncMark(address);
+	//EnterCriticalSection( csptr );
 
-		if ( z > fBuffer->zBuffer[address] )
-		{
-			//LeaveCriticalSection(csptr); 
-			return;
-		}
-		fBuffer->zBuffer[address] = z;
-		//LeaveCriticalSection(csptr); 
-#else
-		if ( z > fBuffer->zBuffer[address] )
-		{
-			return;
-		}
-		fBuffer->zBuffer[address] = z;
-#endif
-
-
-		// here, rasterize
-		assert( primitive && primitive->shader);
-
-#ifdef FIXED_FUNCTION_RASTERIZOR
-		FixedRasterize( thisBuffer, vertA, vertB, NULL, ratio, &(primitive->shaderConstants), true  );
-#else
-		primitive->shader->ProcessRasterize( thisBuffer, vertA, vertB, NULL, ratio, &(primitive->shaderConstants), true );
-#endif
-		
-		thisBuffer->primitive = primitive;
-	}
-	else
+	if ( z > fBuffer->zBuffer[address] )
 	{
-		SrFragment tmpBuffer = *thisBuffer;
+		//LeaveCriticalSection(csptr); 
+		return;
+	}
+	fBuffer->zBuffer[address] = z;
+	//LeaveCriticalSection(csptr); 
+#else
+	if ( z > fBuffer->zBuffer[address] )
+	{
+		return;
+	}
+	fBuffer->zBuffer[address] = z;
+#endif
+
+
+	// here, rasterize
+	assert( primitive && primitive->shader);
 
 #ifdef FIXED_FUNCTION_RASTERIZOR
-		FixedRasterize(  &tmpBuffer, vertA, vertB, NULL, ratio, &(primitive->shaderConstants), true );
+	FixedRasterize( thisBuffer, vertA, vertB, NULL, ratio, &(primitive->shaderConstants), primitive->shader->m_maxChannel, true  );
 #else
-		primitive->shader->ProcessRasterize( &tmpBuffer, vertA, vertB, NULL, ratio, &(primitive->shaderConstants), true );
+	primitive->shader->ProcessRasterize( thisBuffer, vertA, vertB, NULL, ratio, &(primitive->shaderConstants), true );
 #endif
-		
-		tmpBuffer.primitive = primitive;
-		
-// 		uint32 color = primitive->shaderConstants.Tex2D( float2(tmpBuffer.worldpos_tx.w, tmpBuffer.normal_ty.w), 0 );
-// 		if ( ( color & 0xFF000000 ) >> 24 < 1 )
-// 		{
-// 			return;
-// 		}
-
-		// lerp z
-		float z = posA->z * (1.f - ratio) + posB->z * ratio;
-		z = (z - 1.f);
-
-		// cs
-		assert(address < g_context->width * g_context->height && address >=0 );
-
-#ifdef RASTERIZER_SYNC
-		//LPCRITICAL_SECTION csptr = fBuffer->GetSyncMark(address);
-		//EnterCriticalSection( csptr );
-
-		if ( z > fBuffer->zBuffer[address] )
-		{
-			//LeaveCriticalSection(csptr); 
-			return;
-		}
-		fBuffer->zBuffer[address] = z;
-		//LeaveCriticalSection(csptr); 
-#else
-		if ( z > fBuffer->zBuffer[address] )
-		{
-			return;
-		}
-		fBuffer->zBuffer[address] = z;
-#endif
-		*thisBuffer = tmpBuffer;
-	}
-
+	
+	thisBuffer->primitive = primitive;
 }
 

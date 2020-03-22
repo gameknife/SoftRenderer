@@ -18,56 +18,127 @@ class SrRasTaskDispatcher;
 class SrSoftRenderer;
 
 #ifdef SR_USE_SIMD
-inline void FastRasterize( SrRendVertex* out, SrRendVertex* a, SrRendVertex* b, float ratio, float inv_ratio )
+inline void FastRasterize(SrRendVertexAVX* out, SrRendVertexAVX* a, SrRendVertexAVX* b, float ratio, float inv_ratio )
 {
-	__m256 channel0_1_a = _mm256_loadu_ps(&(a->pos.x));
-	__m256 channel0_1_b = _mm256_loadu_ps(&(b->pos.x));
-
-	__m256 channel2_3_a = _mm256_loadu_ps(&(a->channel2.x));
-	__m256 channel2_3_b = _mm256_loadu_ps(&(b->channel2.x));
-
-	channel0_1_a = _mm256_add_ps( _mm256_mul_ps( channel0_1_a, _mm256_set1_ps(inv_ratio) ), _mm256_mul_ps( channel0_1_b, _mm256_set1_ps(ratio) ));
-	channel2_3_a = _mm256_add_ps( _mm256_mul_ps( channel2_3_a, _mm256_set1_ps(inv_ratio) ), _mm256_mul_ps( channel2_3_b, _mm256_set1_ps(ratio) ));
-
-	_mm256_storeu_ps(&(out->pos.x), channel0_1_a);
-	_mm256_storeu_ps(&(out->channel2.x), channel2_3_a);
+	out->channel_0_1 = _mm256_add_ps( _mm256_mul_ps( a->channel_0_1, _mm256_set1_ps(inv_ratio) ), _mm256_mul_ps( b->channel_0_1, _mm256_set1_ps(ratio) ));
+	out->channel_2_3 = _mm256_add_ps( _mm256_mul_ps( a->channel_2_3, _mm256_set1_ps(inv_ratio) ), _mm256_mul_ps( b->channel_2_3, _mm256_set1_ps(ratio) ));
 }
 
-inline void FastFinalRasterize( SrRendVertex* out, float w )
+inline void FastFinalRasterize(SrRendVertexAVX* out, float w )
 {
-	__m256 channel0_1_a = _mm256_loadu_ps((float*)(&(out->pos)));
-	__m256 channel0_1_b = _mm256_loadu_ps((float*)(&(out->channel2)));
-
-	channel0_1_a = _mm256_div_ps(channel0_1_a, _mm256_set_ps(1,1,1,1,w,w,w,w));
-	channel0_1_b = _mm256_div_ps(channel0_1_b, _mm256_set1_ps(w));
-
-	_mm256_storeu_ps((float*)(&(out->pos)), channel0_1_a);
-	_mm256_storeu_ps((float*)(&(out->channel2)), channel0_1_b);
+	out->channel_0_1 = _mm256_div_ps(out->channel_0_1, _mm256_set_ps(1.f,1.f,1.f,1.f,w,w,w,w));
+	out->channel_2_3 = _mm256_div_ps(out->channel_2_3, _mm256_set1_ps(w));
 }
+
+inline __m128 FastLerp128(__m128 &a, __m128 &b, float ratio)
+{
+	__m128 ratio128 = _mm_set1_ps(ratio);
+	return _mm_fmadd_ps(ratio128, b, _mm_fnmadd_ps(ratio128, a, a));
+}
+
+inline __m128 FastLerp128W(__m128& a, __m128& b, float ratio, float w)
+{
+	__m128 ratio128 = _mm_set1_ps(ratio);
+	__m128 w128 = _mm_set1_ps(1.0f / w);
+	return _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b, _mm_fnmadd_ps(ratio128, a, a)));
+}
+
+inline __m256 FastLerp256(__m256& a, __m256& b, float ratio)
+{
+	__m256 ratio256 = _mm256_set1_ps(ratio);
+	return _mm256_fmadd_ps(ratio256, b, _mm256_fnmadd_ps(ratio256, a, a));
+}
+
+inline __m256 FastLerp256W(__m256& a, __m256& b, float ratio, float w)
+{
+	__m256 ratio256 = _mm256_set1_ps(ratio);
+	__m256 w256 = _mm256_set1_ps(1.0f / w);	
+	return _mm256_mul_ps(w256, _mm256_fmadd_ps(ratio256, b, _mm256_fnmadd_ps(ratio256, a, a)));
+}
+
+inline void FastRasterizeSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRendVertexSSE* b, float ratio, int channelMax)
+{
+	//__m128 inv_ratio128 = _mm_set1_ps(inv_ratio);
+	__m128 ratio128 = _mm_set1_ps(ratio);
+	//__m256 ratio256 = _mm256_set1_ps(ratio);
+	//__m128 nratio128 = _mm_set1_ps(-ratio);
+
+	// a * (1-t) + b * t
+	// out->c0 = _mm_add_ps(_mm_mul_ps(a->c0, inv_ratio128), _mm_mul_ps(b->c0, ratio128));
+	// if( channelMax > 1) out->c1 = _mm_add_ps(_mm_mul_ps(a->c1, inv_ratio128), _mm_mul_ps(b->c1, ratio128));
+	// if (channelMax > 2) out->c2 = _mm_add_ps(_mm_mul_ps(a->c2, inv_ratio128), _mm_mul_ps(b->c2, ratio128));
+	// if (channelMax > 3) out->c3 = _mm_add_ps(_mm_mul_ps(a->c3, inv_ratio128), _mm_mul_ps(b->c3, ratio128));
+	//
+	//
+
+	// a + (b-a) * t
+	// out->c0 = _mm_add_ps(a->c0, _mm_mul_ps(_mm_sub_ps(b->c0, a->c0), ratio128));
+	// if (channelMax > 1) out->c1 = _mm_add_ps(a->c1, _mm_mul_ps(_mm_sub_ps(b->c1, a->c1), ratio128));
+	// if (channelMax > 2) out->c2 = _mm_add_ps(a->c2, _mm_mul_ps(_mm_sub_ps(b->c2, a->c2), ratio128));
+	// if (channelMax > 3) out->c3 = _mm_add_ps(a->c3, _mm_mul_ps(_mm_sub_ps(b->c3, a->c3), ratio128));
+
+	// https://devblogs.nvidia.com/lerp-faster-cuda/
+	// fma(t, b, fnma(t, a, a));
+	out->c0 = _mm_fmadd_ps(ratio128, b->c0, _mm_fnmadd_ps(ratio128, a->c0, a->c0));
+	if (channelMax > 1) out->c1 = _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1));
+	if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
+	if (channelMax > 3) out->c3 = _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3));
+
+	//out->c1_2 = _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2));
+	//if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
+}
+
+
+inline void FastRasterizeFinalSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRendVertexSSE* b, float ratio, int channelMax)
+{
+	//__m128 inv_ratio128 = _mm_set1_ps(inv_ratio);
+	__m128 ratio128 = _mm_set1_ps(ratio);
+	//__m256 ratio256 = _mm256_set1_ps(ratio);
+	//__m128 nratio128 = _mm_set1_ps(-ratio);
+
+	// a * (1-t) + b * t
+	// out->c0 = _mm_add_ps(_mm_mul_ps(a->c0, inv_ratio128), _mm_mul_ps(b->c0, ratio128));
+	// if( channelMax > 1) out->c1 = _mm_add_ps(_mm_mul_ps(a->c1, inv_ratio128), _mm_mul_ps(b->c1, ratio128));
+	// if (channelMax > 2) out->c2 = _mm_add_ps(_mm_mul_ps(a->c2, inv_ratio128), _mm_mul_ps(b->c2, ratio128));
+	// if (channelMax > 3) out->c3 = _mm_add_ps(_mm_mul_ps(a->c3, inv_ratio128), _mm_mul_ps(b->c3, ratio128));
+	//
+	//
+
+	// a + (b-a) * t
+	// out->c0 = _mm_add_ps(a->c0, _mm_mul_ps(_mm_sub_ps(b->c0, a->c0), ratio128));
+	// if (channelMax > 1) out->c1 = _mm_add_ps(a->c1, _mm_mul_ps(_mm_sub_ps(b->c1, a->c1), ratio128));
+	// if (channelMax > 2) out->c2 = _mm_add_ps(a->c2, _mm_mul_ps(_mm_sub_ps(b->c2, a->c2), ratio128));
+	// if (channelMax > 3) out->c3 = _mm_add_ps(a->c3, _mm_mul_ps(_mm_sub_ps(b->c3, a->c3), ratio128));
+
+	// https://devblogs.nvidia.com/lerp-faster-cuda/
+	// fma(t, b, fnma(t, a, a));
+	// // b*t - a*t + a
+	out->c0 = _mm_fmadd_ps(ratio128, b->c0, _mm_fnmadd_ps(ratio128, a->c0, a->c0));
+
+	__m128 w128 = _mm_set1_ps(1.0f / out->pos.w);
+	
+	if (channelMax > 1) out->c1 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1)));
+	if (channelMax > 2) out->c2 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2)));
+	if (channelMax > 3) out->c3 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3)));
+	//
+	// __m256 w256 = _mm256_set1_ps(1.0f / out->pos.w);
+	// out->c1_2 = _mm256_mul_ps(w256, _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2)));
+}
+
 #endif
 
-inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false )
+inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, uint8 channel, bool final = false )
 {
-	const SrRendVertex* verA = static_cast<const SrRendVertex*>(rInRef0);
-	const SrRendVertex* verB = static_cast<const SrRendVertex*>(rInRef1);
-	SrRendVertex* verO = static_cast<SrRendVertex*>(rOut);
-
-	// 线性插值project space pos
-	float inv_ratio = 1.f - ratio;
-	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
-
-	// 已经除w
-	// 直接插值，其他channel
-	verO->channel1 = SrFastLerp( verA->channel1, verB->channel1, ratio, inv_ratio );
-	verO->channel2 = SrFastLerp( verA->channel2, verB->channel2, ratio, inv_ratio );
-	verO->channel3 = SrFastLerp( verA->channel3, verB->channel3, ratio, inv_ratio );
+	
 
 	// 对于scanline扫描的，将透视插值坐标，插值回正常值
 	if (final)
 	{
-		verO->channel1 /= verO->pos.w;
-		verO->channel2 /= verO->pos.w;
-		verO->channel3 /= verO->pos.w;
+		FastRasterizeFinalSSE((SrRendVertexSSE*)rOut, (SrRendVertexSSE*)rInRef0, (SrRendVertexSSE*)rInRef1, ratio, channel);
+	}
+	else
+	{
+		FastRasterizeSSE((SrRendVertexSSE*)rOut, (SrRendVertexSSE*)rInRef0, (SrRendVertexSSE*)rInRef1, ratio, channel);
 	}
 };
 
@@ -125,7 +196,10 @@ public:
 	static void RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, float zFar );
 	// 光栅化处理后的三角形入口
 	static void RasterizeTriangle( SrRastTriangle& tri, bool subtri = false );
-	
+	static void WriteLine(const void* vertA, const void* vertB, SrRendPrimitve* primitive, uint32 count,
+	                      float ratio_step,
+	                      float ratio_start, uint32 address_start);
+
 	//////////////////////////////////////////////////////////////////////////
 	// 内部光栅化函数
 

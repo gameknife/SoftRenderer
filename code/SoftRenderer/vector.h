@@ -542,14 +542,14 @@ public:
 	static float4 make( const float px , const float py , const float pz , const float pw )
 	{
 		float4 tmp;
-// #ifdef SR_USE_SIMD
-// 		m128 = _mm_set_ps(pw, pz, py, px);
-// #else
+ #ifdef SR_USE_SIMD
+ 		tmp.m128 = _mm_set_ps(pw, pz, py, px);
+ #else
 		tmp.x = px;
 		tmp.y = py;
 		tmp.z = pz;
 		tmp.w = pw;
-//#endif
+#endif
 		return tmp;
 	}
 

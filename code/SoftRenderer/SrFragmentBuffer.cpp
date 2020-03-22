@@ -8,7 +8,7 @@ SrFragmentBuffer::SrFragmentBuffer( int width, int height ):m_width(width), m_he
 {
 	uint32 size = width * height;
 	//fragBuffer = new SrFragmentBuffer[size];
-	fBuffer = (SrFragment*)(_mm_malloc_custom( sizeof(SrFragment) * size, 16 ));
+	fBuffer = (SrFragment*)(_mm_malloc_custom( sizeof(SrFragment) * size, 32 ));
 
 	memset(fBuffer, 0, size * sizeof(SrFragment));
 
