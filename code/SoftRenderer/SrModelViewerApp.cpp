@@ -22,9 +22,10 @@ void SrModelViewerApp::OnInit()
 {
 	g_context->OpenFeature(eRFeature_MThreadRendering);
 	//g_context->OpenFeature(eRFeature_JitAA);
-	g_context->OpenFeature(eRFeature_LinearFiltering);
+	//g_context->OpenFeature(eRFeature_LinearFiltering);
 	g_context->OpenFeature(eRFeature_JitAA);
-
+	//g_context->OpenFeature(eRFeature_DefaultTex);
+	
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 	
@@ -42,7 +43,7 @@ void SrModelViewerApp::OnInit()
 	lt->worldPos = float3::make( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
 
-	m_shade_mode = 2;
+	m_shade_mode = 0;
 	UpdateShader();
 }
 

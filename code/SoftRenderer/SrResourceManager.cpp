@@ -91,7 +91,10 @@ const SrTexture* SrResourceManager::LoadTexture( const char* filename, bool bump
 	}
 	else
 	{
-		ret = new SrBitmap(filename);
+		if( !g_context->IsFeatureEnable(eRFeature_DefaultTex) )
+		{
+			ret = new SrBitmap(filename);
+		}
 		if ( !ret || !(ret->getBuffer()) )
 		{
 			delete ret;

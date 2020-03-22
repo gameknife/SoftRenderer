@@ -31,7 +31,7 @@ int main()
 	SoftRenderApp app;
 
 	app.RegisterTask(new SrModelViewerApp);
-	app.Init();
+	app.Init(1280,720);
 
 	app.SendEvent("set_model", "media\\sponza.obj");
 	

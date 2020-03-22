@@ -20,7 +20,7 @@ class SoftRenderApp
 public:
 	SoftRenderApp(void);
 	virtual ~SoftRenderApp(void);
-	bool Init();
+	bool Init(int width, int height);
 	void Destroy();
 	void Run();
 

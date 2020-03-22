@@ -45,9 +45,12 @@ NAN_METHOD(getcounter) {
 SoftRenderApp* g_app;
 
 NAN_METHOD(initOfflineSystem) {
+    unsigned int width = info[0]->Uint32Value();
+    unsigned int height = info[1]->Uint32Value();
+
 	g_app = new SoftRenderApp();
 	g_app->RegisterTask(new SrModelViewerApp);
-	g_app->Init();
+	g_app->Init(width, height);
 }
 
 NAN_METHOD(renderToBuffer) {

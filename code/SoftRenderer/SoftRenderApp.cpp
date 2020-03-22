@@ -25,7 +25,7 @@ SoftRenderApp::~SoftRenderApp(void)
 {
 }
 
-bool SoftRenderApp::Init()
+bool SoftRenderApp::Init(int width, int height)
 {
 	m_curr_task = 0;
 
@@ -35,8 +35,8 @@ bool SoftRenderApp::Init()
 	GtLogInfo("///////////////////////////////////\n");
 	GtLogInfo("SoftRenderer Init...\n\n");
 
-	const int createWidth = 1280;
-	const int createHeight = 720;
+	const int createWidth = width;
+	const int createHeight = height;
 
 	// 初始化资源管理器
 	GtLogInfo("Creating ResourceManger...");

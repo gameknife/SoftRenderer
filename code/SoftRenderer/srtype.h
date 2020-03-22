@@ -69,7 +69,8 @@ enum ERenderFeature
 	eRFeature_MThreadRendering = 1 << 1,			///< 多线程渲染
 	eRFeature_LinearFiltering = 1 << 2,			///< 双线性采样
 	eRFeature_DotCoverageRendering = 1 << 3,		///< Dot空洞渲染
-	eRFeature_InterlaceRendering = 1 << 4,		///< Dot空洞渲染
+	eRFeature_InterlaceRendering = 1 << 4,			///< Dot空洞渲染
+	eRFeature_DefaultTex = 1 << 5,					///< 使用最小纹理
 };
 
 /**

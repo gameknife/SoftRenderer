@@ -394,15 +394,22 @@ float2 g_reflect[16] =
 	float2::make( sinf( 15.25f * SR_PI / 8.f),	cosf( 15.25f * SR_PI / 8.f) ),
 };
 
-float2 g_kernel[8] = {
-	float2::make(-2.f,0),
-	float2::make(2.f,0),
-	float2::make(0,2.f),
-	float2::make(0,-2.f),
-	float2::make(-0.7071,0.7071),
-	float2::make(0.7071,-0.7071),
-	float2::make(0.7071,0.7071),
-	float2::make(-0.7071,-0.7071),
+// float2 g_kernel[8] = {
+// 	float2::make(-2.f,0),
+// 	float2::make(2.f,0),
+// 	float2::make(0,2.f),
+// 	float2::make(0,-2.f),
+// 	float2::make(-0.7071,0.7071),
+// 	float2::make(0.7071,-0.7071),
+// 	float2::make(0.7071,0.7071),
+// 	float2::make(-0.7071,-0.7071),
+// };
+
+float2 g_kernel[4] = {
+	float2::make(-1.4,0.7071),
+	float2::make(0.7071,-1.4),
+	float2::make(1.4,0.7071),
+	float2::make(-0.7071,-1.4),
 };
 
 void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const
@@ -410,6 +417,9 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	SrPhongShading_Vert2Frag* in = (SrPhongShading_Vert2Frag*)pIn;
 	uint32* out = (uint32*)pOut;
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
+
+
+	float3 worldpos = in->worldpos_tx.xyz;
 	float2 tc0 = float2::make(in->worldpos_tx.w, in->normal_ty.w);
 	
 	uint32 col = context->Tex2D( tc0, 0 );
@@ -435,18 +445,20 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	normalDir = tangent2world * normalTangent;
 	normalDir.normalize();
 
-	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - in->worldpos_tx.xyz;
+	float3 viewWS = context->matrixs[eMd_ViewInverse].GetTranslate() - worldpos;
 	viewWS.normalize();
 
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
 	float4 specularAcc = float4::make(0.f);
 	
-	CalcLights(context, in->worldpos_tx.xyz, normalDir, viewWS, diffuseAcc, specularAcc);
+	CalcLights(context, worldpos, normalDir, viewWS, diffuseAcc, specularAcc);
 
 	// calc ssao here
 	float ao = 0;
 
 	bool jit = (gEnv->context->IsFeatureEnable(eRFeature_JitAA));
+
+	float multiple = 2.f * (jit ? 2.f : 1.f);
 
 	if ( !jit ||  ( ( (address - ((address /  gEnv->context->width) % 2)) % 2 != gEnv->renderer->getFrameCount() % 2) )  )
 	{
@@ -457,13 +469,53 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	
 		float2 hTc = float2::make(in->pos.x / (float) gEnv->context->width, in->pos.y / (float) gEnv->context->height);
 
-		for ( int i=0; i < 8; ++i)
+		// 优化下，用sse一次做完
+		const int jitcount = 4;
+		const float jitmultiple = 0.25f;
+
+#ifdef SR_USE_SIMD
+		float4 simdCore;
+		float4 simdLength;
+		__m128 zero = _mm_set1_ps(0.f);
+		__m128 one = _mm_set1_ps(1.f);
+		__m128 length_tweak = _mm_set1_ps(0.3f);
+		__m128 final_tweak = _mm_set1_ps(multiple);
+		__m128 dot_tweak = _mm_set1_ps(0.25f);
+		
+		for (int i = 0; i < jitcount; ++i)
+		{
+			float2 tc = g_kernel[i];
+			tc.reflect(tc, g_reflect[address]);
+			tc = (tc / (float)gEnv->context->width) * 180 * (1 - in->pos.z);
+			float3 diff = gEnv->context->fBuffer->GetWorldPos(hTc + tc);
+			diff -= worldpos;
+			float d = diff.length();
+			// if (d < SR_EQUAL_PRECISION)
+			// {
+			// 	//ao += 1;
+			// 	continue;
+			// }
+			diff = diff / d;
+			simdCore.m[i] = float3::dot(normalDir, diff);
+			simdLength.m[i] = d;
+			//d *= 0.3f;
+			//ao += fmax(0.0f, ) * (1.0f / (1.0f + d)) * multiple;
+		}
+		simdLength.m128 = _mm_fmadd_ps(simdLength.m128, length_tweak, one);
+		simdLength.m128 = _mm_div_ps(one, simdLength.m128);
+		simdCore.m128 = _mm_mul_ps(_mm_mul_ps(_mm_max_ps(simdCore.m128, zero), simdLength.m128), final_tweak);
+
+		simdCore.m128 = _mm_dot_ps(simdCore.m128, dot_tweak);
+
+		ao = *(reinterpret_cast<float*>(&simdCore.m128));
+#else
+		for ( int i=0; i < jitcount; ++i)
 		{
 			float2 tc = g_kernel[i];
 			tc.reflect( tc, g_reflect[address]);
 			tc = (tc / (float)gEnv->context->width) * 180 * (1- in->pos.z);
-			float3 worldposOther = gEnv->context->fBuffer->GetWorldPos( hTc + tc );
-			float3 diff = worldposOther - in->worldpos_tx.xyz; 
+			float3 diff = gEnv->context->fBuffer->GetWorldPos( hTc + tc );
+			diff -= worldpos;
 			float d = diff.length(); 
 			if (d < SR_EQUAL_PRECISION)
 			{
@@ -471,11 +523,14 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 				continue;
 			}
 			diff = diff / d;
-			d*= 0.3f;
-			ao += fmax(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0f / (1.0f + d) ) * 2.f * (jit ? 2.f : 1.f);
+			d *= 0.3f;
+			ao += fmax(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0f / (1.0f + d) ) * multiple;
 		}
 
-		ao *= 0.125f;
+		ao *= jitmultiple;
+#endif
+
+		
 
 		ao = Clamp(ao, 0.f, 1.f);
 

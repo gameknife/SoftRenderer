@@ -27,7 +27,7 @@ public:
 	// }
 
 	inline float3 GetNormal(const float2& texcoord) const;
-	float3 GetWorldPos(const float2& texcoord) const
+	inline float3 GetWorldPos(const float2& texcoord) const
 	{
 		float u = texcoord.x - floor(texcoord.x);
 		float v = texcoord.y - floor(texcoord.y);
