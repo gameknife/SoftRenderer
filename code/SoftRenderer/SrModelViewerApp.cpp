@@ -43,7 +43,7 @@ void SrModelViewerApp::OnInit()
 	lt->worldPos = float3::make( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
 
-	m_shade_mode = 2;
+	m_shade_mode = 0;
 	UpdateShader();
 }
 
