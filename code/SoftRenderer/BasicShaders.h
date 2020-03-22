@@ -20,7 +20,7 @@
 class SrFlatShader : public SrSwShader
 {
 public:
-	SrFlatShader():SrSwShader("flat") {}
+	SrFlatShader():SrSwShader("flat") { m_maxChannel = 1; }
 	~SrFlatShader() {}
 
 	virtual void SRFASTCALL ProcessPatch(void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;
@@ -32,7 +32,7 @@ public:
 class SrGourandShader : public SrSwShader
 {
 public:
-	SrGourandShader():SrSwShader("gourand") {}
+	SrGourandShader():SrSwShader("gourand") { m_maxChannel = 1; }
 	~SrGourandShader() {}
 
 	virtual void SRFASTCALL ProcessVertex( void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;
@@ -43,7 +43,7 @@ public:
 class SrPhongShader : public SrSwShader
 {
 public:
-	SrPhongShader():SrSwShader("default") {}
+	SrPhongShader() :SrSwShader("default") { m_maxChannel = 3; }
 	~SrPhongShader() {}
 
 	virtual void SRFASTCALL ProcessVertex( void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;
@@ -55,7 +55,7 @@ public:
 class SrPhongWithNormalShader : public SrSwShader
 {
 public:
-	SrPhongWithNormalShader():SrSwShader("default_normal") {}
+	SrPhongWithNormalShader():SrSwShader("default_normal") { m_maxChannel = 4; }
 	~SrPhongWithNormalShader() {}
 
 	virtual void SRFASTCALL ProcessPatch(void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;

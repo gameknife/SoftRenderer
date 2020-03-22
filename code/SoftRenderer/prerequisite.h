@@ -52,7 +52,7 @@
 // 光栅化同步_修正多线程光栅化可能造成的Z冲突
 #define RASTERIZER_SYNC
 // 固定函数光栅化调用
-//#define FIXED_FUNCTION_RASTERIZOR
+#define FIXED_FUNCTION_RASTERIZOR
 // SIMD加速
 #define SR_USE_SIMD
 
@@ -259,9 +259,9 @@ SR_ALIGN struct SrFragment
 		SR_ALIGN float data[FBUFFER_CHANNEL_SIZE * 4];
 		struct  
 		{
-			float4 hpos;
 			float4 worldpos_tx;
 			float4 normal_ty;
+			float4 hpos;
 			float4 preserve;
 		};
 #ifdef SR_USE_SIMD

@@ -60,7 +60,7 @@ inline void FastRasterizeSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRendVer
 {
 	//__m128 inv_ratio128 = _mm_set1_ps(inv_ratio);
 	__m128 ratio128 = _mm_set1_ps(ratio);
-	__m256 ratio256 = _mm256_set1_ps(ratio);
+	//__m256 ratio256 = _mm256_set1_ps(ratio);
 	//__m128 nratio128 = _mm_set1_ps(-ratio);
 
 	// a * (1-t) + b * t
@@ -80,11 +80,11 @@ inline void FastRasterizeSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRendVer
 	// https://devblogs.nvidia.com/lerp-faster-cuda/
 	// fma(t, b, fnma(t, a, a));
 	out->c0 = _mm_fmadd_ps(ratio128, b->c0, _mm_fnmadd_ps(ratio128, a->c0, a->c0));
-	// if (channelMax > 1) out->c1 = _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1));
-	// if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
-	// if (channelMax > 3) out->c3 = _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3));
+	if (channelMax > 1) out->c1 = _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1));
+	if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
+	if (channelMax > 3) out->c3 = _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3));
 
-	out->c1_2 = _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2));
+	//out->c1_2 = _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2));
 	//if (channelMax > 2) out->c2 = _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2));
 }
 
@@ -93,7 +93,7 @@ inline void FastRasterizeFinalSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRe
 {
 	//__m128 inv_ratio128 = _mm_set1_ps(inv_ratio);
 	__m128 ratio128 = _mm_set1_ps(ratio);
-	__m256 ratio256 = _mm256_set1_ps(ratio);
+	//__m256 ratio256 = _mm256_set1_ps(ratio);
 	//__m128 nratio128 = _mm_set1_ps(-ratio);
 
 	// a * (1-t) + b * t
@@ -115,47 +115,30 @@ inline void FastRasterizeFinalSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRe
 	// // b*t - a*t + a
 	out->c0 = _mm_fmadd_ps(ratio128, b->c0, _mm_fnmadd_ps(ratio128, a->c0, a->c0));
 
-	//__m128 w128 = _mm_set1_ps(1.0f / out->pos.w);
+	__m128 w128 = _mm_set1_ps(1.0f / out->pos.w);
 	
-	// if (channelMax > 1) out->c1 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1)));
-	// if (channelMax > 2) out->c2 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2)));
-	// if (channelMax > 3) out->c3 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3)));
+	if (channelMax > 1) out->c1 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c1, _mm_fnmadd_ps(ratio128, a->c1, a->c1)));
+	if (channelMax > 2) out->c2 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c2, _mm_fnmadd_ps(ratio128, a->c2, a->c2)));
+	if (channelMax > 3) out->c3 = _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b->c3, _mm_fnmadd_ps(ratio128, a->c3, a->c3)));
 	//
-	__m256 w256 = _mm256_set1_ps(1.0f / out->pos.w);
-	out->c1_2 = _mm256_mul_ps(w256, _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2)));
+	// __m256 w256 = _mm256_set1_ps(1.0f / out->pos.w);
+	// out->c1_2 = _mm256_mul_ps(w256, _mm256_fmadd_ps(ratio256, b->c1_2, _mm256_fnmadd_ps(ratio256, a->c1_2, a->c1_2)));
 }
 
-inline void FastFinalRasterizeSSE(SrRendVertexSSE* out, float w, int channelMax)
-{
-	__m128 w128 = _mm_set1_ps(1.0f / w);
-	if (channelMax > 1) out->c1 = _mm_mul_ps(out->c1, w128);
-	if (channelMax > 2) out->c2 = _mm_mul_ps(out->c2, w128);
-	if (channelMax > 3) out->c3 = _mm_mul_ps(out->c3, w128);
-}
 #endif
 
-inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false )
+inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, uint8 channel, bool final = false )
 {
-	const SrRendVertex* verA = static_cast<const SrRendVertex*>(rInRef0);
-	const SrRendVertex* verB = static_cast<const SrRendVertex*>(rInRef1);
-	SrRendVertex* verO = static_cast<SrRendVertex*>(rOut);
-
-	// 线性插值project space pos
-	float inv_ratio = 1.f - ratio;
-	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
-
-	// 已经除w
-	// 直接插值，其他channel
-	verO->channel1 = SrFastLerp( verA->channel1, verB->channel1, ratio, inv_ratio );
-	verO->channel2 = SrFastLerp( verA->channel2, verB->channel2, ratio, inv_ratio );
-	verO->channel3 = SrFastLerp( verA->channel3, verB->channel3, ratio, inv_ratio );
+	
 
 	// 对于scanline扫描的，将透视插值坐标，插值回正常值
 	if (final)
 	{
-		verO->channel1 /= verO->pos.w;
-		verO->channel2 /= verO->pos.w;
-		verO->channel3 /= verO->pos.w;
+		FastRasterizeFinalSSE((SrRendVertexSSE*)rOut, (SrRendVertexSSE*)rInRef0, (SrRendVertexSSE*)rInRef1, ratio, channel);
+	}
+	else
+	{
+		FastRasterizeSSE((SrRendVertexSSE*)rOut, (SrRendVertexSSE*)rInRef0, (SrRendVertexSSE*)rInRef1, ratio, channel);
 	}
 };
 

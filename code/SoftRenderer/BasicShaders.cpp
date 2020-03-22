@@ -335,31 +335,33 @@ void SrPhongWithNormalShader::ProcessVertex( void* vOut, void* vOut1, void* vOut
 
 void SrPhongWithNormalShader::ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final ) const
 {
+
+	//
+	// float inv_ratio = 1.f - ratio;
+
+#ifdef SR_USE_SIMD
+	if (final)
+	{
+		FastRasterizeFinalSSE((SrRendVertexSSE*)rOut, (SrRendVertexSSE*)rInRef0, (SrRendVertexSSE*)rInRef1, ratio, 4);
+	}
+	else
+	{
+		FastRasterizeSSE((SrRendVertexSSE*)rOut, (SrRendVertexSSE*)rInRef0, (SrRendVertexSSE*)rInRef1, ratio, 4);
+	}
+#else
 	const SrPhongShading_Vert2Frag* verA = static_cast<const SrPhongShading_Vert2Frag*>(rInRef0);
 	const SrPhongShading_Vert2Frag* verB = static_cast<const SrPhongShading_Vert2Frag*>(rInRef1);
 	SrPhongShading_Vert2Frag* verO = static_cast<SrPhongShading_Vert2Frag*>(rOut);
+	// 
+	verO->pos = SrFastLerp(verA->pos, verB->pos, ratio, inv_ratio);
 
-	float inv_ratio = 1.f - ratio;
-
-#ifdef SR_USE_SIMD
-	FastRasterize( (SrRendVertexAVX*)rOut, (SrRendVertexAVX*)rInRef0, (SrRendVertexAVX*)rInRef1, ratio, inv_ratio);
-
-	if (final)
-	{
-		FastFinalRasterize( (SrRendVertexAVX*)rOut, ((SrRendVertex*)rOut)->pos.w);
-	}
-#else
-	verO->pos = SrFastLerp( verA->pos, verB->pos, ratio, inv_ratio );
-
-	verO->normal_ty = SrFastLerp( verA->normal_ty, verB->normal_ty, ratio, inv_ratio );
-	verO->worldpos_tx = SrFastLerp( verA->worldpos_tx, verB->worldpos_tx, ratio, inv_ratio );
-	verO->tangent = SrFastLerp( verA->tangent, verB->tangent, ratio, inv_ratio );
+	verO->normal_ty = SrFastLerp(verA->normal_ty, verB->normal_ty, ratio, inv_ratio);
+	verO->worldpos_tx = SrFastLerp(verA->worldpos_tx, verB->worldpos_tx, ratio, inv_ratio);
 
 	if (final)
 	{
 		verO->normal_ty /= verO->pos.w;
 		verO->worldpos_tx /= verO->pos.w;
-		verO->tangent /= verO->pos.w;
 	}
 #endif
 

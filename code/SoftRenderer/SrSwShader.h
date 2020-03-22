@@ -42,6 +42,7 @@ public:
 
 public:
 	class SrShader* m_bindShader;
+	uint8 m_maxChannel;
 };
 
 /**
