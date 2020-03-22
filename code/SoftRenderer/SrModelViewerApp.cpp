@@ -22,9 +22,10 @@ void SrModelViewerApp::OnInit()
 {
 	g_context->OpenFeature(eRFeature_MThreadRendering);
 	//g_context->OpenFeature(eRFeature_JitAA);
-	g_context->OpenFeature(eRFeature_LinearFiltering);
+	//g_context->OpenFeature(eRFeature_LinearFiltering);
 	g_context->OpenFeature(eRFeature_JitAA);
-
+	//g_context->OpenFeature(eRFeature_DefaultTex);
+	
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 	
