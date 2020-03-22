@@ -30,6 +30,32 @@ inline void FastFinalRasterize(SrRendVertexAVX* out, float w )
 	out->channel_2_3 = _mm256_div_ps(out->channel_2_3, _mm256_set1_ps(w));
 }
 
+inline __m128 FastLerp128(__m128 &a, __m128 &b, float ratio)
+{
+	__m128 ratio128 = _mm_set1_ps(ratio);
+	return _mm_fmadd_ps(ratio128, b, _mm_fnmadd_ps(ratio128, a, a));
+}
+
+inline __m128 FastLerp128W(__m128& a, __m128& b, float ratio, float w)
+{
+	__m128 ratio128 = _mm_set1_ps(ratio);
+	__m128 w128 = _mm_set1_ps(1.0f / w);
+	return _mm_mul_ps(w128, _mm_fmadd_ps(ratio128, b, _mm_fnmadd_ps(ratio128, a, a)));
+}
+
+inline __m256 FastLerp256(__m256& a, __m256& b, float ratio)
+{
+	__m256 ratio256 = _mm256_set1_ps(ratio);
+	return _mm256_fmadd_ps(ratio256, b, _mm256_fnmadd_ps(ratio256, a, a));
+}
+
+inline __m256 FastLerp256W(__m256& a, __m256& b, float ratio, float w)
+{
+	__m256 ratio256 = _mm256_set1_ps(ratio);
+	__m256 w256 = _mm256_set1_ps(1.0f / w);	
+	return _mm256_mul_ps(w256, _mm256_fmadd_ps(ratio256, b, _mm256_fnmadd_ps(ratio256, a, a)));
+}
+
 inline void FastRasterizeSSE(SrRendVertexSSE* out, SrRendVertexSSE* a, SrRendVertexSSE* b, float ratio, int channelMax)
 {
 	//__m128 inv_ratio128 = _mm_set1_ps(inv_ratio);
@@ -187,7 +213,10 @@ public:
 	static void RasterizeTriangle_Clip( SrRastTriangle& tri, float zNear, float zFar );
 	// 光栅化处理后的三角形入口
 	static void RasterizeTriangle( SrRastTriangle& tri, bool subtri = false );
-	
+	static void WriteLine(const void* vertA, const void* vertB, SrRendPrimitve* primitive, uint32 count,
+	                      float ratio_step,
+	                      float ratio_start, uint32 address_start);
+
 	//////////////////////////////////////////////////////////////////////////
 	// 内部光栅化函数
 

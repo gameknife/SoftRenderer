@@ -267,16 +267,16 @@ SR_ALIGN struct SrFragment
 #ifdef SR_USE_SIMD
 		struct
 		{
-			__m128 c0;
 			__m128 c1;
 			__m128 c2;
+			__m128 c0;
 			__m128 c3;
 		};
-		// struct
-		// {
-		// 	__m256 c01;
-		// 	__m256 c02;
-		// };
+		struct
+		{
+			__m256 c12;
+			__m256 c03;
+		};
 #endif
 	};	
 	///< 4 x float4 的数据范围
