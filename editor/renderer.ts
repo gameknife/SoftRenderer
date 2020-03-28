@@ -1,4 +1,4 @@
-import * as addon from '../node_natives/build/Release/addon';
+import * as addon from '../node_natives';
 import * as path from 'path';
 
 // This file is required by the index.html file and will
