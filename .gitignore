@@ -38,6 +38,7 @@ bin32/log.txt
 
 log.txt
 
+dist/
 build/
 node_modules/
 bin32/

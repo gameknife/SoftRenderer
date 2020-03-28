@@ -1,17 +1,19 @@
-let addon = require('../node_natives/build/Release/addon.node');
-let path = require('path');
+import * as addon from '../node_natives/build/Release/addon';
+import * as path from 'path';
 
-import EditorResourceManager from './respanel';
-import Logger from './logger';
-
-window.onload = function(){
-
+// This file is required by the index.html file and will
+// be executed in the renderer process for that window.
+// All of the Node.js APIs are available in this process.
+window.onload = () => {
+  
+    
   // 初始化canvas
-  let canvas = bid('canvas');
+  let canvas = bid('canvas') as HTMLCanvasElement;
   canvas.width = 854;
   canvas.height = 480;
   let context = canvas.getContext('2d');
 
+console.log(`starting...`);
   // 设置资源路径
   let rootPath = path.dirname(__dirname);
   addon.setRootPath(rootPath);
@@ -23,7 +25,7 @@ window.onload = function(){
   bid('canvas-title').textContent = `CPU | ${canvas.width} x ${canvas.height} AA | 100%`;
 
 
-  Logger.init(bid('console-log-container'));
+  //Logger.init(bid('console-log-container'));
 
   //addon.setLogCallback( function(msg) {
     //Logger.info(msg);
@@ -55,13 +57,13 @@ window.onload = function(){
     ev.preventDefault();
   }
 
-  let resPanel = new EditorResourceManager();
+//   let resPanel = new EditorResourceManager();
 
-  // 刷新project面板
-  resPanel.init(bid('res-container'), path.join(__dirname, '../'));
-  resPanel.rescan_resources();
-  resPanel.reconstruct_filetree();
-  resPanel.refresh();
+//   // 刷新project面板
+//   resPanel.init(bid('res-container'), path.join(__dirname, '../'));
+//   resPanel.rescan_resources();
+//   resPanel.reconstruct_filetree();
+//   resPanel.refresh();
 
   // 默认打开sponza
   let event = "set_model";
@@ -87,9 +89,6 @@ window.onload = function(){
       requestAnimationFrame(render_loop);
   }
 
-  // 关闭渲染引擎
-  //addon.shutdownrender();
 };
 
 function bid(id){return document.getElementById(id);}
-
