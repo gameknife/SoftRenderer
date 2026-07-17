@@ -39,3 +39,10 @@ bin32/log.txt
 
 bin32/
 .vs/
+
+# CMake and IDE build output
+build*/
+cmake-build-*/
+out/
+.idea/
+bin64/
