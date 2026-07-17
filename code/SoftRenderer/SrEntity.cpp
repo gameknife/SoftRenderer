@@ -97,10 +97,11 @@ void SrEntity::LoadMaterial( const char* filename )
 SrMaterial* SrEntity::getMaterial( uint32 index )
 {
 	SrMaterial* ret = NULL;
-	if (index < m_mesh->m_primitives.size())
+	if (m_mesh && index < m_mesh->m_primitives.size())
 	{
-		return m_mesh->m_primitives[index].material;
+		ret = m_mesh->m_primitives[index].material;
 	}
+	return ret;
 }
 
 uint32 SrEntity::getMaterialCount()

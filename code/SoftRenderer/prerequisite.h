@@ -129,17 +129,17 @@ inline void _mm_free_16byte(void* p)
 class IRenderer;
 class SrInputManager;
 struct SrRendPrimitve;
-class IProfiler;
+struct IProfiler;
 struct SrShaderContext;
 struct SrMaterial;
-class IResourceManager;
+struct IResourceManager;
 class SrTexture;
 class SrScene;
 class SrSwShader;
 class SrResource;
 class SrMesh;
 class SrShader;
-class SrDefaultMediaPack;
+struct SrDefaultMediaPack;
 struct ILogger;
 struct SrRendContext;
 
@@ -397,6 +397,9 @@ SR_ALIGN struct SrVertexBuffer
 
 	void* userData;
 
+	void* operator new(size_t size) {return _mm_malloc_custom(size, 16);}
+	void operator delete(void* memoryToBeDeallocated) {_mm_free_custom(memoryToBeDeallocated);}
+
 	SrVertexBuffer()
 	{
 		memset(this, 0, sizeof(SrVertexBuffer));
@@ -441,6 +444,9 @@ SR_ALIGN struct SrIndexBuffer
 	uint32  currAddress;
 
 	void* userData;
+
+	void* operator new(size_t size) {return _mm_malloc_custom(size, 16);}
+	void operator delete(void* memoryToBeDeallocated) {_mm_free_custom(memoryToBeDeallocated);}
 
 	SrIndexBuffer()
 	{

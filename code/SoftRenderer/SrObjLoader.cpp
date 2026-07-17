@@ -33,12 +33,12 @@ bool SrObjLoader::IsMatIDExist( DWORD matID )
 	return false;
 }
 //--------------------------------------------------------------------------------------
-WORD SrObjLoader::AddVertex( uint32 hash, SrVertexP3N3T2* pVertex )
+uint32 SrObjLoader::AddVertex( uint32 hash, SrVertexP3N3T2* pVertex )
 {
 	// If this vertex doesn't already exist in the Vertices list, create a new entry.
 	// Add the index of the vertex to the Indices list.
 	bool bFoundInList = false;
-	WORD index = 0;
+	uint32 index = 0;
 
 	// Since it's very slow to check every element in the vertex list, a hashtable stores
 	// vertex indices according to the vertex position's index as reported by the OBJ file
@@ -214,7 +214,7 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 			// Face
 			int iPosition, iTexCoord, iNormal;
 			SrVertexP3N3T2 vertex;
-			uint16	dwIndex[3];
+			uint32	dwIndex[3];
 			for( uint32 iFace = 0; iFace < 3; iFace++ )
 			{
 				memset( &vertex, 0, sizeof( SrVertexP3N3T2 ) );

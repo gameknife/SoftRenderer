@@ -387,10 +387,10 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 #define CLIP_CODE_NW 0x0009 
 #define CLIP_CODE_SW 0x0005
 
-	int xc1=x1, 
-		yc1=y1, 
-		xc2=x2, 
-		yc2=y2;
+	float xc1 = static_cast<float>(x1),
+		yc1 = static_cast<float>(y1),
+		xc2 = static_cast<float>(x2),
+		yc2 = static_cast<float>(y2);
 
 	int p1_code=0, 
 		p2_code=0;
@@ -441,24 +441,24 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 	case CLIP_CODE_N:
 		{
 			yc1 = min_clip_y;
-			xc1 = x1 + 0.5+(min_clip_y-y1)*(x2-x1)/(y2-y1);
+			xc1 = x1 + 0.5f+(min_clip_y-y1)*(x2-x1)/(y2-y1);
 		} break;
 	case CLIP_CODE_S:
 		{
 			yc1 = max_clip_y;
-			xc1 = x1 + 0.5+(max_clip_y-y1)*(x2-x1)/(y2-y1);
+			xc1 = x1 + 0.5f+(max_clip_y-y1)*(x2-x1)/(y2-y1);
 		} break;
 
 	case CLIP_CODE_W:
 		{
 			xc1 = min_clip_x;
-			yc1 = y1 + 0.5+(min_clip_x-x1)*(y2-y1)/(x2-x1);
+			yc1 = y1 + 0.5f+(min_clip_x-x1)*(y2-y1)/(x2-x1);
 		} break;
 
 	case CLIP_CODE_E:
 		{
 			xc1 = max_clip_x;
-			yc1 = y1 + 0.5+(max_clip_x-x1)*(y2-y1)/(x2-x1);
+			yc1 = y1 + 0.5f+(max_clip_x-x1)*(y2-y1)/(x2-x1);
 		} break;
 
 		// these cases are more complex, must compute 2 intersections
@@ -466,14 +466,14 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// north hline intersection
 			yc1 = min_clip_y;
-			xc1 = x1 + 0.5+(min_clip_y-y1)*(x2-x1)/(y2-y1);
+			xc1 = x1 + 0.5f+(min_clip_y-y1)*(x2-x1)/(y2-y1);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc1 < min_clip_x || xc1 > max_clip_x)
 			{
 				// east vline intersection
 				xc1 = max_clip_x;
-				yc1 = y1 + 0.5+(max_clip_x-x1)*(y2-y1)/(x2-x1);
+				yc1 = y1 + 0.5f+(max_clip_x-x1)*(y2-y1)/(x2-x1);
 			} // end if
 
 		} break;
@@ -482,14 +482,14 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// south hline intersection
 			yc1 = max_clip_y;
-			xc1 = x1 + 0.5+(max_clip_y-y1)*(x2-x1)/(y2-y1);	
+			xc1 = x1 + 0.5f+(max_clip_y-y1)*(x2-x1)/(y2-y1);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc1 < min_clip_x || xc1 > max_clip_x)
 			{
 				// east vline intersection
 				xc1 = max_clip_x;
-				yc1 = y1 + 0.5+(max_clip_x-x1)*(y2-y1)/(x2-x1);
+				yc1 = y1 + 0.5f+(max_clip_x-x1)*(y2-y1)/(x2-x1);
 			} // end if
 
 		} break;
@@ -498,13 +498,13 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// north hline intersection
 			yc1 = min_clip_y;
-			xc1 = x1 + 0.5+(min_clip_y-y1)*(x2-x1)/(y2-y1);
+			xc1 = x1 + 0.5f+(min_clip_y-y1)*(x2-x1)/(y2-y1);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc1 < min_clip_x || xc1 > max_clip_x)
 			{
 				xc1 = min_clip_x;
-				yc1 = y1 + 0.5+(min_clip_x-x1)*(y2-y1)/(x2-x1);	
+				yc1 = y1 + 0.5f+(min_clip_x-x1)*(y2-y1)/(x2-x1);
 			} // end if
 
 		} break;
@@ -513,13 +513,13 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// south hline intersection
 			yc1 = max_clip_y;
-			xc1 = x1 + 0.5+(max_clip_y-y1)*(x2-x1)/(y2-y1);	
+			xc1 = x1 + 0.5f+(max_clip_y-y1)*(x2-x1)/(y2-y1);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc1 < min_clip_x || xc1 > max_clip_x)
 			{
 				xc1 = min_clip_x;
-				yc1 = y1 + 0.5+(min_clip_x-x1)*(y2-y1)/(x2-x1);	
+				yc1 = y1 + 0.5f+(min_clip_x-x1)*(y2-y1)/(x2-x1);
 			} // end if
 
 		} break;
@@ -562,14 +562,14 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// north hline intersection
 			yc2 = min_clip_y;
-			xc2 = x2 + 0.5+(min_clip_y-y2)*(x1-x2)/(y1-y2);
+			xc2 = x2 + 0.5f+(min_clip_y-y2)*(x1-x2)/(y1-y2);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc2 < min_clip_x || xc2 > max_clip_x)
 			{
 				// east vline intersection
 				xc2 = max_clip_x;
-				yc2 = y2 + 0.5+(max_clip_x-x2)*(y1-y2)/(x1-x2);
+				yc2 = y2 + 0.5f+(max_clip_x-x2)*(y1-y2)/(x1-x2);
 			} // end if
 
 		} break;
@@ -578,14 +578,14 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// south hline intersection
 			yc2 = max_clip_y;
-			xc2 = x2 + 0.5+(max_clip_y-y2)*(x1-x2)/(y1-y2);	
+			xc2 = x2 + 0.5f+(max_clip_y-y2)*(x1-x2)/(y1-y2);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc2 < min_clip_x || xc2 > max_clip_x)
 			{
 				// east vline intersection
 				xc2 = max_clip_x;
-				yc2 = y2 + 0.5+(max_clip_x-x2)*(y1-y2)/(x1-x2);
+				yc2 = y2 + 0.5f+(max_clip_x-x2)*(y1-y2)/(x1-x2);
 			} // end if
 
 		} break;
@@ -594,13 +594,13 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// north hline intersection
 			yc2 = min_clip_y;
-			xc2 = x2 + 0.5+(min_clip_y-y2)*(x1-x2)/(y1-y2);
+			xc2 = x2 + 0.5f+(min_clip_y-y2)*(x1-x2)/(y1-y2);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc2 < min_clip_x || xc2 > max_clip_x)
 			{
 				xc2 = min_clip_x;
-				yc2 = y2 + 0.5+(min_clip_x-x2)*(y1-y2)/(x1-x2);	
+				yc2 = y2 + 0.5f+(min_clip_x-x2)*(y1-y2)/(x1-x2);
 			} // end if
 
 		} break;
@@ -609,13 +609,13 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 		{
 			// south hline intersection
 			yc2 = max_clip_y;
-			xc2 = x2 + 0.5+(max_clip_y-y2)*(x1-x2)/(y1-y2);	
+			xc2 = x2 + 0.5f+(max_clip_y-y2)*(x1-x2)/(y1-y2);
 
 			// test if intersection is valid, of so then done, else compute next
 			if (xc2 < min_clip_x || xc2 > max_clip_x)
 			{
 				xc2 = min_clip_x;
-				yc2 = y2 + 0.5+(min_clip_x-x2)*(y1-y2)/(x1-x2);	
+				yc2 = y2 + 0.5f+(min_clip_x-x2)*(y1-y2)/(x1-x2);
 			} // end if
 
 		} break;
@@ -634,10 +634,10 @@ int SrRasterizer::Clip_Line(int &x1,int &y1,int &x2, int &y2)
 	} // end if
 
 	// store vars back
-	x1 = xc1;
-	y1 = yc1;
-	x2 = xc2;
-	y2 = yc2;
+	x1 = static_cast<int>(xc1);
+	y1 = static_cast<int>(yc1);
+	x2 = static_cast<int>(xc2);
+	y2 = static_cast<int>(yc2);
 
 	return(1);
 

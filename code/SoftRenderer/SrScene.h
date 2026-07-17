@@ -26,6 +26,9 @@ public:
 	typedef std::stack<SrCamera*> SrCameraStack;
 
 public:
+	void* operator new(size_t size) {return _mm_malloc_custom(size, 16);}
+	void operator delete(void* memoryToBeDeallocated) {_mm_free_custom(memoryToBeDeallocated);}
+
 	SrScene(void);
 	~SrScene(void);
 

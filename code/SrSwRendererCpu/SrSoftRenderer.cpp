@@ -84,7 +84,7 @@ bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
 		&d3dpp, &m_hwDevice ) ) )
 	{
-		MessageBox(hWnd,"无法创建DX设备","",MB_OK);
+		MessageBoxA(hWnd, "Unable to create D3D device", "", MB_OK);
 		return false;
 	}
 

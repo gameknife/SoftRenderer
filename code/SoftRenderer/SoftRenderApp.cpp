@@ -238,7 +238,7 @@ bool SoftRenderApp::Update()
 // 		(*it)->OnUpdate();
 // 	}
 
-	if( m_curr_task < m_tasks.size())
+	if (m_curr_task >= 0 && static_cast<size_t>(m_curr_task) < m_tasks.size())
 	{
 		m_tasks[m_curr_task]->OnUpdate();
 	}
@@ -466,7 +466,7 @@ bool SoftRenderApp::InitRenderers()
 	}
 	m_currRendererIndex = 0;
 	gEnv->renderer = m_renderers[m_currRendererIndex];
-	gEnv->renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32);
+	return gEnv->renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32);
 }
 
 void SoftRenderApp::ShutdownRenderers()

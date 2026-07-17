@@ -18,6 +18,9 @@ class SrObjLoader
 
 	SR_ALIGN struct CacheEntry
 	{
+		void* operator new(size_t size) {return _mm_malloc_custom(size, 16);}
+		void operator delete(void* memoryToBeDeallocated) {_mm_free_custom(memoryToBeDeallocated);}
+
 		uint32 index;
 		CacheEntry* pNext;
 	};
@@ -31,7 +34,7 @@ public:
 	bool LoadGeometryFromOBJ( const char* strMeshData, SrPrimitives& primitives );
 	bool LoadMaterialFromMTL( const char* strFileData);
 private:
-	WORD AddVertex( uint32 hash, SrVertexP3N3T2* pVertex );
+	uint32 AddVertex( uint32 hash, SrVertexP3N3T2* pVertex );
 	bool IsMatIDExist( DWORD matID );
 	void DeleteCache();
 	void ClearData();

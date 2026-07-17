@@ -13,7 +13,7 @@
 #include "prerequisite.h"
 #include "RendererBase.h"
 
-struct SrFragmentBuffer;
+class SrFragmentBuffer;
 
 /**
  *@brief äÖÈ¾Æ÷

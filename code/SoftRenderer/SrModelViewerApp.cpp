@@ -114,7 +114,7 @@ void SrModelViewerApp::OnInit()
 	std::vector<std::string> result;
 	enum_all_files_in_folder( dir.c_str(), result ,false );
 
-	for ( int i=0; i < result.size(); ++i )
+	for (size_t i = 0; i < result.size(); ++i)
 	{
 		//if ( result[i] )
 		{
@@ -122,7 +122,7 @@ void SrModelViewerApp::OnInit()
 			strcpy( file, result[i].c_str());
 
 			char* ext = strrchr( file, '.' );
-			if (ext && !stricmp( ext, ".obj" ))
+			if (ext && !_stricmp( ext, ".obj" ))
 			{
 				*ext = 0;
 
@@ -395,7 +395,7 @@ void SrModelViewerApp::updateCam()
 
 void SrModelViewerApp::selectEnt(int index)
 {
-	for (int i=0; i < m_ents.size(); ++i)
+	for (size_t i = 0; i < m_ents.size(); ++i)
 	{
 		m_ents[i]->SetVisible(false);
 	}

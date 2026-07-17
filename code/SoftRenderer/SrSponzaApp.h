@@ -19,6 +19,9 @@ class SrSponzaApp :
 	public SrAppFramework, public IInputEventListener
 {
 public:
+	void* operator new(size_t size) {return _mm_malloc_custom(size, 16);}
+	void operator delete(void* memoryToBeDeallocated) {_mm_free_custom(memoryToBeDeallocated);}
+
 	SrSponzaApp(void);
 	~SrSponzaApp(void);
 
@@ -35,7 +38,7 @@ private:
 
 	bool m_ssao;
 
-	class SrCamera* m_camera;
+	struct SrCamera* m_camera;
 	class SrScene* m_scene;
 	class SrEntity* m_ent;
 };

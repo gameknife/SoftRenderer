@@ -29,7 +29,7 @@ extern "C" __declspec(dllexport) SrSwShader* LoadShader( const char* shaderName 
 
 	for (uint32 i=0; i < shaders.size(); ++i)
 	{
-		if ( !stricmp(shaders[i]->getName(), shaderName))
+		if ( !_stricmp(shaders[i]->getName(), shaderName))
 		{
 			return shaders[i];
 		}

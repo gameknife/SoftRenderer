@@ -369,7 +369,8 @@ void SrRasterizer::Flush()
 	gEnv->profiler->setBegin(ePe_PixelShaderTime);
 
 	// 任务统计
-	for ( uint32 i=0; i < g_context->width * g_context->height; ++i)
+	const uint32 pixelCount = static_cast<uint32>(g_context->width) * static_cast<uint32>(g_context->height);
+	for (uint32 i = 0; i < pixelCount; ++i)
 	{
 		if(fBuffer->zBuffer[i] < 0.f)
 		{

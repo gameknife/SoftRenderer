@@ -22,7 +22,7 @@ extern "C" __declspec(dllexport) SrSwShader* LoadShader( const char* shaderName 
 
 	for (uint32 i=0; i < shaders.size(); ++i)
 	{
-		if ( !stricmp(shaders[i]->getName(), shaderName))
+		if ( !_stricmp(shaders[i]->getName(), shaderName))
 		{
 			return shaders[i];
 		}
@@ -598,7 +598,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 			}
 			diff = diff / d;
 			d*= 0.3f;
-			ao += max(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0 / (1.0 + d) ) * 2.f * (jit ? 2.f : 1.f);
+			ao += max(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0f / (1.0f + d) ) * 2.f * (jit ? 2.f : 1.f);
 		}
 
 		// Æ½¾ùAO

@@ -15,6 +15,9 @@ class SrFragmentBuffer;
 
 struct SrRendContext
 {
+	void* operator new(size_t size) {return _mm_malloc_custom(size, 16);}
+	void operator delete(void* memoryToBeDeallocated) {_mm_free_custom(memoryToBeDeallocated);}
+
 	SrRendContext(int w, int h, int obpp)
 	{
 			memset(this, 0, sizeof(SrRendContext));
