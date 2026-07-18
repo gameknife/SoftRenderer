@@ -4,7 +4,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 cd /d "%~dp0"
 set "ROOT=%CD%"
 set "BUILD_DIR=%ROOT%\out\cmake-x64"
-set "RUNTIME_DIR=%BUILD_DIR%\runtime\Release"
+set "RUNTIME_DIR=%ROOT%\bin"
 
 where cmake >nul 2>&1
 if errorlevel 1 (

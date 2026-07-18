@@ -1,32 +1,83 @@
 # SoftRenderer
 
-An SoftRenderer for experiment &amp; learn.
+An experimental software renderer for learning and research.
 
-## Build with CMake
+## Environment
 
-This is a Windows/MSVC project. Configure and build a Win32 Release binary from
-PowerShell with:
+SoftRenderer is a Windows x64/MSVC project. The following components are
+required:
 
-```powershell
-cmake -S . -B out/cmake-win32 -G "Visual Studio 18 2026" -A Win32
-cmake --build out/cmake-win32 --config Release --target SoftRenderer
+- Visual Studio with the Desktop development with C++ workload
+- CMake 3.20 or newer
+- The DirectX SDK files included under `code/thirdparty/dxsdk/`
+
+## Quick start
+
+Run `buildrun.bat` from the repository root, or double-click it in Explorer:
+
+```bat
+buildrun.bat
 ```
 
-The runnable layout is generated under
-`out/cmake-win32/runtime/Release/`. Run `SoftRenderer.exe` from that directory;
-CMake places the renderer DLL in `renderer/`, shader modules in `shader/`, and
-copies the tracked media files into `media/`.
+The script automatically selects the newest Visual Studio generator available
+to CMake, configures an x64 Release build in `out/cmake-x64`, builds
+SoftRenderer, and launches `bin/SoftRenderer.exe`.
 
-## Tile-binning renderer
+To build without launching the application:
 
-The legacy backend remains the default while the tile performance gates are
-being validated. Pass `--tile` to use draw-local geometry jobs, deterministic
-CSR binning, dynamically scheduled single-owner tiles, local pixel shading,
-and the deferred full-GBuffer batch used by the normal-mapped SSAO shader.
-Use `--legacy` for an explicit A/B reference.
-The measured default tile size is 24×24 and can be overridden at runtime.
+```bat
+buildrun.bat --build-only
+```
 
-Useful automation options:
+## Manual CMake build
+
+For a Visual Studio generator available on your machine, configure and build
+the x64 Release target with:
+
+```powershell
+cmake -S . -B out/cmake-x64 -G "Visual Studio 18 2026" -A x64
+cmake --build out/cmake-x64 --config Release --target SoftRenderer
+```
+
+If your installed Visual Studio version is different, replace the generator
+name accordingly. Run the application with `bin` as the working directory:
+
+```powershell
+Push-Location bin
+& .\SoftRenderer.exe
+Pop-Location
+```
+
+## Output layout
+
+Build outputs are written directly to the repository's `bin/` directory:
+
+```text
+bin/
+├── SoftRenderer.exe
+├── renderer/SrSwRendererCpu.dll
+├── shader/BasicShaders.swsl
+├── shader/AdvanceShaders.swsl
+└── media/                  # tracked runtime assets
+```
+
+The build does not copy runtime assets. The application uses the existing
+tracked `bin/media/` directory.
+
+## Tests
+
+Build and run the deterministic tile layout/binning tests with:
+
+```powershell
+cmake --build out/cmake-x64 --config Release --target SoftRendererTests
+ctest --test-dir out/cmake-x64 -C Release --output-on-failure
+```
+
+## Renderer options
+
+The legacy backend remains available as an A/B reference. Use `--tile` for the
+tile-binning renderer and `--legacy` for the legacy renderer. The default tile
+size is 24×24 and can be overridden at runtime.
 
 ```text
 --tile | --legacy
@@ -39,28 +90,11 @@ Useful automation options:
 --hash-output=results.csv
 ```
 
-`--relaxed-ssao` is an opt-in tile mode that removes the global barrier between
-rasterization and full-GBuffer SSAO shading. A tile publishes its GBuffer after
-rasterization, then shades and post-processes immediately; SSAO samples aimed at
-unfinished neighboring tiles are skipped. This is memory-safe but intentionally
-schedule-dependent and may differ visually from the exact default mode.
+`--relaxed-ssao` removes the global barrier between rasterization and full
+G-buffer SSAO shading. It is memory-safe but schedule-dependent and may differ
+visually from the exact default mode.
 
-The software overlay uses a startup-built ASCII glyph cache and writes directly
-to the locked frame buffer, avoiding per-frame D3D `GetDC` synchronization.
-Headless mode skips overlay work automatically; `--no-ui` does the same for an
-interactive run or profiler A/B capture.
-
-`--hash-output` writes per-frame color, depth, GBuffer, and winner hashes plus
-stage timings, tile/bin counts, worker job counts, busy ratio, and load-balance
-metrics. Tile size and worker count can also be set with `SR_TILE_SIZE` and
+`--hash-output` writes per-frame color, depth, G-buffer, and winner hashes,
+stage timings, tile/bin counts, worker statistics, and load-balance metrics.
+Tile size and worker count can also be set with `SR_TILE_SIZE` and
 `SR_WORKER_COUNT`.
-
-Run the deterministic layout/binning tests with:
-
-```powershell
-ctest --test-dir out/cmake-win32 -C Release --output-on-failure
-```
-
-For a one-click build and launch from the repository root, double-click
-`buildrun.bat`. From a terminal, use `buildrun.bat --build-only` to build without
-launching the application.

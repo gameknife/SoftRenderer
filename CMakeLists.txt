@@ -14,8 +14,7 @@ set(SR_CODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/code")
 set(SR_CORE_DIR "${SR_CODE_DIR}/SoftRenderer")
 set(SR_RENDERER_DIR "${SR_CODE_DIR}/SrSwRendererCpu")
 set(SR_THIRDPARTY_DIR "${SR_CODE_DIR}/thirdparty")
-set(SR_MEDIA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin32/media")
-set(SR_RUNTIME_DIR "${CMAKE_BINARY_DIR}/runtime")
+set(SR_RUNTIME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(SR_DXSDK_ARCH x64)
@@ -53,15 +52,15 @@ function(sr_configure_target target)
 endfunction()
 
 function(sr_set_runtime_layout target subdirectory)
-    set(output_directory "${SR_RUNTIME_DIR}/$<CONFIG>")
+    set(output_directory "${SR_RUNTIME_DIR}")
     if(NOT "${subdirectory}" STREQUAL "")
         set(output_directory "${output_directory}/${subdirectory}")
     endif()
 
     set_target_properties(${target} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${output_directory}"
-        LIBRARY_OUTPUT_DIRECTORY "${output_directory}"
-        ARCHIVE_OUTPUT_DIRECTORY "${output_directory}"
+        RUNTIME_OUTPUT_DIRECTORY "$<1:${output_directory}>"
+        LIBRARY_OUTPUT_DIRECTORY "$<1:${output_directory}>"
+        ARCHIVE_OUTPUT_DIRECTORY "$<1:${output_directory}>"
     )
 endfunction()
 
@@ -176,22 +175,11 @@ add_executable(SoftRendererTests
 	"${SR_RENDERER_DIR}/SrTileBinner.cpp"
 )
 target_include_directories(SoftRendererTests PRIVATE "${SR_RENDERER_DIR}")
+sr_set_runtime_layout(SoftRendererTests "")
 add_test(NAME SoftRenderer.TileLayout COMMAND SoftRendererTests)
-
-if(NOT EXISTS "${SR_MEDIA_DIR}")
-    message(FATAL_ERROR "Runtime media directory was not found: ${SR_MEDIA_DIR}")
-endif()
-
-add_custom_command(TARGET SoftRenderer POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${SR_MEDIA_DIR}"
-        "$<TARGET_FILE_DIR:SoftRenderer>/media"
-    COMMENT "Copying runtime media"
-)
 
 set_property(TARGET SoftRenderer PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:SoftRenderer>")
 
 install(TARGETS SoftRenderer RUNTIME DESTINATION .)
 install(TARGETS SrSwRendererCpu RUNTIME DESTINATION renderer)
 install(TARGETS BasicShaders AdvanceShaders RUNTIME DESTINATION shader)
-install(DIRECTORY "${SR_MEDIA_DIR}/" DESTINATION media)
