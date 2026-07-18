@@ -295,6 +295,7 @@ void SrRasterizer::Flush()
 		ProcessRasterizer( &(m_rendPrimitives[i]), g_context->GetFragBuffer() );
 	}
 #else
+	int submittedTriangleCount = 0;
 	for ( std::list<SrRendPrimitve*>::iterator it = m_rendPrimitives.begin(); it != m_rendPrimitives.end(); ++it)
 	{
 
@@ -307,6 +308,7 @@ void SrRasterizer::Flush()
 		if (vb && ib)
 		{
 			uint32 triCount = ib->count / 3;
+			submittedTriangleCount += static_cast<int>(triCount);
 
 			for (uint32 j = 0; j < triCount; j += RASTERIZE_TASK_BLOCK )
 			{
@@ -351,6 +353,7 @@ void SrRasterizer::Flush()
 		if (vb && ib)
 		{
 			uint32 triCount = ib->count / 3;
+			submittedTriangleCount += static_cast<int>(triCount);
 
 			for (uint32 j = 0; j < triCount; j += RASTERIZE_TASK_BLOCK )
 			{
@@ -385,6 +388,8 @@ void SrRasterizer::Flush()
 // 			}
 // 		}
 // 	}
+
+	gEnv->profiler->setIncrement(ePe_TriangleCount, submittedTriangleCount);
 
 	// RHZ PRIMITIVE
 
@@ -522,6 +527,7 @@ void SrRasterizer::ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* 
 	if (vb && ib)
 	{
 		uint32 triCount = ib->count / 3;
+		gEnv->profiler->setIncrement(ePe_TriangleCount, static_cast<int>(triCount));
 		// tiled
 		uint32 startIdx = 0;
 		uint32 processSize = triCount;

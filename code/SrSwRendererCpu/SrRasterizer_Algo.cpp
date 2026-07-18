@@ -10,7 +10,6 @@
 
 #include "stdafx.h"
 #include "SrRasterizer.h"
-#include "SrProfiler.h"
 #include "SrMesh.h"
 #include "SrMaterial.h"
 #include "SrSwShader.h"
@@ -63,7 +62,6 @@ bool SrRasterizer::PrepareTriangle(SrRastTriangle& calTri)
 			return false;
 	}
 
-	gEnv->profiler->setIncrement(ePe_TriangleCount);
 	SrRendVertex* p[3] = { &calTri.p[0], &calTri.p[1], &calTri.p[2] };
 	SrRendVertex tmp[3] = { calTri.p[0], calTri.p[1], calTri.p[2] };
 	calTri.primitive->shader->ProcessPatch(p[0], p[1], p[2], &tmp[0], &tmp[1], &tmp[2], &calTri.primitive->shaderConstants);

@@ -239,6 +239,14 @@ void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32
 {
 	gEnv->profiler->setBegin(ePe_VertexShaderTime);
 	m_tileDraws.assign(m_rendPrimitives.begin(), m_rendPrimitives.end());
+	int submittedTriangleCount = 0;
+	for (uint32 draw = 0; draw < m_tileDraws.size(); ++draw)
+		if (m_tileDraws[draw] && m_tileDraws[draw]->vb && m_tileDraws[draw]->ib)
+			submittedTriangleCount += static_cast<int>(m_tileDraws[draw]->ib->count / 3);
+	for (std::list<SrRendPrimitve*>::iterator it = m_rendPrimitivesRHZ.begin(); it != m_rendPrimitivesRHZ.end(); ++it)
+		if (*it && (*it)->vb && (*it)->ib)
+			submittedTriangleCount += static_cast<int>((*it)->ib->count / 3);
+	gEnv->profiler->setIncrement(ePe_TriangleCount, submittedTriangleCount);
 	if (m_tileDrawTriangles.size() < m_tileDraws.size())
 		m_tileDrawTriangles.resize(m_tileDraws.size());
 	for (uint32 draw = 0; draw < m_tileDraws.size(); ++draw)

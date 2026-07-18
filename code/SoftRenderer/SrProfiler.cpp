@@ -105,7 +105,7 @@ void SrProfiler::Update()
 		gEnv->profiler->getAverageTime(ePe_PostProcessTime));
 		gEnv->renderer->DrawScreenText( buffer, 20, 20, 1, SR_UICOLOR_NORMAL );
 
-	sprintf_s(buffer, "Batch: %3d | Tri: %6d | Pixel: %6d | Vertex: %6d", 
+	sprintf_s(buffer, "Batch: %3d | Tri(in): %6d | Pixel: %6d | Vertex: %6d",
 		gEnv->profiler->getCount(ePe_BatchCount),
 		gEnv->profiler->getCount(ePe_TriangleCount),
 		gEnv->profiler->getCount(ePe_PixelCount),
