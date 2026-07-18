@@ -33,7 +33,15 @@ function(sr_configure_target target)
         target_compile_options(${target} PRIVATE /W3 /fp:fast)
         target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
     else()
-        target_compile_options(${target} PRIVATE -Wall -Wno-unused-variable -Wno-unused-function -ffast-math -fms-extensions)
+		# Anonymous unions preserve the renderer's POD/SIMD layout; the
+		# corresponding aggregate-brace and legacy member-order diagnostics are
+		# intentional for these low-level compatibility types.
+		target_compile_options(${target} PRIVATE -Wall -Wno-unused-variable -Wno-unused-function -Wno-missing-braces -ffast-math -fms-extensions)
+		if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+			target_compile_options(${target} PRIVATE -Wno-reorder-ctor)
+		elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+			target_compile_options(${target} PRIVATE -Wno-reorder)
+		endif()
         if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
             target_compile_definitions(${target} PRIVATE SR_USE_SIMD)
         endif()

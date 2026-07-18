@@ -2,8 +2,8 @@
 #include "SrFragmentBuffer.h"
 #include "SrSoftRenderer.h"
 
-SrFragmentBuffer::SrFragmentBuffer( int width, int height, SrSoftRenderer* renderer)
-	: m_width(width), m_height(height), m_tileReady(NULL), m_tileSize(0), m_tileColumns(0), m_renderer(renderer)
+SrFragmentBuffer::SrFragmentBuffer( int width, int height)
+	: m_width(width), m_height(height), m_tileReady(NULL), m_tileSize(0), m_tileColumns(0)
 {
 	uint32 size = width * height;
 	//fragBuffer = new SrFragmentBuffer[size];

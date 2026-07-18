@@ -35,13 +35,13 @@ void SrSponzaApp::OnInit()
 	m_ent = m_scene->CreateEntity("model1", "media\\sponza.obj", "media\\sponza.mtl");
 
 	//m_ent = m_scene->CreateEntity("model1", "media\\prophet\\prophet.obj", "media\\prophet\\prophet.mtl");
-	m_ent->SetScale(float3{2,2,2});
+	m_ent->SetScale(float3{{{2,2,2}}});
 	if (!getenv("SR_DISABLE_SSAO"))
 		SwitchSSAO();
 
 	// �������
 	m_camera = m_scene->CreateCamera("cam0");
-	m_camera->setPos(float3{0,10,-45});
+	m_camera->setPos(float3{{{0,10,-45}}});
 	m_camera->setFov(68.0f);
 	m_scene->PushCamera(m_camera);
 
@@ -49,7 +49,7 @@ void SrSponzaApp::OnInit()
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
-	lt->worldPos = float3{ 1000.f, 1000.f, -1000.f};
+	lt->worldPos = float3{{{ 1000.f, 1000.f, -1000.f}}};
 	lt->radius = 100.f;
 
 	// ��������豸�ص�
@@ -79,9 +79,6 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 {
 	static bool rotateMode = false;
 	static float speed = 5.f;
-	static bool shiftMode = false;
-	static bool altMode = false;
-	static bool ctrlMode = false;
 	switch(event.keyId)
 	{
 	case  eKI_LShift:
@@ -89,36 +86,10 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 			if (event.state == eIS_Pressed)
 			{
 				speed = 20.f;
-				shiftMode = true;
 			}
 			else if (event.state == eIS_Released)
 			{
 				speed = 5.f;
-				shiftMode = false;
-			}
-		}
-		break;
-	case  eKI_LAlt:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				altMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				altMode = false;
-			}
-		}
-		break;
-	case  eKI_LCtrl:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				ctrlMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				ctrlMode = false;
 			}
 		}
 		break;
@@ -126,7 +97,7 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 		{
 			if (event.state == eIS_Down)
 			{
-				m_camera->Move( float3{0,0,speed} * gEnv->timer->getElapsedTime() );
+				m_camera->Move( float3{{{0,0,speed}}} * gEnv->timer->getElapsedTime() );
 			}			
 		}
 		break;
@@ -134,7 +105,7 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 		{
 			if (event.state == eIS_Down)
 			{
-				m_camera->Move( float3{0,0,-speed} * gEnv->timer->getElapsedTime() );
+				m_camera->Move( float3{{{0,0,-speed}}} * gEnv->timer->getElapsedTime() );
 			}			
 		}
 		break;
@@ -142,7 +113,7 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 		{
 			if (event.state == eIS_Down)
 			{
-				m_camera->Move( float3{-speed,0,0} * gEnv->timer->getElapsedTime() );
+				m_camera->Move( float3{{{-speed,0,0}}} * gEnv->timer->getElapsedTime() );
 			}			
 		}
 		break;
@@ -150,7 +121,7 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 		{
 			if (event.state == eIS_Down)
 			{
-				m_camera->Move( float3{speed,0,0} * gEnv->timer->getElapsedTime() );
+				m_camera->Move( float3{{{speed,0,0}}} * gEnv->timer->getElapsedTime() );
 			}			
 		}
 		break;
@@ -235,6 +206,8 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 				}
 			}
 		}
+		break;
+	default:
 		break;
 	}
 	return false;

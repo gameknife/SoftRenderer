@@ -83,12 +83,12 @@ struct float2
 
 	inline float2 operator + ( const float2 & p ) const
 	{
-		float2 tmp{ x + p.x , y + p.y };
+		float2 tmp{{{ x + p.x , y + p.y }}};
 		return tmp;
 	}
 	inline float2 operator - ( const float2 & p ) const
 	{
-		float2 tmp{ x - p.x , y - p.y };
+		float2 tmp{{{ x - p.x , y - p.y }}};
 		return tmp;
 	}
 	inline float operator % ( const float2 & p ) const
@@ -97,17 +97,17 @@ struct float2
 	}
 	inline float2 operator * ( const float2 & p ) const
 	{
-		float2 tmp{ x * p.x , y * p.y };
+		float2 tmp{{{ x * p.x , y * p.y }}};
 		return tmp;
 	}
 	inline float2 operator * ( const float p ) const
 	{
-		float2 tmp{ x * p , y * p };
+		float2 tmp{{{ x * p , y * p }}};
 		return tmp;
 	}
 	inline float2 operator / ( const float p ) const
 	{
-		float2 tmp{ x / p , y / p };
+		float2 tmp{{{ x / p , y / p }}};
 		return tmp;
 	}
 
@@ -265,7 +265,7 @@ SR_ALIGN struct float3
 		float3 tmp;
 		tmp.m128 = _mm_add_ps( m128, p.m128 );
 #else
-		float3 tmp{ x + p.x , y + p.y , z + p.z };
+		float3 tmp{{{ x + p.x , y + p.y , z + p.z }}};
 #endif
 		return tmp;
 	}
@@ -275,7 +275,7 @@ SR_ALIGN struct float3
 		float3 tmp;
 		tmp.m128 = _mm_sub_ps( m128, p.m128 );
 #else
-		float3 tmp{ x - p.x , y - p.y , z - p.z };
+		float3 tmp{{{ x - p.x , y - p.y , z - p.z }}};
 #endif
 		return tmp;
 	}
@@ -286,7 +286,7 @@ SR_ALIGN struct float3
 		tmp.m128 = _mm_setzero_ps();
 		tmp.m128 = _mm_sub_ps( tmp.m128, m128 );
 #else
-		float3 tmp{ -x , -y , -z };
+		float3 tmp{{{ -x , -y , -z }}};
 #endif
 		return tmp;
 	}
@@ -296,7 +296,7 @@ SR_ALIGN struct float3
 #ifdef SR_USE_SIMD
  		m128 = _mm_cross3_ps( m128, p.m128 );
 #else
-		float3 tmp{ y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x };
+		float3 tmp{{{ y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x }}};
 		x = tmp.x;
 		y = tmp.y;
 		z = tmp.z;
@@ -309,7 +309,7 @@ SR_ALIGN struct float3
 		float3 tmp;
  		tmp.m128 = _mm_cross3_ps( m128, p.m128 );
  #else
-		float3 tmp{ y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x };
+		float3 tmp{{{ y * p.z - z * p.y , z * p.x - x * p.z , x * p.y - y * p.x }}};
 #endif
 		return tmp;
 	}
@@ -319,7 +319,7 @@ SR_ALIGN struct float3
 		float3 tmp;
 		tmp.m128 = _mm_mul_ps( m128, p.m128 );
 #else
-		float3 tmp{ x * p.x , y * p.y , z * p.z };
+		float3 tmp{{{ x * p.x , y * p.y , z * p.z }}};
 #endif
 		return tmp;
 	}
@@ -331,7 +331,7 @@ SR_ALIGN struct float3
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_mul_ps( m128, tmp.m128 );
 #else
-		float3 tmp{ x * p , y * p , z * p };
+		float3 tmp{{{ x * p , y * p , z * p }}};
 #endif
 		return tmp;
 	}
@@ -342,7 +342,7 @@ SR_ALIGN struct float3
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_div_ps( m128, tmp.m128 );
 #else
-		float3 tmp{ x / p , y / p , z / p };
+		float3 tmp{{{ x / p , y / p , z / p }}};
 #endif
 		return tmp;
 	}
@@ -497,10 +497,10 @@ SR_ALIGN struct float4
 	}
 	inline float4 & operator %= ( const float4 & p )
 	{
-		float4 tmp	{ w * p.x + x * p.w - z * p.y + y * p.z
+		float4 tmp	{{{ w * p.x + x * p.w - z * p.y + y * p.z
 			, w * p.y + y * p.w - x * p.z + z * p.x
 			, w * p.z + z * p.w - y * p.x + x * p.y
-			, w * p.w - x * p.x - y * p.y - z * p.z };
+			, w * p.w - x * p.x - y * p.y - z * p.z }}};
 		x = tmp.x;
 		y = tmp.y;
 		z = tmp.z;
@@ -554,7 +554,7 @@ SR_ALIGN struct float4
 		float4 tmp;
 		tmp.m128 = _mm_add_ps( m128, p.m128 );
 #else
-		float4 tmp{ x + p.x , y + p.y , z + p.z , w + p.w };
+		float4 tmp{{{ x + p.x , y + p.y , z + p.z , w + p.w }}};
 #endif
 		return tmp;
 	}
@@ -564,17 +564,17 @@ SR_ALIGN struct float4
 		float4 tmp;
 		tmp.m128 = _mm_sub_ps( m128, p.m128 );
 #else
-		float4 tmp{ x - p.x , y - p.y , z - p.z , w - p.w };
+		float4 tmp{{{ x - p.x , y - p.y , z - p.z , w - p.w }}};
 #endif		
 		return tmp;
 	}
 
 	inline float4 operator % ( const float4 & p ) const
 	{
-		float4 tmp	{ w * p.x + x * p.w - z * p.y + y * p.z
+		float4 tmp	{{{ w * p.x + x * p.w - z * p.y + y * p.z
 			, w * p.y + y * p.w - x * p.z + z * p.x
 			, w * p.z + z * p.w - y * p.x + x * p.y
-			, w * p.w - x * p.x - y * p.y - z * p.z };
+			, w * p.w - x * p.x - y * p.y - z * p.z }}};
 		return tmp;
 	}
 	inline float4 operator * ( const float4 & p ) const
@@ -584,7 +584,7 @@ SR_ALIGN struct float4
 		float4 tmp;
 		tmp.m128 = _mm_mul_ps( m128, p.m128 );
 #else
-		float4 tmp{ x * p.x , y * p.y , z * p.z , w * p.w };
+		float4 tmp{{{ x * p.x , y * p.y , z * p.z , w * p.w }}};
 #endif
 		return tmp;
 	}
@@ -596,7 +596,7 @@ SR_ALIGN struct float4
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_mul_ps( m128, tmp.m128 );
 		#else
-		float4 tmp{ x * p , y * p , z * p , w * p };
+		float4 tmp{{{ x * p , y * p , z * p , w * p }}};
 		#endif
 		
 		return tmp;
@@ -608,7 +608,7 @@ SR_ALIGN struct float4
 		tmp.m128 = _mm_set_ps1(p);
 		tmp.m128 = _mm_div_ps( m128, tmp.m128 );
 #else
-		float4 tmp{ x / p , y / p , z / p , w / p };
+		float4 tmp{{{ x / p , y / p , z / p , w / p }}};
 #endif		
 		return tmp;
 	}
@@ -700,7 +700,7 @@ inline float3 float3_from_xy_z( const float2& pxy, float pz )
 	r.m128 = _mm_set_ps(0, pz, pxy.x, pxy.y);
 	return r;
 #else
-	return float3{ pxy.x, pxy.y, pz };
+	return float3{{{ pxy.x, pxy.y, pz }}};
 #endif
 }
 
@@ -713,7 +713,7 @@ inline float4 float4_from_v_w( const float3& v, float pw )
 	r.w = pw;
 	return r;
 #else
-	return float4{ v.x, v.y, v.z, pw };
+	return float4{{{ v.x, v.y, v.z, pw }}};
 #endif
 }
 
@@ -725,7 +725,7 @@ inline float4 float4_from_ptr( const float* p )
 	r.m128 = _mm_loadr_ps( p );
 	return r;
 #else
-	return float4{ p[0], p[1], p[2], p[3] };
+	return float4{{{ p[0], p[1], p[2], p[3] }}};
 #endif
 }
 

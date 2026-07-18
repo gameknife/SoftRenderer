@@ -39,7 +39,7 @@ SrRasterizer::SrRasterizer(void)
  */
 void SrRasterizer::Init(SrSoftRenderer* renderer)
 {
-	fBuffer = new SrFragmentBuffer(g_context->width, g_context->height, renderer);
+	fBuffer = new SrFragmentBuffer(g_context->width, g_context->height);
 	gEnv->context->fBuffer = fBuffer;
 
 	m_MemSBuffer = gEnv->resourceMgr->CreateRenderTexture( "$MemoryScreenBuffer" ,g_context->width, g_context->height, 4 );

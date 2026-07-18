@@ -13,8 +13,8 @@ static uint64_t SrPerformanceTicks()
 		std::chrono::steady_clock::now().time_since_epoch()).count());
 }
 
-SrTaskThread::SrTaskThread( int tileId, SrRasTaskDispatcher* creator ):m_creator(creator),
-	m_threadId(tileId)
+SrTaskThread::SrTaskThread( int tileId, SrRasTaskDispatcher* creator ):m_threadId(tileId),
+	m_creator(creator)
 {
 	m_runningFlag = new CManualResetEvent(false);
 	m_waitFlag = new CManualResetEvent(false);

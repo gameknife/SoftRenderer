@@ -91,9 +91,9 @@ SR_ALIGN struct float33
 		tmp.y = _mm_cvtss_f32( _mm_dot_ps( p.m128, line2));
 		tmp.z = _mm_cvtss_f32( _mm_dot_ps( p.m128, line3));
 #else
-		float3 tmp{ p.x * m[0] + p.y * m[3] + p.z * m[6]
+		float3 tmp{{{ p.x * m[0] + p.y * m[3] + p.z * m[6]
 		, p.x * m[1] + p.y * m[4] + p.z * m[7]
-		, p.x * m[2] + p.y * m[5] + p.z * m[8] };
+		, p.x * m[2] + p.y * m[5] + p.z * m[8] }}};
 #endif
 		return tmp;
 	}		
@@ -285,10 +285,10 @@ SR_ALIGN struct float44
 	 */
 	float4 operator *( const float4 & p ) const
 	{
-		float4 tmp{ p.x * m[0] + p.y * m[4] + p.z * m[8] + p.w * m[12]
+		float4 tmp{{{ p.x * m[0] + p.y * m[4] + p.z * m[8] + p.w * m[12]
 		, p.x * m[1] + p.y * m[5] + p.z * m[9] + p.w * m[13]
 		, p.x * m[2] + p.y * m[6] + p.z * m[10] + p.w * m[14]
-		, p.x * m[3] + p.y * m[7] + p.z * m[11] + p.w * m[15]};
+		, p.x * m[3] + p.y * m[7] + p.z * m[11] + p.w * m[15]}}};
 		return tmp;
 	}
 	/**
@@ -298,9 +298,9 @@ SR_ALIGN struct float44
 	 */
 	float3 operator *( const float3 & p ) const
 	{
-		float3 tmp{ p.x * m[0] + p.y * m[4] + p.z * m[8] + m[12]
+		float3 tmp{{{ p.x * m[0] + p.y * m[4] + p.z * m[8] + m[12]
 		, p.x * m[1] + p.y * m[5] + p.z * m[9] + m[13]
-		, p.x * m[2] + p.y * m[6] + p.z * m[10] + m[14] };
+		, p.x * m[2] + p.y * m[6] + p.z * m[10] + m[14] }}};
 		return tmp;
 	}		
 	/**
@@ -342,9 +342,9 @@ SR_ALIGN struct float44
 	 */
 	float3 MultVector3( const float3 &p )
 	{
-		float3 tmp{ m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12]
+		float3 tmp{{{ m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12]
 		, m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13]
-		, m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14] };
+		, m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14] }}};
 		return tmp;
 	}
 	/**
@@ -364,9 +364,9 @@ SR_ALIGN struct float44
 		tmp.y = _mm_cvtss_f32( _mm_dot_ps( p.m128, line2));
 		tmp.z = _mm_cvtss_f32( _mm_dot_ps( p.m128, line3));
 #else
-		float3 tmp{ m[0] * p.x + m[4] * p.y + m[8] * p.z
+		float3 tmp{{{ m[0] * p.x + m[4] * p.y + m[8] * p.z
 			, m[1] * p.x + m[5] * p.y + m[9] * p.z
-			, m[2] * p.x + m[6] * p.y + m[10] * p.z };
+			, m[2] * p.x + m[6] * p.y + m[10] * p.z }}};
 #endif
 
 		return tmp;
@@ -385,7 +385,7 @@ SR_ALIGN struct float44
 		float3 front = ( to - from ).normalize();
 		float3 right = ( up % front ).normalize();
 		float3 tup = ( front % right ).normalize();
-		float3 tfrom{ from.dot( right ), from.dot( tup ) , from.dot( front ) };
+		float3 tfrom{{{ from.dot( right ), from.dot( tup ) , from.dot( front ) }}};
 
 		_m[0][0] = right.x; _m[1][0] = right.y; _m[2][0] = right.z;
 		_m[0][1] = tup.x; _m[1][1] = tup.y; _m[2][1] = tup.z;
@@ -408,7 +408,7 @@ SR_ALIGN struct float44
 		float3 front = ( to - from ).normalize();
 		float3 right = ( front % up ).normalize();
 		float3 tup = ( right % front ).normalize();
-		float3 tfrom{ float3::dot(from, right) , float3::dot(from, tup) , float3::dot(from, front) };
+		float3 tfrom{{{ float3::dot(from, right) , float3::dot(from, tup) , float3::dot(from, front) }}};
 
 		_m[0][0] = right.x; _m[1][0] = right.y; _m[2][0] = right.z;
 		_m[0][1] = tup.x; _m[1][1] = tup.y; _m[2][1] = tup.z;
@@ -600,10 +600,10 @@ SR_ALIGN struct float44
 	float3 GetTranslate() const
 	{
 #ifdef SR_USE_SIMD
-		return float3{m30, m31, m32};
+		return float3{{{m30, m31, m32}}};
 		//return row3_float3;
 #else
-		return float3{m30, m31, m32};
+		return float3{{{m30, m31, m32}}};
 #endif
 	}
 
@@ -613,7 +613,7 @@ SR_ALIGN struct float44
 	 */
 	static float44 CreateIdentity()
 	{
-		return float44{ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 1 , 0, 0 , 0 , 0 , 1 };
+		return float44{{{ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 1 , 0, 0 , 0 , 0 , 1 }}};
 	}
 
 	/**
@@ -622,7 +622,7 @@ SR_ALIGN struct float44
 	 */
 	static float44 CreateZero()
 	{
-		return float44{ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 };
+		return float44{{{ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 }}};
 	}
 };
 

@@ -345,6 +345,8 @@ bool SoftRenderApp::OnInputEvent( const SInputEvent &event )
 			}
 
 			break;
+		default:
+			break;
 
 	}
 	return false;

@@ -14,13 +14,11 @@
 #include <atomic>
 
 struct  SrRendContext;
-class SrSoftRenderer;
-
 class SrFragmentBuffer
 {
 	friend SrRendContext;
 public:
-	SrFragmentBuffer(int width, int height, SrSoftRenderer* renderer);
+	SrFragmentBuffer(int width, int height);
 	~SrFragmentBuffer(void);
 
 	LPCRITICAL_SECTION GetSyncMark(uint32 address)
@@ -99,11 +97,9 @@ private:
 	uint32					m_tileSize;
 	uint32					m_tileColumns;
 
-	SrSoftRenderer*			m_renderer;
 };
 extern SrFragmentBuffer* fBuffer;
 
 
 #endif // SrFragmentBuffer_h__
-
 

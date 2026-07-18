@@ -25,12 +25,12 @@ SR_ALIGN struct Quat
 	 Quat() {}
 
 	 Quat( float W, float X, float Y, float Z, bool bNorm = false )
-		: w(W), v{X, Y, Z}
+		: v{{{X, Y, Z}}}, w(W)
 	{
 		if (bNorm) Normalize();
 		assert(IsValid());
 	}
-	 Quat( float angle, const float3 &axis) : w(angle), v(axis) {};
+	 Quat( float angle, const float3 &axis) : v(axis), w(angle) {};
 
 	// 四元数 单乘
 	void operator *= (float op) {	w*=op; v*=op;	}
@@ -54,12 +54,12 @@ SR_ALIGN struct Quat
 	 void SetRotationZ( float r );
 	static Quat CreateRotationZ( float r );
 
-	float3 GetColumn0() const {return float3{2*(v.x*v.x+w*w)-1,2*(v.y*v.x+v.z*w),2*(v.z*v.x-v.y*w)};}
-	float3 GetColumn1() const {return float3{2*(v.x*v.y-v.z*w),2*(v.y*v.y+w*w)-1,2*(v.z*v.y+v.x*w)};}
-	float3 GetColumn2() const {return float3{2*(v.x*v.z+v.y*w),2*(v.y*v.z-v.x*w),2*(v.z*v.z+w*w)-1};}
-	float3 GetRow0() const {return float3{2*(v.x*v.x+w*w)-1,2*(v.x*v.y-v.z*w),2*(v.x*v.z+v.y*w)};}
-	float3 GetRow1() const {return float3{2*(v.y*v.x+v.z*w),2*(v.y*v.y+w*w)-1,2*(v.y*v.z-v.x*w)};}
-	float3 GetRow2() const	{return float3{2*(v.z*v.x-v.y*w),2*(v.z*v.y+v.x*w),2*(v.z*v.z+w*w)-1};}
+	float3 GetColumn0() const {return float3{{{2*(v.x*v.x+w*w)-1,2*(v.y*v.x+v.z*w),2*(v.z*v.x-v.y*w)}}};}
+	float3 GetColumn1() const {return float3{{{2*(v.x*v.y-v.z*w),2*(v.y*v.y+w*w)-1,2*(v.z*v.y+v.x*w)}}};}
+	float3 GetColumn2() const {return float3{{{2*(v.x*v.z+v.y*w),2*(v.y*v.z-v.x*w),2*(v.z*v.z+w*w)-1}}};}
+	float3 GetRow0() const {return float3{{{2*(v.x*v.x+w*w)-1,2*(v.x*v.y-v.z*w),2*(v.x*v.z+v.y*w)}}};}
+	float3 GetRow1() const {return float3{{{2*(v.y*v.x+v.z*w),2*(v.y*v.y+w*w)-1,2*(v.y*v.z-v.x*w)}}};}
+	float3 GetRow2() const	{return float3{{{2*(v.z*v.x-v.y*w),2*(v.z*v.y+v.x*w),2*(v.z*v.z+w*w)-1}}};}
 
 	 void Invert( void );
 	 Quat GetInverted() const;

@@ -112,13 +112,13 @@ namespace
 
 SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
 	m_window(NULL),
+	m_rasterizer(NULL),
+	m_renderState(0),
 	m_cachedBuffer(NULL),
 	m_bufferPitch(0),
-	m_renderState(0),
 	m_normalizeVertexBuffer(NULL),
 	m_currShader(NULL),
-	m_shaderConstants(NULL),
-	m_rasterizer(NULL)
+	m_shaderConstants(NULL)
 {
 	m_textureStages.assign( SR_MAX_TEXTURE_STAGE_NUM , NULL );
 	m_normalizeVBAllocSize = 0;

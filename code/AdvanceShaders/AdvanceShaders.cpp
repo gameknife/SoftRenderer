@@ -164,7 +164,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 
 	// 将0-1处理到-1到1空间
 	float3 normalTangent = norf.xyz;
-	normalTangent = (normalTangent - float3{0.5f, 0.5f, 0.5f}) * 2.f;
+	normalTangent = (normalTangent - float3{{{0.5f, 0.5f, 0.5f}}}) * 2.f;
 
 	// 将采样到的切线空间法线转换到世界空间
 	normalDir = tangent2world * normalTangent;
@@ -179,7 +179,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	viewReflWS.reflect(viewWS, normalDir);
 
 	// 采样反射纹理
-	uint32 refl = context->Tex2D( (float2{viewReflWS.x, viewReflWS.y} * 0.5f + float2{0.5f, 0.5f}), 3 );
+	uint32 refl = context->Tex2D( (float2{{{viewReflWS.x, viewReflWS.y}}} * 0.5f + float2{{{0.5f, 0.5f}}}), 3 );
 	float4 reflf = uint32_2_float4(refl);
 
 	// 取得全局天光，并利用normal作快速天光模拟
@@ -310,7 +310,7 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;
-	normalTangent = (normalTangent - float3{0.5f, 0.5f, 0.5f}) * 2.f;
+	normalTangent = (normalTangent - float3{{{0.5f, 0.5f, 0.5f}}}) * 2.f;
 	//normalTangent.y *= -1;
 
 	// 将采样到的切线空间法线转换到世界空间
@@ -326,7 +326,7 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	viewReflWS.reflect(viewWS, normalDir);
 
 	// 采样反射纹理
-	uint32 refl = context->Tex2D( (float2{viewReflWS.x, viewReflWS.y} * 0.5f + float2{0.5f, 0.5f}), 3 );
+	uint32 refl = context->Tex2D( (float2{{{viewReflWS.x, viewReflWS.y}}} * 0.5f + float2{{{0.5f, 0.5f}}}), 3 );
 	float4 reflf = uint32_2_float4(refl) * 0.25f;
 
 

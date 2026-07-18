@@ -369,8 +369,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 	xe = x2;
 
 	// ��¼ÿ��ɨ���߼���ratioʱ��ƫ��ֵ
-	float offsetY = 0;
-
 	// y��ü�
 	if (y1 < min_clip_y)
 	{
@@ -379,7 +377,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 		xe = xe+dx_right*(-y1+min_clip_y);
 
 		// reset y1
-		offsetY = ceil(y1) - y1;
 		y1 = min_clip_y;
 
 
@@ -390,8 +387,6 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 		// ȷ�� top-left ��䷨��
 		iy1 = (int)(ceil(y1));
 		// ����ƫ��ֵ
-		offsetY = iy1 - y1;
-
 		// bump xs and xe appropriately
 		xs = xs+dx_left*(iy1-y1);
 		xe = xe+dx_right*(iy1-y1);
@@ -583,8 +578,6 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 	xe = x1; 
 
 	// ��¼ÿ��ɨ���߼���ratioʱ��ƫ��ֵ
-	float offsetY = 0;
-
 	// y �ü�
 	if (y1 < min_clip_y)
 	{
@@ -593,7 +586,6 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 		xe = xe+dx_right*(-y1+min_clip_y);
 
 		// ����
-		offsetY = ceil(y1) - y1;
 		y1 = min_clip_y;
 
 		iy1 = (int)y1;
@@ -601,8 +593,6 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 	else
 	{
 		iy1 = (int)(ceil(y1));
-		offsetY = iy1 - y1;
-
 		xs = xs+dx_left*(iy1-y1);
 		xe = xe+dx_right*(iy1-y1);
 	} 

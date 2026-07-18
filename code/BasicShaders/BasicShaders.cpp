@@ -345,7 +345,7 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec;
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 	if (!std::isfinite(diffuseAcc.x) || !std::isfinite(diffuseAcc.y) || !std::isfinite(diffuseAcc.z) || !std::isfinite(diffuseAcc.w))
-		diffuseAcc = float4{0.f, 0.f, 0.f, 0.f};
+		diffuseAcc = float4{{{0.f, 0.f, 0.f, 0.f}}};
 
 	// srgb��ԭ
 	diffuseAcc.sqrt();
@@ -478,42 +478,42 @@ float2 g_reflect[16] =
 // 	float2( sinf( 14 * SR_PI / 8.f), cosf( 14 * SR_PI / 8.f) ),
 
 
-	float2{ sinf( 1.25f * SR_PI / 8.f),	cosf( 1.25f * SR_PI / 8.f) },
-		float2{ sinf( 0.25f * SR_PI / 8.f),	cosf( 0.25f * SR_PI / 8.f) },
+	float2{{{ sinf( 1.25f * SR_PI / 8.f),	cosf( 1.25f * SR_PI / 8.f) }}},
+		float2{{{ sinf( 0.25f * SR_PI / 8.f),	cosf( 0.25f * SR_PI / 8.f) }}},
 
-	float2{ sinf( 3.25f * SR_PI / 8.f),	cosf( 3.25f * SR_PI / 8.f) },
-		float2{ sinf( 2.25f * SR_PI / 8.f),	cosf( 2.25f * SR_PI / 8.f) },
+	float2{{{ sinf( 3.25f * SR_PI / 8.f),	cosf( 3.25f * SR_PI / 8.f) }}},
+		float2{{{ sinf( 2.25f * SR_PI / 8.f),	cosf( 2.25f * SR_PI / 8.f) }}},
 
-		float2{ sinf( 4.25f * SR_PI / 8.f),	cosf( 4.25f * SR_PI / 8.f) },
-	float2{ sinf( 5.25f * SR_PI / 8.f),	cosf( 5.25f * SR_PI / 8.f) },
+	float2{{{ sinf( 4.25f * SR_PI / 8.f),	cosf( 4.25f * SR_PI / 8.f) }}},
+	float2{{{ sinf( 5.25f * SR_PI / 8.f),	cosf( 5.25f * SR_PI / 8.f) }}},
 
-		float2{ sinf( 6.25f * SR_PI / 8.f),	cosf( 6.25f * SR_PI / 8.f) },
-	float2{ sinf( 7.25f * SR_PI / 8.f),	cosf( 7.25f * SR_PI / 8.f) },
+	float2{{{ sinf( 6.25f * SR_PI / 8.f),	cosf( 6.25f * SR_PI / 8.f) }}},
+	float2{{{ sinf( 7.25f * SR_PI / 8.f),	cosf( 7.25f * SR_PI / 8.f) }}},
 
 
 
-	float2{ sinf( 9.25f * SR_PI / 8.f),	cosf( 9.25f * SR_PI / 8.f) },
-		float2{ sinf( 8.25f * SR_PI / 8.f),	cosf( 8.25f * SR_PI / 8.f) },
+	float2{{{ sinf( 9.25f * SR_PI / 8.f),	cosf( 9.25f * SR_PI / 8.f) }}},
+		float2{{{ sinf( 8.25f * SR_PI / 8.f),	cosf( 8.25f * SR_PI / 8.f) }}},
 
-	float2{ sinf( 11.25f * SR_PI / 8.f),	cosf( 11.25f * SR_PI / 8.f) },
-		float2{ sinf( 10.25f * SR_PI / 8.f),	cosf( 10.25f * SR_PI / 8.f) },
+	float2{{{ sinf( 11.25f * SR_PI / 8.f),	cosf( 11.25f * SR_PI / 8.f) }}},
+		float2{{{ sinf( 10.25f * SR_PI / 8.f),	cosf( 10.25f * SR_PI / 8.f) }}},
 
-	float2{ sinf( 12.25f * SR_PI / 8.f),	cosf( 12.25f * SR_PI / 8.f) },
-	float2{ sinf( 13.25f * SR_PI / 8.f),	cosf( 13.25f * SR_PI / 8.f) },
-	float2{ sinf( 14.25f * SR_PI / 8.f),	cosf( 14.25f * SR_PI / 8.f) },
-	float2{ sinf( 15.25f * SR_PI / 8.f),	cosf( 15.25f * SR_PI / 8.f) },
+	float2{{{ sinf( 12.25f * SR_PI / 8.f),	cosf( 12.25f * SR_PI / 8.f) }}},
+	float2{{{ sinf( 13.25f * SR_PI / 8.f),	cosf( 13.25f * SR_PI / 8.f) }}},
+	float2{{{ sinf( 14.25f * SR_PI / 8.f),	cosf( 14.25f * SR_PI / 8.f) }}},
+	float2{{{ sinf( 15.25f * SR_PI / 8.f),	cosf( 15.25f * SR_PI / 8.f) }}},
 
 };
 
 float2 g_kernel[8] = {
-	float2{-2.f,0},
-	float2{2.f,0},
-	float2{0,2.f},
-	float2{0,-2.f},
-	float2{-0.7071,0.7071},
-	float2{0.7071,-0.7071},
-	float2{0.7071,0.7071},
-	float2{-0.7071,-0.7071},
+	float2{{{-2.f,0}}},
+	float2{{{2.f,0}}},
+	float2{{{0,2.f}}},
+	float2{{{0,-2.f}}},
+	float2{{{-0.7071,0.7071}}},
+	float2{{{0.7071,-0.7071}}},
+	float2{{{0.7071,0.7071}}},
+	float2{{{-0.7071,-0.7071}}},
 };
 
 void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const
@@ -545,7 +545,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;
-	normalTangent = (normalTangent - float3{0.5f, 0.5f, 0.5f}) * 2.f;
+	normalTangent = (normalTangent - float3{{{0.5f, 0.5f, 0.5f}}}) * 2.f;
 
 	// �������������߿ռ䷨��ת��������ռ�
 	normalDir = tangent2world * normalTangent;
@@ -628,7 +628,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
 	if (!std::isfinite(diffuseAcc.x) || !std::isfinite(diffuseAcc.y) || !std::isfinite(diffuseAcc.z) || !std::isfinite(diffuseAcc.w))
-		diffuseAcc = float4{0.f, 0.f, 0.f, 0.f};
+		diffuseAcc = float4{{{0.f, 0.f, 0.f, 0.f}}};
 
 	// srgb��ԭ
 	diffuseAcc.sqrt();

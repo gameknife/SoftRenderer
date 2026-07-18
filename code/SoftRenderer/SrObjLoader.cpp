@@ -189,7 +189,7 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 			float x, y, z;
 			InFile >> x >> y >> z;
 
-			Positions.push_back( float4{ x, y, z, 1 } );
+			Positions.push_back( float4{{{ x, y, z, 1 }}} );
 
 			// for3DsMax, 加入点列，随后方便走面的时候，输入normal和tc
 		}
@@ -199,14 +199,14 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 			float u, v;
 			InFile >> u >> v;
 			// for3DsMax, 加入点列，随后方便走面的时候，输入normal和tc
-			TexCoords.push_back( float2{ u, 1-v } );
+			TexCoords.push_back( float2{{{ u, 1-v }}} );
 		}
 		else if( 0 == strcmp( strCommand, "vn")  )
 		{
 			// Vertex Normal
 			float x, y, z;
 			InFile >> x >> y >> z;
-			Normals.push_back( float3{ x, y, z} );
+			Normals.push_back( float3{{{ x, y, z}}} );
 		}
 		else if( 0 == strcmp( strCommand, "f" ) )
 		{
@@ -330,9 +330,9 @@ struct SrMatLoadingParam
 
 	SrMatLoadingParam()
 	{
-		Ka = float4{0,0,0,0};
-		Kd = float4{1.f,1.f,1.f,1.f};
-		Ks = float4{.5f,.5f,.5f,1.f};
+		Ka = float4{{{0,0,0,0}}};
+		Kd = float4{{{1.f,1.f,1.f,1.f}}};
+		Ks = float4{{{.5f,.5f,.5f,1.f}}};
 		Glossness = 25.f;
 		FresnelPower = 5.f;
 		FresnelBia = 1.f;
@@ -520,5 +520,4 @@ bool SrObjLoader::LoadMaterialFromMTL( const char* strFileData )
 
 	return S_OK;
 }
-
 

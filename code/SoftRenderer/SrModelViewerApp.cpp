@@ -11,11 +11,19 @@ inline void enum_all_files_in_folder(const char* root_path, std::vector<std::str
 {
 	if (!root_path || !std::filesystem::exists(root_path)) return;
 	if (inc_sub_folders)
+	{
 		for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(root_path))
+		{
 			if (entry.is_regular_file()) result.push_back(entry.path().filename().string());
+		}
+	}
 	else
+	{
 		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(root_path))
+		{
 			if (entry.is_regular_file()) result.push_back(entry.path().filename().string());
+		}
+	}
 }
 
 SrModelViewerApp::SrModelViewerApp(void)
@@ -74,7 +82,7 @@ void SrModelViewerApp::OnInit()
 				std::string mtlfile = filename + file + ".mtl";
 				m_ent = m_scene->CreateEntity(file, objfile.c_str(), mtlfile.c_str());
 				m_ents.push_back( m_ent );
-				m_ent->SetScale(float3{40,40,40});
+				m_ent->SetScale(float3{{{40,40,40}}});
 			}
 		}
 
@@ -85,7 +93,7 @@ void SrModelViewerApp::OnInit()
 
 	// �������
 	m_camera = m_scene->CreateCamera("cam0");
-	m_camera->setPos(float3{0,0,-15});
+	m_camera->setPos(float3{{{0,0,-15}}});
 	m_camera->setFov(68.0f);
 	m_camera->Rotate( 0.1f, 0.3f );
 	m_scene->PushCamera(m_camera);
@@ -96,7 +104,7 @@ void SrModelViewerApp::OnInit()
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
-	lt->worldPos = float3{ 1000.f, 1000.f, -1000.f};
+	lt->worldPos = float3{{{ 1000.f, 1000.f, -1000.f}}};
 	lt->radius = 100.f;
 
 	// ��������豸�ص�
@@ -128,50 +136,8 @@ void SrModelViewerApp::OnDestroy()
 bool SrModelViewerApp::OnInputEvent( const SInputEvent &event )
 {
 	static bool rotateMode = false;
-	static float speed = 5.f;
-	static bool shiftMode = false;
-	static bool altMode = false;
-	static bool ctrlMode = false;
 	switch(event.keyId)
 	{
-	case  eKI_LShift:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				speed = 20.f;
-				shiftMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				speed = 5.f;
-				shiftMode = false;
-			}
-		}
-		break;
-	case  eKI_LAlt:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				altMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				altMode = false;
-			}
-		}
-		break;
-	case  eKI_LCtrl:
-		{
-			if (event.state == eIS_Pressed)
-			{
-				ctrlMode = true;
-			}
-			else if (event.state == eIS_Released)
-			{
-				ctrlMode = false;
-			}
-		}
-		break;
 	case eKI_Mouse1:
 		{
 			if (event.state == eIS_Pressed)
@@ -303,6 +269,8 @@ bool SrModelViewerApp::OnInputEvent( const SInputEvent &event )
 			}
 		}
 		break;
+	default:
+		break;
 	}
 	return false;
 }
@@ -315,8 +283,8 @@ void SrModelViewerApp::SwitchSSAO()
 }
 void SrModelViewerApp::updateCam()
 {
-	m_camera->setPos( float3{0,0,0} );
-	m_camera->Move( float3{0,0,-m_camdist});
+	m_camera->setPos( float3{{{0,0,0}}} );
+	m_camera->Move( float3{{{0,0,-m_camdist}}});
 }
 
 void SrModelViewerApp::selectEnt(int index)
