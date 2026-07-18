@@ -53,7 +53,6 @@ public:
 	// 渲染调用
 	bool DrawPrimitive( SrPrimitve* primitive );
 	bool DrawLine(const float3& from, const float3& to);
-	bool DrawScreenText(const char* str, int x,int y, uint32 size, DWORD color = SR_UICOLOR_HIGHLIGHT);
 
 	// Shader设置
 	virtual bool SetShader( const SrShader* shader );
@@ -66,8 +65,6 @@ private:
 	bool Swap();
 	// 创建硬件buffer函数
 	bool CreateHwBuffer();
-	// 批量绘制文字
-	void FlushText();
 
 	virtual SrVertexBuffer* AllocateNormalizedVertexBuffer( uint32 count, bool fastmode = false );
 
@@ -97,8 +94,6 @@ private:
 	float4* m_shaderConstants;
 	SrHandleList m_swHandles;
 
-
-	SrTextLines m_textLines;
 };
 
 #endif // SrRenderer_h__

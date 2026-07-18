@@ -66,27 +66,6 @@ void SrSponzaApp::OnUpdate()
 		g_context->CloseFeature(eRFeature_JitAA);
 	}
 
-	// ��Ϣ���
-	char buffer[255];
-	int keyL = 15;
-	int startxL = 70;
-	int starty = 4 * g_context->height / 5;
-
-	gEnv->renderer->DrawScreenText( "[Press P]", keyL, starty, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "SSAO: %s", m_ssao ? "on" : "off" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-	gEnv->renderer->DrawScreenText( "[Press K]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "DotCoverage: %s", g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) ? "on" : "off" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-// 	gEnv->renderer->DrawScreenText( "[Press ~]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-// 	sprintf_s( buffer, "Renderer: %s", gEnv->renderer->m_rendererType == eRt_HardwareD3D9 ? "Hw_D3D9" : "Software" );
-// 	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
-
-	gEnv->renderer->DrawScreenText( "[CamCtrl]", keyL, starty += 10, 1, SR_UICOLOR_MAIN);
-	sprintf_s( buffer, "WASD Move Cam | Mouse L+Drag Rotate Cam" );
-	gEnv->renderer->DrawScreenText( buffer, startxL, starty, 1, SR_UICOLOR_NORMAL );
 }
 
 void SrSponzaApp::OnDestroy()

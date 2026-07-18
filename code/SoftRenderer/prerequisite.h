@@ -87,12 +87,6 @@
 #define PIXEL_TASK_BLOCK 64				///< PixelShader����ֿ��С
 #define RASTERIZE_TASK_BLOCK 512		///< Rasterize����ֿ��С
 
-//////////////////////////////////////////////////////////////////////////
-// UI��ʾɫ��
-#define SR_UICOLOR_HIGHLIGHT 0xffffff
-#define SR_UICOLOR_MAIN		 0xaf7333
-#define SR_UICOLOR_NORMAL    0xcccccc
-
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
 #endif

@@ -62,6 +62,10 @@ BOOL SoftRenderApp::Init()
 
 	const int createWidth = getenv("SR_WIDTH") ? (std::max)(1, atoi(getenv("SR_WIDTH"))) : 854;
 	const int createHeight = getenv("SR_HEIGHT") ? (std::max)(1, atoi(getenv("SR_HEIGHT"))) : 480;
+	// MiniFB defaults to one swap interval for its OpenGL backend.  Disable
+	// the interval before creating the window so the backend applies swap
+	// interval 0 when it initializes the GL context.
+	mfb_set_target_fps(0);
 	g_miniFBWindow = getenv("SR_HEADLESS") ? NULL : mfb_open("SoftRenderer", createWidth, createHeight);
 	m_hWnd = reinterpret_cast<HWND>(g_miniFBWindow);
 

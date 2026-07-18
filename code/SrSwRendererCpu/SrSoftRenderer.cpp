@@ -27,68 +27,8 @@
 
 namespace
 {
-	struct SrCachedGlyph
-	{
-		SrCachedGlyph() : width(0), height(0), originX(0), originY(0), advance(0), stride(0) {}
-		uint32 width, height;
-		int originX, originY, advance;
-		uint32 stride;
-		std::vector<uint8> bits;
-	};
-
-	struct SrCachedFont
-	{
-		SrCachedFont() : ready(false), ascent(0) {}
-		bool ready;
-		int ascent;
-		SrCachedGlyph glyphs[128];
-	};
-
-	SrCachedFont g_bigFontCache;
-	SrCachedFont g_smallFontCache;
-	SrTextLines g_inFlightTextLines;
 	SrVertexBufferArray g_inFlightNormalizedVBs;
 	uint32 g_inFlightFrameNumber = 0;
-
-	#ifdef _WIN32
-	static bool BuildFontCache(HFONT font, SrCachedFont& cache)
-	{
-		HDC dc = CreateCompatibleDC(NULL);
-		if (!dc)
-			return false;
-		HGDIOBJ oldFont = SelectObject(dc, font);
-		TEXTMETRIC metrics;
-		memset(&metrics, 0, sizeof(metrics));
-		GetTextMetrics(dc, &metrics);
-		cache.ascent = metrics.tmAscent;
-		MAT2 transform;
-		memset(&transform, 0, sizeof(transform));
-		transform.eM11.value = 1;
-		transform.eM22.value = 1;
-		for (uint32 character = 32; character < 128; ++character)
-		{
-			GLYPHMETRICS glyphMetrics;
-			memset(&glyphMetrics, 0, sizeof(glyphMetrics));
-			const DWORD size = GetGlyphOutlineA(dc, character, GGO_BITMAP, &glyphMetrics, 0, NULL, &transform);
-			if (size == GDI_ERROR)
-				continue;
-			SrCachedGlyph& glyph = cache.glyphs[character];
-			glyph.width = glyphMetrics.gmBlackBoxX;
-			glyph.height = glyphMetrics.gmBlackBoxY;
-			glyph.originX = glyphMetrics.gmptGlyphOrigin.x;
-			glyph.originY = glyphMetrics.gmptGlyphOrigin.y;
-			glyph.advance = glyphMetrics.gmCellIncX;
-			glyph.stride = ((glyph.width + 31) / 32) * 4;
-			glyph.bits.resize(size);
-			if (size)
-				GetGlyphOutlineA(dc, character, GGO_BITMAP, &glyphMetrics, size, &glyph.bits[0], &transform);
-		}
-		SelectObject(dc, oldFont);
-		DeleteDC(dc);
-		cache.ready = true;
-		return true;
-	}
-	#endif
 
 	static uint64_t HashBytes(uint64_t hash, const void* data, size_t size)
 	{
@@ -219,9 +159,6 @@ bool SrSoftRenderer::ShutdownRenderer()
 			m_rasterizer->IsFrameSurfaceReady())
 		{
 			WriteFrameHash(g_inFlightFrameNumber, m_cachedBuffer, m_bufferPitch);
-			m_textLines.swap(g_inFlightTextLines);
-			FlushText();
-			m_textLines.clear();
 			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
 				delete g_inFlightNormalizedVBs[i];
 			g_inFlightNormalizedVBs.clear();
@@ -290,15 +227,11 @@ void SrSoftRenderer::EndFrame()
 	const bool tileBinning = g_context->IsFeatureEnable(eRFeature_TileBinning) != FALSE;
 	if (tileBinning)
 	{
+		Swap();
 		const bool completedFrame = m_rasterizer->WaitForFrameAsync();
 		if (completedFrame && m_rasterizer->IsFrameSurfaceReady())
 		{
 			WriteFrameHash(g_inFlightFrameNumber, m_cachedBuffer, m_bufferPitch);
-			m_textLines.swap(g_inFlightTextLines);
-			FlushText();
-			m_textLines.clear();
-			Swap();
-			m_textLines.swap(g_inFlightTextLines);
 			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
 				delete g_inFlightNormalizedVBs[i];
 			g_inFlightNormalizedVBs.clear();
@@ -306,18 +239,16 @@ void SrSoftRenderer::EndFrame()
 		}
 		else if (completedFrame)
 		{
-			g_inFlightTextLines.clear();
 			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
 				delete g_inFlightNormalizedVBs[i];
 			g_inFlightNormalizedVBs.clear();
 		}
 
 		// No render worker is active in this hand-off window. This keeps the
-		// profiler reset and overlay generation free of cross-frame races.
+		// profiler reset free of cross-frame races.
 		gEnv->profiler->Update();
 		m_rasterizer->SubmitFrameAsync();
 		g_inFlightFrameNumber = m_frameCount;
-		g_inFlightTextLines.swap(m_textLines);
 		g_inFlightNormalizedVBs.swap(m_normlizedVBs);
 
 		// Present the completed frame, then hand the persistent CPU surface to the next frame.
@@ -336,9 +267,6 @@ void SrSoftRenderer::EndFrame()
 		m_bufferPitch = g_context->width * static_cast<int>(sizeof(uint32));
 		m_rasterizer->Flush();
 		WriteFrameHash(m_frameCount, m_cachedBuffer, m_bufferPitch);
-		FlushText();
-		m_textLines.clear();
-		Swap();
 		for (uint32 i = 0; i < m_normlizedVBs.size(); ++i)
 			delete m_normlizedVBs[i];
 		m_normlizedVBs.clear();
@@ -376,57 +304,6 @@ bool SrSoftRenderer::DrawPrimitive( SrPrimitve* primitive )
 {
 	return m_rasterizer->DrawPrimitive(primitive);
 }
-
-void SrSoftRenderer::FlushText()
-{
-	if (std::getenv("SR_HEADLESS") || std::getenv("SR_DISABLE_UI"))
-		return;
-	if (m_textLines.empty() || !m_cachedBuffer)
-		return;
-
-	gEnv->profiler->setBegin(ePe_FlushTextTime);
-	for (SrTextLines::const_iterator it = m_textLines.begin(); it != m_textLines.end(); ++it)
-	{
-		const SrCachedFont& font = it->size == 0 ? g_bigFontCache : g_smallFontCache;
-		if (!font.ready)
-			continue;
-		const uint32 color = (GetRValue(it->color) << 16) | (GetGValue(it->color) << 8) | GetBValue(it->color);
-		int penX = it->pos.x;
-		const int baseline = it->pos.y + font.ascent;
-		for (size_t characterIndex = 0; characterIndex < it->text.size(); ++characterIndex)
-		{
-			uint32 character = static_cast<uint8>(it->text[characterIndex]);
-			if (character < 32 || character >= 128)
-				character = '?';
-			const SrCachedGlyph& glyph = font.glyphs[character];
-			const int glyphX = penX + glyph.originX;
-			const int glyphY = baseline - glyph.originY;
-			if (!glyph.stride || glyph.bits.size() < static_cast<size_t>(glyph.stride) * glyph.height)
-			{
-				penX += glyph.advance;
-				continue;
-			}
-			for (uint32 row = 0; row < glyph.height; ++row)
-			{
-				const int y = glyphY + static_cast<int>(row);
-				if (y < 0 || y >= g_context->height)
-					continue;
-				uint32* destination = reinterpret_cast<uint32*>(static_cast<uint8*>(m_cachedBuffer) + y * m_bufferPitch);
-				const uint8* source = &glyph.bits[row * glyph.stride];
-				for (uint32 column = 0; column < glyph.width; ++column)
-				{
-					const int x = glyphX + static_cast<int>(column);
-					if (x >= 0 && x < g_context->width && (source[column >> 3] & (0x80 >> (column & 7))))
-						destination[x] = color;
-				}
-			}
-			penX += glyph.advance;
-		}
-	}
-	gEnv->profiler->setEnd(ePe_FlushTextTime);
-}
-
-
 
 bool SrSoftRenderer::Resize( uint32 width, uint32 height )
 {
@@ -556,19 +433,6 @@ bool SrSoftRenderer::InnerInitShaders()
 	 	}
 	}
 
-
-	return true;
-}
-
-bool SrSoftRenderer::DrawScreenText( const char* str, int x,int y, uint32 size, DWORD color /*= SR_UICOLOR_HIGHLIGHT*/ )
-{
-	SrTextLine line;
-	line.text = std::string(str);
-	line.pos = int2(x,y);
-	line.size = size;
-	line.color = color;
-
-	m_textLines.push_back( line );
 
 	return true;
 }

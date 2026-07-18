@@ -20,15 +20,6 @@ class SrRasterizer;
 class SrResourceManager;
 class SrShader;
 
-struct SrTextLine
-{
-	std::string text;
-	int2 pos;
-	uint32 color;
-	uint32 size;
-};
-typedef std::vector<SrTextLine> SrTextLines;
-
 enum EHwTimerElement
 {
 	eHt_GpuFlushTime = 0,
@@ -86,7 +77,6 @@ public:
 	// 渲染调用
 	virtual bool DrawPrimitive( SrPrimitve* primitive )=0;
 	virtual bool DrawLine(const float3& from, const float3& to)=0;
-	virtual bool DrawScreenText(const char* str, int x,int y, uint32 size, DWORD color = SR_UICOLOR_HIGHLIGHT) =0;
 
 	// Shader设置
 	virtual bool SetShader(const SrShader* shader) =0;

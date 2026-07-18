@@ -25,7 +25,6 @@ enum EProfilerElement
 	ePe_RasterizeShaderTime,
 	ePe_PixelShaderTime,
 	ePe_FrameTime,
-	ePe_FlushTextTime,
 	ePe_PostProcessTime,
 
 	ePe_DrawCallTime,

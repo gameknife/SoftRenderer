@@ -166,7 +166,6 @@ void SrRasterizer::PresentPendingFrame()
 {
 	if (!m_presentPending)
 		return;
-	m_renderer->Swap();
 	m_presentPending = false;
 }
 

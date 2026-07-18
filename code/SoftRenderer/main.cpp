@@ -55,7 +55,6 @@ static void ApplyRendererCommandLine(const char* commandLine)
 	if (HasCommandLineOption(commandLine, "--no-jitaa")) _putenv_s("SR_DISABLE_JITAA", "1");
 	if (HasCommandLineOption(commandLine, "--ssao")) _putenv_s("SR_DISABLE_SSAO", "");
 	if (HasCommandLineOption(commandLine, "--no-ssao")) _putenv_s("SR_DISABLE_SSAO", "1");
-	if (HasCommandLineOption(commandLine, "--no-ui")) _putenv_s("SR_DISABLE_UI", "1");
 	if (HasCommandLineOption(commandLine, "--relaxed-ssao")) _putenv_s("SR_RELAXED_SSAO", "1");
 	SetOptionEnvironment(commandLine, "--tile-size=", "SR_TILE_SIZE");
 	SetOptionEnvironment(commandLine, "--workers=", "SR_WORKER_COUNT");

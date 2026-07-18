@@ -33,9 +33,8 @@ Release/854×480/24-thread/24×24 tile 的 180 帧验证中，默认 JitAA media
 720，tile busy ratio 从 87.2% 提升至 92.8%。
 
 提交与 UI 路径也完成了单线程算法收敛：`SrRendPrimitve`/帧 VB 描述符跨帧复用，
-避免每个 subset 每帧重复分配和释放（顶点数据语义保持原样）；文本在启动时构建两套
-ASCII glyph bitmap cache，帧内直接写入已锁定的 backbuffer，不再调用 D3D
-`GetDC/ReleaseDC/DrawText`。`--headless` 自动跳过 UI，`--no-ui` 可用于交互 A/B。
+避免每个 subset 每帧重复分配和释放（顶点数据语义保持原样）；当前窗口架构不再
+维护屏内文本 overlay 或对应的 glyph cache。
 
 ## 1. 结论先行
 

@@ -112,7 +112,7 @@ size is 24×24 and can be overridden at runtime.
 --width=N --height=N
 --scene=sponza|model
 --headless --frames=N
---no-jitaa --no-ssao --no-ui --relaxed-ssao
+--no-jitaa --no-ssao --relaxed-ssao
 --hash-output=results.csv
 ```
 
