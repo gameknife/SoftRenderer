@@ -64,6 +64,16 @@ bin/
 The build does not copy runtime assets. The application uses the existing
 tracked `bin/media/` directory.
 
+## Optimization comparison
+
+The following screenshots show the Sponza scene before and after the renderer
+optimization. The optimized view includes the tile-binning statistics together
+with the CPU model and worker information.
+
+| Before | After |
+| --- | --- |
+| ![Before optimization](doc/sr_dbc6527.webp) | ![After optimization](doc/sr_c87febf.webp) |
+
 ## Tests
 
 Build and run the deterministic tile layout/binning tests with:
