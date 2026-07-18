@@ -4,7 +4,8 @@
 
 std::map<const void*, void*> m_align_pt_mapper;
 
-SrFragmentBuffer::SrFragmentBuffer( int width, int height, SrSoftRenderer* renderer):m_width(width), m_height(height), m_renderer(renderer)
+SrFragmentBuffer::SrFragmentBuffer( int width, int height, SrSoftRenderer* renderer)
+	: m_width(width), m_height(height), m_tileReady(NULL), m_tileSize(0), m_tileColumns(0), m_renderer(renderer)
 {
 	uint32 size = width * height;
 	//fragBuffer = new SrFragmentBuffer[size];
@@ -15,27 +16,44 @@ SrFragmentBuffer::SrFragmentBuffer( int width, int height, SrSoftRenderer* rende
 	//fragBufferPitch = sizeof(SrFragment) * width;
 	m_fBufferIndices = gEnv->resourceMgr->AllocateIndexBuffer(width * height);
 
-	fragBufferSync = new SrFragmentBufferSync[size];
-
 	zBuffer = new float[size];
+	memset(zBuffer, 0, size * sizeof(float));
+	#ifdef RASTERIZER_SYNC
+	fragBufferSync = new SrFragmentBufferSync[size];
+	#endif
 }
 
+void SrFragmentBuffer::ConfigureRelaxedTileReads(std::atomic<LONG>* tileReady, uint32 tileSize, uint32 tileColumns)
+{
+	m_tileReady = tileReady;
+	m_tileSize = tileSize;
+	m_tileColumns = tileColumns;
+}
+
+void SrFragmentBuffer::DisableRelaxedTileReads()
+{
+	m_tileReady = NULL;
+	m_tileSize = 0;
+	m_tileColumns = 0;
+}
 
 SrFragmentBuffer::~SrFragmentBuffer(void)
 {
 	_mm_free_custom(fBuffer);
 	gEnv->resourceMgr->DeleteIndexBuffer(m_fBufferIndices);
+	#ifdef RASTERIZER_SYNC
 	delete[] fragBufferSync;
+	#endif
 	delete[] zBuffer;
 }
 
 float3 SrFragmentBuffer::GetNormal( float2& texcoord ) const
 {
-	// ÔÚÕâÀï×÷warp
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½warp
 	float u = texcoord.x - floor(texcoord.x);
 	float v = texcoord.y - floor(texcoord.y);
 
-	// ÁÙ½üµã²ÉÑù
+	// ï¿½Ù½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	u *= (m_width);
 	v *= (m_height);
 

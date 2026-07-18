@@ -113,6 +113,8 @@ set(SR_RENDERER_SOURCES
     "${SR_RENDERER_DIR}/SrRasterizer_Algo.cpp"
     "${SR_RENDERER_DIR}/SrRasterize_Clip.cpp"
     "${SR_RENDERER_DIR}/SrSoftRenderer.cpp"
+	"${SR_RENDERER_DIR}/SrTileRenderer.cpp"
+	"${SR_RENDERER_DIR}/SrTileBinner.cpp"
 )
 
 add_library(SrSwRendererCpu SHARED ${SR_RENDERER_SOURCES})
@@ -141,6 +143,14 @@ set_target_properties(AdvanceShaders PROPERTIES OUTPUT_NAME AdvanceShaders SUFFI
 sr_set_runtime_layout(AdvanceShaders "shader")
 
 add_dependencies(SoftRenderer SrSwRendererCpu BasicShaders AdvanceShaders)
+
+enable_testing()
+add_executable(SoftRendererTests
+	"${SR_RENDERER_DIR}/tests/SrTileTests.cpp"
+	"${SR_RENDERER_DIR}/SrTileBinner.cpp"
+)
+target_include_directories(SoftRendererTests PRIVATE "${SR_RENDERER_DIR}")
+add_test(NAME SoftRenderer.TileLayout COMMAND SoftRendererTests)
 
 if(NOT EXISTS "${SR_MEDIA_DIR}")
     message(FATAL_ERROR "Runtime media directory was not found: ${SR_MEDIA_DIR}")

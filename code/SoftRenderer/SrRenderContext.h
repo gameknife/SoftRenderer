@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -30,9 +30,16 @@ struct SrRendContext
 			GetSystemInfo(&siSysInfo); 
 
 			processorNum = siSysInfo.dwNumberOfProcessors;
+			const char* configuredWorkers = getenv("SR_WORKER_COUNT");
+			if (configuredWorkers)
+			{
+				const int requested = atoi(configuredWorkers);
+				if (requested > 0)
+					processorNum = (std::min<int>)(requested, static_cast<int>(siSysInfo.dwNumberOfProcessors));
+			}
 	}
 
-	// äÖÈ¾ÌØĞÔÏà¹Ø
+	// ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void OpenFeature( ERenderFeature feature )
 	{
 		features |= feature;
@@ -46,13 +53,13 @@ struct SrRendContext
 		return features & feature;
 	}
 	
-	// ÏêÏ¸²ÎÊı
-	int width;							///< äÖÈ¾Æ÷¿í¶È
-	int height;							///< äÖÈ¾Æ÷¸ß¶È
-	SrViewport viewport;				///< 3Î¬ÊÓ¿Ú
-	int bpp;							///< ÏñËØÎ»¿í£¬µ¥Î»byte
-	uint32 features;					///< äÖÈ¾ÌØĞÔ
-	int processorNum;					///< ´¦ÀíÆ÷¸öÊı
+	// ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½
+	int width;							///< ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½ï¿½
+	int height;							///< ï¿½ï¿½È¾ï¿½ï¿½ï¿½ß¶ï¿½
+	SrViewport viewport;				///< 3Î¬ï¿½Ó¿ï¿½
+	int bpp;							///< ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Î»byte
+	uint32 features;					///< ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
+	int processorNum;					///< ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	SrFragmentBuffer* fBuffer;			///< FragBuffer
 };

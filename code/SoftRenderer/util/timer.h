@@ -1,11 +1,11 @@
 /**
   @file timer.h
   
-  @brief ¼ÆÊ±Æ÷Àà£¬srÊ¹ÓÃµÄÊ±¼ä½Ó¿Ú
+  @brief è®¡æ—¶å™¨ç±»ï¼Œsrä½¿ç”¨çš„æ—¶é—´æ¥å£
 
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -32,7 +32,8 @@ public:
 	{
 		m_time = timeGetTime() / 1000.f;
 		m_elapsedTime = 0;
-		QueryPerformanceFrequency(&m_freq); // »ñÈ¡cpuÊ±ÖÓÖÜÆÚ   
+		QueryPerformanceFrequency(&m_freq); // è·å–cpuæ—¶é’Ÿå‘¨æœŸ
+		QueryPerformanceCounter(&m_qpcStart);
 	}
 
 	void Update()
@@ -61,8 +62,11 @@ public:
 	float getRealTime()
 	{
 		LARGE_INTEGER now;
-		QueryPerformanceCounter(&now); // »ñÈ¡cpuÊ±ÖÓ¼ÆÊı
-		return (float)(now.QuadPart)/m_freq.QuadPart;
+		QueryPerformanceCounter(&now); // è·å–cpuæ—¶é’Ÿè®¡æ•°
+		// Keep the value relative to application start. Converting an absolute
+		// QPC value to float loses millisecond precision after a long uptime.
+		return static_cast<float>(static_cast<double>(now.QuadPart - m_qpcStart.QuadPart) /
+			static_cast<double>(m_freq.QuadPart));
 	}
 
 private:
@@ -71,6 +75,7 @@ private:
 
 	// high precision
 	LARGE_INTEGER m_freq;
+	LARGE_INTEGER m_qpcStart;
 };
 
 #endif

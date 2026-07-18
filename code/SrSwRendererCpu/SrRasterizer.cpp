@@ -1,11 +1,11 @@
 /**
   @file SrRasterizer.cpp
-  
+
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
-   
+
  */
 
 #include "StdAfx.h"
@@ -23,14 +23,15 @@
 SrFragmentBuffer* fBuffer = NULL;						/// fragment Buffer
 
 SrRasterizer::SrRasterizer(void)
-{	
+	: m_rendPrimitiveUsed(0)
+{
 	m_MemSBuffer = NULL;
 	m_BackSBuffer = NULL;
 }
 
 /**
- *@brief ³õÊ¼»¯¹âÕ¤»¯Æ÷£¬³õÊ¼»¯TaskDispatcher£¬ÉêÇërendertexture
- *@return void 
+ *@brief ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½TaskDispatcherï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rendertexture
+ *@return void
  */
 void SrRasterizer::Init(SrSoftRenderer* renderer)
 {
@@ -39,6 +40,9 @@ void SrRasterizer::Init(SrSoftRenderer* renderer)
 
 	m_MemSBuffer = gEnv->resourceMgr->CreateRenderTexture( "$MemoryScreenBuffer" ,g_context->width, g_context->height, 4 );
 	m_BackSBuffer = gEnv->resourceMgr->CreateRenderTexture( "$BackupScreenBuffer" ,g_context->width, g_context->height, 4 );
+	const size_t screenBytes = static_cast<size_t>(g_context->width) * g_context->height * sizeof(uint32);
+	memset(const_cast<uint8*>(m_MemSBuffer->getBuffer()), SR_GREYSCALE_CLEARCOLOR, screenBytes);
+	memset(const_cast<uint8*>(m_BackSBuffer->getBuffer()), SR_GREYSCALE_CLEARCOLOR, screenBytes);
 
 	m_rasTaskDispatcher = new SrRasTaskDispatcher;
 	m_rasTaskDispatcher->Init();
@@ -51,15 +55,17 @@ SrRasterizer::~SrRasterizer(void)
 	delete fBuffer;
 	m_rasTaskDispatcher->Destroy();
 	delete m_rasTaskDispatcher;
+	for (uint32 i = 0; i < m_rendPrimitivePool.size(); ++i)
+		delete m_rendPrimitivePool[i];
 }
 
 /**
- *@brief »æÖÆprimitive
- *@return bool »æÖÆÌá½»³É¹¦£¬·µ»Øtrue£¬·ñÔòfalse
- *@param SrPrimitve * primitive ÐèÒª»æÖÆµÄprimitive
- *@remark º¯ÊýÄÚ²¿¸ºÔð½«primitiveµÄvb£¬ib¿½±´µ½rendPrimitiveÄÚ¡£\
- ²¢»º´æµ±Ç°µÄtextureStage£¬matrixStack£¬lightList¡£\
- ÎªrendPrimitve½¨Á¢shaderContext£¬ÒÔ·½±ãÔÚshaderÄÚ²¿·ÃÎÊ¡£
+ *@brief ï¿½ï¿½ï¿½ï¿½primitive
+ *@return bool ï¿½ï¿½ï¿½ï¿½ï¿½á½»ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½trueï¿½ï¿½ï¿½ï¿½ï¿½ï¿½false
+ *@param SrPrimitve * primitive ï¿½ï¿½Òªï¿½ï¿½ï¿½Æµï¿½primitive
+ *@remark ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½primitiveï¿½ï¿½vbï¿½ï¿½ibï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rendPrimitiveï¿½Ú¡ï¿½\
+ ï¿½ï¿½ï¿½ï¿½ï¿½æµ±Ç°ï¿½ï¿½textureStageï¿½ï¿½matrixStackï¿½ï¿½lightListï¿½ï¿½\
+ ÎªrendPrimitveï¿½ï¿½ï¿½ï¿½shaderContextï¿½ï¿½ï¿½Ô·ï¿½ï¿½ï¿½ï¿½ï¿½shaderï¿½Ú²ï¿½ï¿½ï¿½ï¿½Ê¡ï¿½
  */
 bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 {
@@ -70,12 +76,23 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 
 	float start = gEnv->timer->getRealTime();
 
-	// ÉêÇëäÖÈ¾primitive
-	SrRendPrimitve* transformed = new SrRendPrimitve();
+	SrRendPrimitve* transformed = NULL;
+	if (m_rendPrimitiveUsed < m_rendPrimitivePool.size())
+		transformed = m_rendPrimitivePool[m_rendPrimitiveUsed];
+	else
+	{
+		transformed = new SrRendPrimitve();
+		m_rendPrimitivePool.push_back(transformed);
+	}
+	++m_rendPrimitiveUsed;
 
-	// vb,ibÉêÇë
-	float start1 = gEnv->timer->getRealTime();	
-	transformed->vb = m_renderer->AllocateNormalizedVertexBuffer(primitive->vb->elementCount, true);
+	// vb,ibï¿½ï¿½ï¿½ï¿½
+	float start1 = gEnv->timer->getRealTime();
+	transformed->vb = &transformed->frameVb;
+	transformed->vb->data = reinterpret_cast<uint8*>(m_renderer->m_normalizeVertexBuffer + m_renderer->m_normalizeVBAllocSize);
+	transformed->vb->elementCount = primitive->vb->elementCount;
+	transformed->vb->elementSize = sizeof(SrRendVertex);
+	m_renderer->m_normalizeVBAllocSize += primitive->vb->elementCount;
 	transformed->ib = primitive->ib;
 	gEnv->profiler->IncreaseTime(ePe_DrawCallAllocTime, gEnv->timer->getRealTime() - start1);
 
@@ -86,13 +103,13 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 		SrVertexBuffer* cacheVB = m_renderer->AllocateNormalizedVertexBuffer( primitive->vb->elementCount );
 		if (cacheVB)
 		{
-			// Ìî³ääÖÈ¾primitive
+			// ï¿½ï¿½ï¿½ï¿½ï¿½È¾primitive
 			for( uint32 i=0; i < primitive->vb->elementCount; ++i )
 			{
 				uint8* vbStart = primitive->vb->data;
 				uint32 eSize = primitive->vb->elementSize;
 
-				// Öð¶¥µãÌî³ä
+				// ï¿½ð¶¥µï¿½ï¿½ï¿½ï¿½
 				memcpy( cacheVB->data + i * sizeof(SrRendVertex), vbStart + i * eSize, eSize);
 			}
 		}
@@ -101,39 +118,41 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 	}
 
 
-	memcpy(transformed->vb->data, primitive->cachedVb->data, primitive->cachedVb->elementSize * primitive->cachedVb->elementCount);
-	
-	// Ìî³äib
+	memcpy(transformed->vb->data, primitive->cachedVb->data,
+		primitive->cachedVb->elementSize * primitive->cachedVb->elementCount);
+
+	// ï¿½ï¿½ï¿½ib
 	//memcpy(transformed.ib->data, primitive->ib->data, primitive->ib->count * sizeof(uint32));
-	
-	// Ìî³äshaderConstants
+
+	// ï¿½ï¿½ï¿½shaderConstants
 	transformed->shader = m_renderer->m_currShader;
-	transformed->shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStack»º´æ
-	transformed->shaderConstants.textureStage = m_renderer->m_textureStages; // ÎÆÀístage»º´æ
-	transformed->shaderConstants.lightList =gEnv->sceneMgr->m_lightList; // lightList»º´æ
+	transformed->shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStackï¿½ï¿½ï¿½ï¿½
+	transformed->shaderConstants.textureStage = m_renderer->m_textureStages; // ï¿½ï¿½ï¿½ï¿½stageï¿½ï¿½ï¿½ï¿½
+	transformed->shaderConstants.lightList =gEnv->sceneMgr->m_lightList; // lightListï¿½ï¿½ï¿½ï¿½
 	memcpy( transformed->shaderConstants.shaderConstants, m_renderer->m_shaderConstants, eSC_ShaderConstantCount * sizeof(float4) );
 	transformed->shaderConstants.alphaTest = primitive->material->m_alphaTest;
 	transformed->shaderConstants.culling = true;
+	transformed->drawSequence = static_cast<uint32>(m_rendPrimitives.size());
 
-	// Ìá½»äÖÈ¾primitive
+	// ï¿½á½»ï¿½ï¿½È¾primitive
 	m_rendPrimitives.push_back( transformed );
-	
+
 	gEnv->profiler->IncreaseTime(ePe_DrawCallTime, gEnv->timer->getRealTime() - start);
 
 	return true;
 }
 
 /**
- *@brief ¹âÕ¤»¯Æ÷µÄ¹¤×÷Èë¿Ú
+ *@brief ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
- *@return void 
- *@remark Ã¿Ò»Ö¡Ä©Î²£¬¶Ô»º´æµÄrendPrimitive½øÐÐ´¦Àí¡£
- 0.bufferµÄClear²Ù×÷
- 1.²¢ÐÐµÄ´¦ÀíËùÓÐ¶¥µã,
- 2.µ¥Ïß³ÌÖ´ÐÐ¸÷¸öprimitiveµÄ¹âÕ¤»¯,
- 3.²¢ÐÐµÄ´¦ÀíËùÓÐµÃµ½µÄÏñËØ,
- 4.ºó´¦Àí
- 5.Çå¿ÕrendPrimitiveµÈ
+ *@return void
+ *@remark Ã¿Ò»Ö¡Ä©Î²ï¿½ï¿½ï¿½Ô»ï¿½ï¿½ï¿½ï¿½rendPrimitiveï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½
+ 0.bufferï¿½ï¿½Clearï¿½ï¿½ï¿½ï¿½
+ 1.ï¿½ï¿½ï¿½ÐµÄ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½,
+ 2.ï¿½ï¿½ï¿½ß³ï¿½Ö´ï¿½Ð¸ï¿½ï¿½ï¿½primitiveï¿½Ä¹ï¿½Õ¤ï¿½ï¿½,
+ 3.ï¿½ï¿½ï¿½ÐµÄ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÃµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,
+ 4.ï¿½ï¿½ï¿½ï¿½
+ 5.ï¿½ï¿½ï¿½rendPrimitiveï¿½ï¿½
  */
 void SrRasterizer::Flush()
 {
@@ -141,12 +160,12 @@ void SrRasterizer::Flush()
 	gEnv->profiler->setBegin(ePe_ClearTime);
 
 	//////////////////////////////////////////////////////////////////////////
-	// 0. Clear²Ù×÷
+	// 0. Clearï¿½ï¿½ï¿½ï¿½
 
-	// clear ÏñËØË÷Òý
+	// clear ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	fBuffer->GetPixelIndicesBuffer()->Clear();
 
-	// Fragment Buffer ºÍ OutBafferµÄClear
+	// Fragment Buffer ï¿½ï¿½ OutBafferï¿½ï¿½Clear
 	uint32* memBuffer = (uint32*)m_MemSBuffer->getBuffer();
 	uint32* backBuffer = (uint32*)m_BackSBuffer->getBuffer();
 	uint32* gpuBuffer = (uint32*)m_renderer->getBuffer();
@@ -156,57 +175,71 @@ void SrRasterizer::Flush()
 	// VIDEO MEM 2 SYSTEM MEM, VERY VERY VERY SLOW!!!
 	//memcpy(m_prevSBuffer->getBuffer(), g_context->GetSBuffer(), 4 * g_context->width * g_context->height);
 	// FAST, SO WE USE A MEM BACKBUFFER, ALL THINGS WRITE TO MEM BACKBUFFER, THEN JIT AA WRITE TO GPU BUFFER
-	// Èç¹û¿ªÆôJit AA£¬ÏÈÐ´µ½memBufferÉÏ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jit AAï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½memBufferï¿½ï¿½
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 	{
-		outBuffer = memBuffer;		
+		outBuffer = memBuffer;
+	}
+
+	if (g_context->IsFeatureEnable(eRFeature_TileBinning))
+	{
+		FlushTileBinning(outBuffer, memBuffer, backBuffer, gpuBuffer);
+		gEnv->profiler->setBegin(ePe_PostProcessTime);
+		m_rendPrimitives.clear();
+		m_rendPrimitivesRHZ.clear();
+		m_rendDynamicVertex.clear();
+		m_rendPrimitiveUsed = 0;
+		gEnv->profiler->setEnd(ePe_PostProcessTime);
+		gEnv->profiler->setEnd(ePe_FlushTime);
+		return;
 	}
 
 	// clear the OutBuffer
-	// Ê¹ÓÃ SR_GREYSCALE_CLEARCOLOR À´Çå¿Õ»º´æ
+	// Ê¹ï¿½ï¿½ SR_GREYSCALE_CLEARCOLOR ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½
 	if (g_context->IsFeatureEnable(eRFeature_MThreadRendering))
 	{
-		// ¶àÏß³ÌÇå¿Õ
+		// ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½
 		int quadsize = g_context->width * g_context->height;
-		
 
-		// Çå¿ÕoutBuffer
+
+		// ï¿½ï¿½ï¿½outBuffer
 		uint8* dst = (uint8*)outBuffer;
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, SR_GREYSCALE_CLEARCOLOR ));
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, SR_GREYSCALE_CLEARCOLOR ));
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, SR_GREYSCALE_CLEARCOLOR ));
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, SR_GREYSCALE_CLEARCOLOR ));
 
-		// Çå¿ÕfragBuffer
+		// ï¿½ï¿½ï¿½fragBuffer
 		dst = (uint8*)fBuffer->zBuffer;
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 0, quadsize, 0 ));
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 1, quadsize, 0 ));
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 2, quadsize, 0 ));
 		m_rasTaskDispatcher->PushTask( new SrRasTask_Clear( dst + quadsize * 3, quadsize, 0 ));
-		
-		// Ö´ÐÐÈÎÎñ¶ÓÁÐ
+
+		// Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		m_rasTaskDispatcher->FlushCoop();
 		m_rasTaskDispatcher->Wait();
 	}
 	else
 	{
-		// µ¥Ïß³ÌÇå¿Õ
+		// ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½
 		int size = g_context->width * g_context->height;
 
-		// Çå¿ÕoutBuffer
+		// ï¿½ï¿½ï¿½outBuffer
 		memset(outBuffer, SR_GREYSCALE_CLEARCOLOR, 4 * size);
-		// Çå¿ÕfragBuffer
+		// ï¿½ï¿½ï¿½fragBuffer
 		memset(fragBuffer, 0, sizeof(SrFragment) * size);
+		memset(fBuffer->zBuffer, 0, sizeof(float) * size);
 	}
 	gEnv->profiler->setEnd(ePe_ClearTime);
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ¶¥µã´¦Àí
+	// ï¿½ï¿½ï¿½ã´¦ï¿½ï¿½
 	// every vertex -> sshader -> every vertex
 	gEnv->profiler->setBegin(ePe_VertexShaderTime);
-	
-	// Ìî³äÈÎÎñ¶ÓÁÐ
+
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	for ( std::list<SrRendPrimitve*>::iterator it = m_rendPrimitives.begin(); it != m_rendPrimitives.end(); ++it)
 	{
@@ -229,7 +262,7 @@ void SrRasterizer::Flush()
 //  	{
 // 		SrRendPrimitve& primitive = m_rendPrimitives[i];
 // 		uint32 vertexCount = 0;
-// 
+//
 // 		for (uint32 i = 0; i < primitive.vb->elementCount; i += VERTEX_TASK_BLOCK )
 // 		{
 // 			uint32 end =  i + VERTEX_TASK_BLOCK;
@@ -242,17 +275,17 @@ void SrRasterizer::Flush()
 // 		}
 //  	}
 
-	// Ö´ÐÐÈÎÎñ¶ÓÁÐ
+	// Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_rasTaskDispatcher->FlushCoop();
 	m_rasTaskDispatcher->Wait();
 
 	gEnv->profiler->setEnd(ePe_VertexShaderTime);
-	// ¶¥µã´¦Àí½áÊø
+	// ï¿½ï¿½ï¿½ã´¦ï¿½ï¿½ï¿½ï¿½ï¿½
 	//////////////////////////////////////////////////////////////////////////
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ¹âÕ¤»¯
+	// ï¿½ï¿½Õ¤ï¿½ï¿½
 	// all vertex -> rasterization -> gbuffer
 	gEnv->profiler->setBegin(ePe_RasterizeShaderTime);
 #if 0
@@ -264,7 +297,7 @@ void SrRasterizer::Flush()
 #else
 	for ( std::list<SrRendPrimitve*>::iterator it = m_rendPrimitives.begin(); it != m_rendPrimitives.end(); ++it)
 	{
-		
+
 
 		gEnv->profiler->setIncrement(ePe_BatchCount);
 
@@ -289,14 +322,14 @@ void SrRasterizer::Flush()
 // 	for ( uint32 i = 0; i < m_rendPrimitives.size(); ++i)
 // 	{
 // 		gEnv->profiler->setIncrement(ePe_BatchCount);
-// 
+//
 // 		SrVertexBuffer* vb = m_rendPrimitives[i].vb;
 // 		SrIndexBuffer* ib = m_rendPrimitives[i].ib;
-// 
+//
 // 		if (vb && ib)
 // 		{
 // 			uint32 triCount = ib->count / 3;
-// 
+//
 // 			for (uint32 j = 0; j < triCount; j += RASTERIZE_TASK_BLOCK )
 // 			{
 // 				uint32 end =  j + RASTERIZE_TASK_BLOCK;
@@ -333,14 +366,14 @@ void SrRasterizer::Flush()
 // 	for ( uint32 i = 0; i < m_rendPrimitivesRHZ.size(); ++i)
 // 	{
 // 		gEnv->profiler->setIncrement(ePe_BatchCount);
-// 
+//
 // 		SrVertexBuffer* vb = m_rendPrimitivesRHZ[i].vb;
 // 		SrIndexBuffer* ib = m_rendPrimitivesRHZ[i].ib;
-// 
+//
 // 		if (vb && ib)
 // 		{
 // 			uint32 triCount = ib->count / 3;
-// 
+//
 // 			for (uint32 j = 0; j < triCount; j += RASTERIZE_TASK_BLOCK )
 // 			{
 // 				uint32 end =  j + RASTERIZE_TASK_BLOCK;
@@ -354,21 +387,21 @@ void SrRasterizer::Flush()
 // 	}
 
 	// RHZ PRIMITIVE
-	
-	// Ö´ÐÐÈÎÎñ¶ÓÁÐ
+
+	// Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_rasTaskDispatcher->FlushCoop();
 	m_rasTaskDispatcher->Wait();
 #endif
 	gEnv->profiler->setEnd(ePe_RasterizeShaderTime);
-	// ¹âÕ¤»¯½áÊø
+	// ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	//////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
-	// ÏñËØ´¦Àí
-	// every gbuffer pixel -> pshader -> every screenbuffer pixel	
+	// ï¿½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½
+	// every gbuffer pixel -> pshader -> every screenbuffer pixel
 	gEnv->profiler->setBegin(ePe_PixelShaderTime);
 
-	// ÈÎÎñÍ³¼Æ
+	// ï¿½ï¿½ï¿½ï¿½Í³ï¿½ï¿½
 	const uint32 pixelCount = static_cast<uint32>(g_context->width) * static_cast<uint32>(g_context->height);
 	for (uint32 i = 0; i < pixelCount; ++i)
 	{
@@ -379,7 +412,7 @@ void SrRasterizer::Flush()
 	}
 
 
-	// ÈÎÎñÌî³ä
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	uint32 size = fBuffer->GetPixelIndicesBuffer()->size();
 	for ( uint32 i = 0 ; i < size; i += PIXEL_TASK_BLOCK)
 	{
@@ -392,11 +425,11 @@ void SrRasterizer::Flush()
 		gEnv->profiler->setIncrement(ePe_PixelCount, end - i);
 	}
 
-	// Ö´ÐÐÈÎÎñ¶ÓÁÐ
+	// Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_rasTaskDispatcher->FlushCoop();
 	m_rasTaskDispatcher->Wait();
 	gEnv->profiler->setEnd(ePe_PixelShaderTime);
-	// ÏñËØ´¦Àí½áÊø
+	// ï¿½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	//////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
@@ -408,7 +441,7 @@ void SrRasterizer::Flush()
 // 	{
 // 		float4 line0 = gEnv->renderer->GetMatrix(eMd_WorldViewProj) * m_rendDynamicVertex[i];
 // 		float4 line1 = gEnv->renderer->GetMatrix(eMd_WorldViewProj) * m_rendDynamicVertex[i+1];
-// 		
+//
 // 		// trans to screen space
 // 		if (line0.w < .5f)
 // 		{
@@ -418,22 +451,22 @@ void SrRasterizer::Flush()
 // 		{
 // 			line1.w = .5f;
 // 		}
-// 
+//
 // 		line0.xyz /= line0.w;
 // 		line1.xyz /= line1.w;
-// 
+//
 // 		line0.x = ((-line0.x * .5f + 0.5f) * g_context->width);
 // 		line0.y = ((-line0.y * .5f + 0.5f) * g_context->height);
 // 		line1.x = ((-line1.x * .5f + 0.5f) * g_context->width);
 // 		line1.y = ((-line1.y * .5f + 0.5f) * g_context->height);
-// 
+//
 // 		Draw_Clip_Line( (int)line0.x, (int)line0.y, (int)line1.x, (int)line1.y, 0xffffffff, outBuffer, g_context->width );
 // 	}
 
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ºóÆÚ´¦Àí
+	// ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½
 	gEnv->profiler->setBegin(ePe_PostProcessTime);
 
 	// SSAO
@@ -453,24 +486,21 @@ void SrRasterizer::Flush()
 		m_rasTaskDispatcher->FlushCoop();
 		m_rasTaskDispatcher->Wait();
 
-		memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);		
+		memcpy( backBuffer, memBuffer, 4 * g_context->width * g_context->height);
 	}
-	
-	// ºóÆÚ´¦Àí½áÊø
+
+	// ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	//////////////////////////////////////////////////////////////////////////
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// ÇåÀí¹¤×÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	// Çå³ýäÖÈ¾primitives
-	for(std::list<SrRendPrimitve*>::iterator it = m_rendPrimitives.begin(); it != m_rendPrimitives.end(); ++it)
-	{
-		delete (*it);
-	}
+	// ï¿½ï¿½ï¿½ï¿½ï¿½È¾primitives
 	m_rendPrimitives.clear();
 	m_rendPrimitivesRHZ.clear();
 	m_rendDynamicVertex.clear();
+	m_rendPrimitiveUsed = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	gEnv->profiler->setEnd(ePe_PostProcessTime);
@@ -478,17 +508,17 @@ void SrRasterizer::Flush()
 }
 
 /**
- *@brief ¹âÕ¤»¯Ò»¸örendPrimitive
- *@return void 
- *@param SrRendPrimitves * in_primitive ÊäÈëµÄrendPrimitive 
- *@param SrFragmentBuffer * out_gBuffer Êä³öµÄfragBuffer
+ *@brief ï¿½ï¿½Õ¤ï¿½ï¿½Ò»ï¿½ï¿½rendPrimitive
+ *@return void
+ *@param SrRendPrimitves * in_primitive ï¿½ï¿½ï¿½ï¿½ï¿½rendPrimitive
+ *@param SrFragmentBuffer * out_gBuffer ï¿½ï¿½ï¿½ï¿½ï¿½fragBuffer
  */
 void SrRasterizer::ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* out_gBuffer )
 {
 	SrVertexBuffer* vb = in_primitive->vb;
 	SrIndexBuffer* ib = in_primitive->ib;
 
-	// ÓÃibË÷Òý£¬¹¹ÔìÈý½ÇÐÎ½øÐÐ¹âÕ¤»¯
+	// ï¿½ï¿½ibï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î½ï¿½ï¿½Ð¹ï¿½Õ¤ï¿½ï¿½
 	if (vb && ib)
 	{
 		uint32 triCount = ib->count / 3;
@@ -504,7 +534,7 @@ void SrRasterizer::ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* 
 			tri.p[2] = *(SrRendVertex*)(vb->data + ib->data[i * 3 + 2] * vb->elementSize);
 			tri.primitive = in_primitive;
 
-			// Ìá½»Èý½ÇÐÎ½øÐÐ²Ã¼ô
+			// ï¿½á½»ï¿½ï¿½ï¿½ï¿½ï¿½Î½ï¿½ï¿½Ð²Ã¼ï¿½
 			RasterizeTriangle_Clip(tri, g_context->viewport.n, g_context->viewport.f);
 		}
 	}
@@ -519,11 +549,12 @@ bool SrRasterizer::DrawLine( const float3& from, const float3& to )
 
 bool SrRasterizer::DrawRHZPrimitive( SrRendPrimitve& rendPrimitive )
 {
-	// Ìî³äshaderConstants
-// 	rendPrimitive.shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStack»º´æ
-// 	rendPrimitive.shaderConstants.textureStage = m_renderer->m_textureStages; // ÎÆÀístage»º´æ
-// 	rendPrimitive.shaderConstants.lightList = gEnv->sceneMgr->m_lightList; // lightList»º´æ
-// 	rendPrimitive.shaderConstants.cBuffer = rendPrimitive.material->m_cbuffer; // ²ÄÖÊµÄcBuffer»º´æ
+	rendPrimitive.drawSequence = static_cast<uint32>(m_rendPrimitives.size() + m_rendPrimitivesRHZ.size());
+	// ï¿½ï¿½ï¿½shaderConstants
+// 	rendPrimitive.shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStackï¿½ï¿½ï¿½ï¿½
+// 	rendPrimitive.shaderConstants.textureStage = m_renderer->m_textureStages; // ï¿½ï¿½ï¿½ï¿½stageï¿½ï¿½ï¿½ï¿½
+// 	rendPrimitive.shaderConstants.lightList = gEnv->sceneMgr->m_lightList; // lightListï¿½ï¿½ï¿½ï¿½
+// 	rendPrimitive.shaderConstants.cBuffer = rendPrimitive.material->m_cbuffer; // ï¿½ï¿½ï¿½Êµï¿½cBufferï¿½ï¿½ï¿½ï¿½
 // 	rendPrimitive.shaderConstants.alphaTest = true;
 // 	rendPrimitive.shaderConstants.culling = false;
 

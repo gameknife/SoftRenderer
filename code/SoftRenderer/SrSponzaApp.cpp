@@ -17,36 +17,42 @@ SrSponzaApp::~SrSponzaApp(void)
 
 void SrSponzaApp::OnInit()
 {
-	// ´ò¿ªäÖÈ¾ÌØÐÔ
+	// ï¿½ï¿½ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
 	g_context->OpenFeature(eRFeature_MThreadRendering);
-	g_context->OpenFeature(eRFeature_JitAA);
-	g_context->OpenFeature(eRFeature_LinearFiltering);
+	if (!getenv("SR_DISABLE_JITAA"))
+		g_context->OpenFeature(eRFeature_JitAA);
+	if (!getenv("SR_DISABLE_LINEAR"))
+		g_context->OpenFeature(eRFeature_LinearFiltering);
+	const char* backend = getenv("SR_RENDERER_BACKEND");
+	if (backend && _stricmp(backend, "tile") == 0)
+		g_context->OpenFeature(eRFeature_TileBinning);
 
-	// ´´½¨³¡¾°
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 
-	// ´´½¨SPONZA
+	// ï¿½ï¿½ï¿½ï¿½SPONZA
 	m_ent = m_scene->CreateEntity("model1", "media\\sponza.obj", "media\\sponza.mtl");
 
 	//m_ent = m_scene->CreateEntity("model1", "media\\prophet\\prophet.obj", "media\\prophet\\prophet.mtl");
 	m_ent->SetScale(float3(2,2,2));
-	SwitchSSAO();
+	if (!getenv("SR_DISABLE_SSAO"))
+		SwitchSSAO();
 
-	// ´´½¨Ïà»ú
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_camera = m_scene->CreateCamera("cam0");
 	m_camera->setPos(float3(0,10,-45));
 	m_camera->setFov(68.0f);
 	m_scene->PushCamera(m_camera);
 
-	// Ìí¼ÓÒ»¸öÖ÷¹â
+	// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
 	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
 
-	// Ìí¼ÓÊäÈëÉè±¸»Øµ÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½Øµï¿½
 	gEnv->inputSys->AddListener(this);
 }
 
@@ -54,13 +60,13 @@ void SrSponzaApp::OnUpdate()
 {
 	m_scene->Update();
 
-	// dotCovarageÇ¿ÖÆ¹Ø±ÕJITAA
+	// dotCovarageÇ¿ï¿½Æ¹Ø±ï¿½JITAA
 	if ( g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) )
 	{
 		g_context->CloseFeature(eRFeature_JitAA);
 	}
 
-	// ÐÅÏ¢Êä³ö
+	// ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½
 	char buffer[255];
 	int keyL = 15;
 	int startxL = 70;
@@ -85,7 +91,7 @@ void SrSponzaApp::OnUpdate()
 
 void SrSponzaApp::OnDestroy()
 {
-	// É¾³ý³¡¾°
+	// É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	delete m_scene;
 	gEnv->inputSys->RemoveListener(this);
 }
@@ -257,7 +263,7 @@ bool SrSponzaApp::OnInputEvent( const SInputEvent &event )
 
 void SrSponzaApp::SwitchSSAO()
 {
-	// SSAOÇÐ»»
+	// SSAOï¿½Ð»ï¿½
 	if (m_ssao)
 	{
 		m_ssao = false;

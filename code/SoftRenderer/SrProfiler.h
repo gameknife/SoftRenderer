@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  ∏¸∏ƒ»’÷æ history
+  Êõ¥ÊîπÊó•Âøó history
   ver:1.0
    
  */
@@ -37,6 +37,19 @@ enum EProfilerElement
 	ePe_ZError,
 
 	ePe_SamplerTime,
+	ePe_TileSize,
+	ePe_TileCount,
+	ePe_TileJobCount,
+	ePe_RelaxedSsao,
+	ePe_ActiveTileCount,
+	ePe_EmptyTileCount,
+	ePe_BinReferenceCount,
+	ePe_BatchCountTile,
+	ePe_BinningTime,
+	ePe_BinBoundsTime,
+	ePe_BinCountTime,
+	ePe_BinPrefixTime,
+	ePe_BinScatterTime,
 
 	ePe_MainThreadTaskNum,
 	ePe_Thread0TaskNum,
@@ -70,6 +83,13 @@ enum EProfilerElement
 	ePe_Count,
 };
 
+struct SrWorkerFrameStats
+{
+	SrWorkerFrameStats() : jobs(0), busyMilliseconds(0.f) {}
+	uint32 jobs;
+	float busyMilliseconds;
+};
+
 struct IProfiler
 {
 	virtual ~IProfiler() {}
@@ -83,6 +103,11 @@ struct IProfiler
 	virtual float getTime( EProfilerElement element ) =0;
 	virtual float getAverageTime( EProfilerElement element ) =0;
 	virtual int getCount( EProfilerElement element ) =0;
+	virtual void addWorkerStats(uint32 workerIndex, uint32 jobs, float busyMilliseconds) =0;
+	virtual const std::vector<SrWorkerFrameStats>& getWorkerStats() const =0;
+	virtual void addTileBatchStats(float busyRatio, float balance) =0;
+	virtual float getTileBusyRatio() const =0;
+	virtual float getTileWorkerBalance() const =0;
 
 // 	virtual void setGPUBegin( EProfilerElement element ) =0;
 // 	virtual void setGPUEnd( EProfilerElement element ) =0;
@@ -122,7 +147,7 @@ struct SrProfilerElement
 		}		
 
 		// TODO: average frametime set
-		// √ø0.25√Î“ª¥Œ£ø
+		// ÊØè0.25Áßí‰∏ÄÊ¨°Ôºü
 		
 		prevElapsedTime[nextTimeIdx] = elapsedTime;
 		if (++nextTimeIdx == AVGTIME_COUNT)
@@ -130,7 +155,7 @@ struct SrProfilerElement
 			nextTimeIdx = 0;
 		}
 
-		// º∆À„∆Ωæ˘ ±º‰
+		// ËÆ°ÁÆóÂπ≥ÂùáÊó∂Èó¥
 		avgElapsedTime = 0;
 		for ( int i=0; i < AVGTIME_COUNT; ++i )
 		{
@@ -163,12 +188,21 @@ public:
 	float getTime( EProfilerElement element );
 	float getAverageTime( EProfilerElement element );
 	int getCount( EProfilerElement element );
+	void addWorkerStats(uint32 workerIndex, uint32 jobs, float busyMilliseconds);
+	const std::vector<SrWorkerFrameStats>& getWorkerStats() const { return m_workerStats; }
+	void addTileBatchStats(float busyRatio, float balance);
+	float getTileBusyRatio() const { return m_tileBatchCount ? m_tileBusyRatioSum / m_tileBatchCount : 0.f; }
+	float getTileWorkerBalance() const { return m_tileBatchCount ? m_tileBalanceSum / m_tileBatchCount : 0.f; }
 
 	void setGPUBegin( EProfilerElement element );
 	void setGPUEnd( EProfilerElement element );
 
 private:
 	std::vector<SrProfilerElement> m_profileElements;
+	std::vector<SrWorkerFrameStats> m_workerStats;
+	float m_tileBusyRatioSum;
+	float m_tileBalanceSum;
+	uint32 m_tileBatchCount;
 };
 
 #endif

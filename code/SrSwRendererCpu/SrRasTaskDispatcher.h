@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -12,12 +12,13 @@
 #define SrRasTaskDispatcher_h__
 
 #include "prerequisite.h"
+#include <atomic>
 
 class SrRasTaskDispatcher;
 
 /**
- @brief ¹âÕ¤»¯ÈÎÎñ½á¹¹
- @remark ¹âÕ¤»¯ÈÎÎñ»ùÀà£¬¼Ì³ÐÖ®¿É¹¹½¨¸÷ÖÖÐèÒªÏß³ÌÍê³ÉµÄÈÎÎñ¡£
+ @brief ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á¹¹
+ @remark ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ï¿½Ì³ï¿½Ö®ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ß³ï¿½ï¿½ï¿½Éµï¿½ï¿½ï¿½ï¿½ï¿½
  */
 struct SrRasTask
 {
@@ -26,10 +27,10 @@ struct SrRasTask
 };
 
 /**
- @brief ÈÎÎñÏß³Ì
- @remark Ë÷È¡£¬Ö´ÐÐ¹âÕ¤»¯ÈÎÎñµÄ´¦ÀíÏß³Ì¡£µ±Ïß³Ì´¦ÓÚÔËÐÐ×´Ì¬Ê±£¬
- Ïß³Ì»á²»¶ÏÏòÈÎÎñ·Ö·¢Æ÷Ë÷È¡ÈÎÎñ½øÐÐÖ´ÐÐ£¬Ö±µ½Ã»ÓÐÈÎÎñ·Ö·¢¡£Ïß³ÌÖ´ÐÐÍê±Ï£¬
- ½«×Ô¼º×´Ì¬ÖÃÎªµÈ´ý¡£
+ @brief ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
+ @remark ï¿½ï¿½È¡ï¿½ï¿½Ö´ï¿½Ð¹ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ß³Ì¡ï¿½ï¿½ï¿½ï¿½ß³Ì´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬Ê±ï¿½ï¿½
+ ï¿½ß³Ì»á²»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ð£ï¿½Ö±ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ß³ï¿½Ö´ï¿½ï¿½ï¿½ï¿½Ï£ï¿½
+ ï¿½ï¿½ï¿½Ô¼ï¿½×´Ì¬ï¿½ï¿½Îªï¿½È´ï¿½ï¿½ï¿½
  */
 class SrTaskThread : public IThread
 {
@@ -52,10 +53,10 @@ public:
 private:
 	int m_threadId;
 
-	CManualResetEvent* m_runningFlag;		/// ÔËÐÐÍê³É±êÖ¾
-	CManualResetEvent* m_waitFlag;			/// µÈ´ýÏÂ´ÎÔËÐÐ±êÖ¾
+	CManualResetEvent* m_runningFlag;		/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É±ï¿½Ö¾
+	CManualResetEvent* m_waitFlag;			/// ï¿½È´ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½Ð±ï¿½Ö¾
 
-	SrRasTaskDispatcher* m_creator;			/// ÈÎÎñ·Ö·¢Æ÷
+	SrRasTaskDispatcher* m_creator;			/// ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
 };
 
 typedef std::vector<SrTaskThread*> SrTaskThreadPool;
@@ -63,13 +64,14 @@ typedef std::stack<SrRasTask*> SrTaskStack;
 typedef std::vector<SrRasTask*> SrTaskList;
 
 /**
- @brief ÈÎÎñ·Ö·¢Æ÷
- @remark Ö÷Ïß³Ì¿ÉÏòÈÎÎñ·Ö·¢Æ÷Ìá½»ÐèÒª´¦ÀíµÄÈÎÎñ¡£È»ºóµ÷ÓÃFlush¿ªÊ¼Ö´ÐÐ£¬µ÷ÓÃWaitµÈ´ýÆäËûÏß³ÌÖ´ÐÐÍê±Ï¡£
- FlushCoopµ÷ÓÃºó£¬Ö÷Ïß³ÌÒ²×÷Îª×÷ÒµÏß³ÌÖ®Ò»£¬ºÍÆäËûÏß³Ì¹²Í¬´¦ÀíTask¡£
+ @brief ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
+ @remark ï¿½ï¿½ï¿½ß³Ì¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½á½»ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½ï¿½ï¿½Flushï¿½ï¿½Ê¼Ö´ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½Waitï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½Ö´ï¿½ï¿½ï¿½ï¿½Ï¡ï¿½
+ FlushCoopï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½ï¿½ß³ï¿½Ò²ï¿½ï¿½Îªï¿½ï¿½Òµï¿½ß³ï¿½Ö®Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì¹ï¿½Í¬ï¿½ï¿½ï¿½ï¿½Taskï¿½ï¿½
  */
 class SrRasTaskDispatcher
 {
 public:
+	typedef void (*BatchFunction)(uint32 jobIndex, void* context);
 	SrRasTaskDispatcher(void);
 	~SrRasTaskDispatcher(void);
 
@@ -80,12 +82,43 @@ public:
 	void FlushCoop();
 	void Flush();
 	void Wait();
+	void RunBatch(uint32 jobCount, void* context, BatchFunction function);
+	bool HasActiveBatch() const { return m_batchActive.load(std::memory_order_acquire); }
+	void ExecuteBatch(uint32 participantIndex);
+	uint32 GetParticipantCount() const;
+	float GetLastBatchBusyRatio() const { return m_lastBatchBusyRatio; }
+	float GetLastBatchBalance() const { return m_lastBatchBalance; }
 
 	SrRasTask* RequestTask();
 
-	SrTaskThreadPool m_pool;			///< ´¦ÀíÈÎÎñµÄÏß³Ì³Ø£¬ÈÎÎñÏß³Ì¸öÊýÎªCPUºËÐÄÊý-1
-	SrTaskStack m_taskStack;			///< ÓÃÓÚ´æ·ÅÈÎÎñµÄÕ»£¬Ë÷È¡ÈÎÎñÖ±½Ó´ÓÕ»¶¥È¡³ö£¬Ö±ÖÁÈ¡Íê¡£
-	SrTaskList  m_taskList;				///< ÓÃÓÚ´æ·ÅÈÎÎñÊý¾ÝµÄÊý×é£¬¸ºÔðÈÎÎñµÄÉú´æÆÚ¡£
+	SrTaskThreadPool m_pool;			///< ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì³Ø£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì¸ï¿½ï¿½ï¿½ÎªCPUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½-1
+	SrTaskStack m_taskStack;			///< ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Ó´ï¿½Õ»ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½È¡ï¿½ê¡£
+	SrTaskList  m_taskList;				///< ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½ï¿½é£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¡ï¿½
+
+private:
+	struct SrBatchState
+	{
+		std::atomic<uint32> nextJob;
+		uint32 jobCount;
+		uint32 grainSize;
+		void* context;
+		BatchFunction function;
+	};
+
+	struct SrBatchWorkerStats
+	{
+		SrBatchWorkerStats() : jobs(0), busyTicks(0) {}
+		uint32 jobs;
+		uint64_t busyTicks;
+		uint8 padding[48];
+	};
+
+	SrBatchState m_batchState;
+	std::vector<SrBatchWorkerStats> m_batchWorkerStats;
+	std::atomic<bool> m_batchActive;
+	LARGE_INTEGER m_batchTimerFrequency;
+	float m_lastBatchBusyRatio;
+	float m_lastBatchBalance;
 };
 
 #endif

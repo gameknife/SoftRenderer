@@ -15,6 +15,12 @@ SrMaterial::SrMaterial( const char* name ):SrResource(name,  eRT_Material)
 	m_textures.clear();
 	m_alphaTest = 0;
 	m_alphaBlend = false;
+	m_matDiffuse = float4(1.f);
+	m_matSpecular = float4(0.f);
+	m_glossness = 1.f;
+	m_fresnelPower = 1.f;
+	m_fresnelBia = 0.f;
+	m_fresnelScale = 1.f;
 	//LoadFromFile();
 	SetShader(gEnv->resourceMgr->GetShader("default"));
 

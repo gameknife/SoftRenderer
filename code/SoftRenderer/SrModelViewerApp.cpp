@@ -29,7 +29,7 @@ inline void enum_all_files_in_folder( const TCHAR* root_path,std::vector<std::st
 		return;
 	}
 
-	//Òª²éÕÒµÄÄ¿Â¼
+	//Òªï¿½ï¿½ï¿½Òµï¿½Ä¿Â¼
 	std::string str = root_path;
 	if (!is_end_with_slash(root_path))
 	{
@@ -40,7 +40,7 @@ inline void enum_all_files_in_folder( const TCHAR* root_path,std::vector<std::st
 
 	while(path_buf.size())
 	{
-		//È¡³öÀ´Õ»¶¥item
+		//È¡ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½item
 		std::string path = path_buf.top();
 		path_buf.pop();
 		size_t k=path_buf.size();
@@ -94,18 +94,23 @@ SrModelViewerApp::~SrModelViewerApp(void)
 
 void SrModelViewerApp::OnInit()
 {
-	// ´ò¿ªäÖÈ¾ÌØÐÔ
+	// ï¿½ï¿½ï¿½ï¿½È¾ï¿½ï¿½ï¿½ï¿½
 	g_context->OpenFeature(eRFeature_MThreadRendering);
-	g_context->OpenFeature(eRFeature_JitAA);
-	g_context->OpenFeature(eRFeature_LinearFiltering);
+	if (!getenv("SR_DISABLE_JITAA"))
+		g_context->OpenFeature(eRFeature_JitAA);
+	if (!getenv("SR_DISABLE_LINEAR"))
+		g_context->OpenFeature(eRFeature_LinearFiltering);
+	const char* backend = getenv("SR_RENDERER_BACKEND");
+	if (backend && _stricmp(backend, "tile") == 0)
+		g_context->OpenFeature(eRFeature_TileBinning);
 
-	// ´´½¨³¡¾°
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_scene = new SrScene;
 	gEnv->sceneMgr = m_scene;
 
 	m_curr_ent = 0;
 
-	// ´´½¨SPONZA
+	// ï¿½ï¿½ï¿½ï¿½SPONZA
 	
 	std::string dir = "\\media\\modelviewer\\";
 	getMediaPath(dir);
@@ -140,7 +145,7 @@ void SrModelViewerApp::OnInit()
 	
 	//SwitchSSAO();
 
-	// ´´½¨Ïà»ú
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_camera = m_scene->CreateCamera("cam0");
 	m_camera->setPos(float3(0,0,-15));
 	m_camera->setFov(68.0f);
@@ -149,14 +154,14 @@ void SrModelViewerApp::OnInit()
 	m_camdist = 15.0f;
 	updateCam();
 
-	// Ìí¼ÓÒ»¸öÖ÷¹â
+	// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
 	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
 	lt->radius = 100.f;
 
-	// Ìí¼ÓÊäÈëÉè±¸»Øµ÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½Øµï¿½
 	gEnv->inputSys->AddListener(this);
 }
 
@@ -165,13 +170,13 @@ void SrModelViewerApp::OnUpdate()
 	selectEnt(m_curr_ent);
 	m_scene->Update();
 
-	// dotCovarageÇ¿ÖÆ¹Ø±ÕJITAA
+	// dotCovarageÇ¿ï¿½Æ¹Ø±ï¿½JITAA
 	if ( g_context->IsFeatureEnable(eRFeature_DotCoverageRendering) )
 	{
 		g_context->CloseFeature(eRFeature_JitAA);
 	}
 
-	// ÐÅÏ¢Êä³ö
+	// ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½
 	char buffer[255];
 	int keyL = 15;
 	int startxL = 70;
@@ -192,7 +197,7 @@ void SrModelViewerApp::OnUpdate()
 
 void SrModelViewerApp::OnDestroy()
 {
-	// É¾³ý³¡¾°
+	// É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_ents.clear();
 	m_ent = NULL;
 	delete m_scene;

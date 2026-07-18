@@ -125,8 +125,8 @@ BOOL SoftRenderApp::Init( HINSTANCE hInstance)
 
 	m_hInst = hInstance; // Store instance handle in our global variable
 
-	const int createWidth = 854;
-	const int createHeight = 480;
+	const int createWidth = getenv("SR_WIDTH") ? (std::max)(1, atoi(getenv("SR_WIDTH"))) : 854;
+	const int createHeight = getenv("SR_HEIGHT") ? (std::max)(1, atoi(getenv("SR_HEIGHT"))) : 480;
 
 	m_hWnd = CreateWindow("SoftRenderer Window Class", "SoftRenderer", WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, createWidth, createHeight, NULL, NULL, hInstance, NULL);
@@ -150,7 +150,7 @@ BOOL SoftRenderApp::Init( HINSTANCE hInstance)
 
 	
 
-	// ´´½¨×ÊÔ´¹ÜÀíÆ÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	GtLogInfo("Creating ResourceManger...");
 	gEnv->resourceMgr = new SrResourceManager;
 	GtLog("- Loading Shader List...");
@@ -158,7 +158,7 @@ BOOL SoftRenderApp::Init( HINSTANCE hInstance)
 	GtLog("- Creating Default Procedura Medias...");
 	gEnv->resourceMgr->InitDefaultMedia();
 
-	// ´´½¨RenderÉÏÏÂÎÄ
+	// ï¿½ï¿½ï¿½ï¿½Renderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	GtLogInfo("Creating Render Context...");
 	g_context = new SrRendContext(createWidth, createHeight, 32);
 	gEnv->context = g_context;
@@ -177,11 +177,11 @@ BOOL SoftRenderApp::Init( HINSTANCE hInstance)
 	gEnv->profiler = new SrProfiler;
 	GtLogInfo("[Profiler] initialized.");
 
-	// ÏÔÊ¾´°¿Ú
-	ShowWindow(m_hWnd, SW_SHOWNORMAL);
+	// ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
+	ShowWindow(m_hWnd, getenv("SR_HEADLESS") ? SW_HIDE : SW_SHOWNORMAL);
 	UpdateWindow(m_hWnd);
 
-	// ÇÐ»»½¹µã
+	// ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½
 	SetFocus(m_hWnd);
 	SetForegroundWindow(m_hWnd);
 
@@ -291,6 +291,8 @@ void SoftRenderApp::Destroy()
 
 void SoftRenderApp::Run()
 {
+	const uint32 fixedFrames = getenv("SR_FIXED_FRAMES") ? static_cast<uint32>(atoi(getenv("SR_FIXED_FRAMES"))) : 0;
+	uint32 renderedFrames = 0;
 	for(;;)
 	{
 		MSG msg;
@@ -322,6 +324,9 @@ void SoftRenderApp::Run()
 				}
 				break;
 			}
+			++renderedFrames;
+			if (fixedFrames && renderedFrames >= fixedFrames)
+				break;
 		}
 
 		//Update();

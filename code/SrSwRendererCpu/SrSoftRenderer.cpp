@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ history
   ver:1.0
    
  */
@@ -17,11 +17,85 @@
 #include "SrRasterizer.h"
 #include "SrProfiler.h"
 #include "SrSwShader.h"
+#include "SrFragmentBuffer.h"
 #include <gl/GL.h>
+#include <fstream>
 
 #include "mmgr/mmgr.h"
 
 #define SR_NORMALIZE_VB_MAX_SIZE 1024 * 1024 * 10
+
+namespace
+{
+	struct SrCachedGlyph
+	{
+		SrCachedGlyph() : width(0), height(0), originX(0), originY(0), advance(0), stride(0) {}
+		uint32 width, height;
+		int originX, originY, advance;
+		uint32 stride;
+		std::vector<uint8> bits;
+	};
+
+	struct SrCachedFont
+	{
+		SrCachedFont() : ready(false), ascent(0) {}
+		bool ready;
+		int ascent;
+		SrCachedGlyph glyphs[128];
+	};
+
+	SrCachedFont g_bigFontCache;
+	SrCachedFont g_smallFontCache;
+
+	static bool BuildFontCache(HFONT font, SrCachedFont& cache)
+	{
+		HDC dc = CreateCompatibleDC(NULL);
+		if (!dc)
+			return false;
+		HGDIOBJ oldFont = SelectObject(dc, font);
+		TEXTMETRIC metrics;
+		memset(&metrics, 0, sizeof(metrics));
+		GetTextMetrics(dc, &metrics);
+		cache.ascent = metrics.tmAscent;
+		MAT2 transform;
+		memset(&transform, 0, sizeof(transform));
+		transform.eM11.value = 1;
+		transform.eM22.value = 1;
+		for (uint32 character = 32; character < 128; ++character)
+		{
+			GLYPHMETRICS glyphMetrics;
+			memset(&glyphMetrics, 0, sizeof(glyphMetrics));
+			const DWORD size = GetGlyphOutlineA(dc, character, GGO_BITMAP, &glyphMetrics, 0, NULL, &transform);
+			if (size == GDI_ERROR)
+				continue;
+			SrCachedGlyph& glyph = cache.glyphs[character];
+			glyph.width = glyphMetrics.gmBlackBoxX;
+			glyph.height = glyphMetrics.gmBlackBoxY;
+			glyph.originX = glyphMetrics.gmptGlyphOrigin.x;
+			glyph.originY = glyphMetrics.gmptGlyphOrigin.y;
+			glyph.advance = glyphMetrics.gmCellIncX;
+			glyph.stride = ((glyph.width + 31) / 32) * 4;
+			glyph.bits.resize(size);
+			if (size)
+				GetGlyphOutlineA(dc, character, GGO_BITMAP, &glyphMetrics, size, &glyph.bits[0], &transform);
+		}
+		SelectObject(dc, oldFont);
+		DeleteDC(dc);
+		cache.ready = true;
+		return true;
+	}
+
+	static uint64_t HashBytes(uint64_t hash, const void* data, size_t size)
+	{
+		const uint8* bytes = static_cast<const uint8*>(data);
+		for (size_t i = 0; i < size; ++i)
+		{
+			hash ^= bytes[i];
+			hash *= 1099511628211ULL;
+		}
+		return hash;
+	}
+}
 
 SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
 	m_d3d9(NULL),
@@ -31,6 +105,7 @@ SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
 	m_bufferPitch(0),
 	m_renderState(0),
 	m_normalizeVertexBuffer(NULL),
+	m_currShader(NULL),
 	m_shaderConstants(NULL),
 	m_rasterizer(NULL)
 {
@@ -90,14 +165,17 @@ bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 
 	// Get backBuffrt
 	m_hwDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_drawSurface);
+	BuildFontCache(m_bigFont, g_bigFontCache);
+	BuildFontCache(m_smallFont, g_smallFontCache);
 
-	// ´´½¨¹âÕ¤»¯´¦ÀíÆ÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_rasterizer = new SrRasterizer;
 	m_rasterizer->Init(this);
 
 	m_normalizeVertexBuffer = (SrRendVertex*)_mm_malloc_custom( SR_NORMALIZE_VB_MAX_SIZE * sizeof(SrRendVertex), 16 );
 
 	m_shaderConstants = (float4*)_mm_malloc_custom( eSC_ShaderConstantCount * sizeof(float4), 16 );
+	memset(m_shaderConstants, 0, eSC_ShaderConstantCount * sizeof(float4));
 
 	InnerInitShaders();
 
@@ -174,22 +252,82 @@ void SrSoftRenderer::EndFrame()
 		m_bufferPitch = lockinfo.Pitch;
 		m_rasterizer->Flush();
 
-		m_drawSurface->UnlockRect();
+		const char* hashOutput = getenv("SR_HASH_OUTPUT");
+		if (hashOutput && hashOutput[0])
+		{
+			uint64_t colorHash = 1469598103934665603ULL;
+			uint64_t depthHash = 1469598103934665603ULL;
+			uint64_t gbufferHash = 1469598103934665603ULL;
+			uint64_t winnerHash = 1469598103934665603ULL;
+			uint32 activePixels = 0;
+			for (int y = 0; y < g_context->height; ++y)
+				colorHash = HashBytes(colorHash, static_cast<const uint8*>(m_cachedBuffer) + y * m_bufferPitch,
+					g_context->width * sizeof(uint32));
+			const uint32 pixelCount = g_context->width * g_context->height;
+			depthHash = HashBytes(depthHash, fBuffer->zBuffer, pixelCount * sizeof(float));
+			for (uint32 i = 0; i < pixelCount; ++i)
+			{
+				if (fBuffer->zBuffer[i] < 0.f) ++activePixels;
+				gbufferHash = HashBytes(gbufferHash, fBuffer->fBuffer[i].data, sizeof(fBuffer->fBuffer[i].data));
+				const uint32 winner = fBuffer->fBuffer[i].primitive ? fBuffer->fBuffer[i].drawSequence : 0xffffffffu;
+				winnerHash = HashBytes(winnerHash, &winner, sizeof(winner));
+			}
+			std::ifstream existing(hashOutput, std::ios::binary | std::ios::ate);
+			const bool emptyOutput = !existing || existing.tellg() == 0;
+			existing.close();
+			const std::vector<SrWorkerFrameStats>& workerStats = gEnv->profiler->getWorkerStats();
+			uint32 workerJobs = 0;
+			uint32 activeWorkers = 0;
+			float workerBusySum = 0.f;
+			float workerBusyMax = 0.f;
+			for (uint32 i = 0; i < workerStats.size(); ++i)
+			{
+				workerJobs += workerStats[i].jobs;
+				workerBusySum += workerStats[i].busyMilliseconds;
+				workerBusyMax = (std::max)(workerBusyMax, workerStats[i].busyMilliseconds);
+				if (workerStats[i].jobs > 0) ++activeWorkers;
+			}
+			const float workerBusyMean = activeWorkers ? workerBusySum / activeWorkers : 0.f;
+			const float flushMilliseconds = gEnv->profiler->getTime(ePe_FlushTime);
+			const float workerBusyRatio = flushMilliseconds > 0.f && !workerStats.empty()
+				? workerBusySum / (flushMilliseconds * workerStats.size()) : 0.f;
+			std::ofstream stream(hashOutput, std::ios::app);
+			if (emptyOutput)
+				stream << "frame,color_hash,depth_hash,gbuffer_hash,winner_hash,active_pixels,flush_ms,vertex_ms,raster_ms,pixel_ms,bin_ms,bin_bounds_ms,bin_count_ms,bin_prefix_ms,bin_scatter_ms,tile_size,tile_count,tile_jobs,relaxed_ssao,active_tiles,empty_tiles,bin_refs,batches,worker_jobs,active_workers,worker_busy_ms,worker_busy_max_ms,worker_busy_ratio,worker_balance,tile_busy_ratio,tile_worker_balance\n";
+			stream << m_frameCount << ',' << colorHash << ',' << depthHash << ',' << gbufferHash << ',' << winnerHash << ',' << activePixels << ','
+				<< gEnv->profiler->getTime(ePe_FlushTime) << ','
+				<< gEnv->profiler->getTime(ePe_VertexShaderTime) << ','
+				<< gEnv->profiler->getTime(ePe_RasterizeShaderTime) << ','
+				<< gEnv->profiler->getTime(ePe_PixelShaderTime) << ','
+				<< gEnv->profiler->getTime(ePe_BinningTime) << ','
+				<< gEnv->profiler->getTime(ePe_BinBoundsTime) << ','
+				<< gEnv->profiler->getTime(ePe_BinCountTime) << ','
+				<< gEnv->profiler->getTime(ePe_BinPrefixTime) << ','
+				<< gEnv->profiler->getTime(ePe_BinScatterTime) << ','
+				<< gEnv->profiler->getCount(ePe_TileSize) << ','
+				<< gEnv->profiler->getCount(ePe_TileCount) << ','
+				<< gEnv->profiler->getCount(ePe_TileJobCount) << ','
+				<< gEnv->profiler->getCount(ePe_RelaxedSsao) << ','
+				<< gEnv->profiler->getCount(ePe_ActiveTileCount) << ','
+				<< gEnv->profiler->getCount(ePe_EmptyTileCount) << ','
+				<< gEnv->profiler->getCount(ePe_BinReferenceCount) << ','
+				<< gEnv->profiler->getCount(ePe_BatchCountTile) << ','
+				<< workerJobs << ',' << activeWorkers << ',' << workerBusySum << ',' << workerBusyMax << ','
+				<< workerBusyRatio << ',' << (workerBusyMean > 0.f ? workerBusyMax / workerBusyMean : 0.f) << ','
+				<< gEnv->profiler->getTileBusyRatio() << ',' << gEnv->profiler->getTileWorkerBalance() << '\n';
+		}
 
- 		FlushText();
+		FlushText();
+		m_drawSurface->UnlockRect();
  
- 		m_textLines.clear();
+		m_textLines.clear();
 
 	m_renderState &= ~eRs_Rendering;
 
 	Swap();
-
-	for (uint32 i=0; i < m_normlizedVBs.size(); ++i)
-	{
+	for (uint32 i = 0; i < m_normlizedVBs.size(); ++i)
 		delete m_normlizedVBs[i];
-	}
 	m_normlizedVBs.clear();
-
 
 	m_normalizeVBAllocSize = 0;
 }
@@ -226,41 +364,51 @@ bool SrSoftRenderer::DrawPrimitive( SrPrimitve* primitive )
 
 void SrSoftRenderer::FlushText()
 {
-	if (!m_drawSurface)
+	if (std::getenv("SR_HEADLESS") || std::getenv("SR_DISABLE_UI"))
 		return;
- 
-  	HDC hdc ;
-  	HRESULT res = m_drawSurface->GetDC(&hdc);
-  	if (res!=S_OK)
-  	{
-  		return;
-  	}
-  
-  	SrTextLines::iterator it = m_textLines.begin();
-  	for ( ; it != m_textLines.end(); ++it )
-  	{
-  		RECT rect;
-  		rect.left = it->pos.x;
-  		rect.right =(LONG)(strlen(it->text.c_str()) * 10 + it->pos.x);
-  		rect.top = it->pos.y;
-  		rect.bottom = it->pos.y+20;
-  		int len = (int)strlen(it->text.c_str());
-  
-  		if ( it->size == 0)
-  		{
-  			SelectObject(hdc, m_bigFont);
-  		}
-  		else
-  		{
-  			SelectObject(hdc, m_smallFont);
-  		}
-  		
-  		SetBkMode(hdc, TRANSPARENT);
-  		SetTextColor(hdc, it->color);
-  		DrawTextA(hdc,it->text.c_str(),len,&rect,DT_LEFT);	
-  	}
-  
-  	m_drawSurface->ReleaseDC(hdc);
+	if (m_textLines.empty() || !m_cachedBuffer)
+		return;
+
+	gEnv->profiler->setBegin(ePe_FlushTextTime);
+	for (SrTextLines::const_iterator it = m_textLines.begin(); it != m_textLines.end(); ++it)
+	{
+		const SrCachedFont& font = it->size == 0 ? g_bigFontCache : g_smallFontCache;
+		if (!font.ready)
+			continue;
+		const uint32 color = (GetRValue(it->color) << 16) | (GetGValue(it->color) << 8) | GetBValue(it->color);
+		int penX = it->pos.x;
+		const int baseline = it->pos.y + font.ascent;
+		for (size_t characterIndex = 0; characterIndex < it->text.size(); ++characterIndex)
+		{
+			uint32 character = static_cast<uint8>(it->text[characterIndex]);
+			if (character < 32 || character >= 128)
+				character = '?';
+			const SrCachedGlyph& glyph = font.glyphs[character];
+			const int glyphX = penX + glyph.originX;
+			const int glyphY = baseline - glyph.originY;
+			if (!glyph.stride || glyph.bits.size() < static_cast<size_t>(glyph.stride) * glyph.height)
+			{
+				penX += glyph.advance;
+				continue;
+			}
+			for (uint32 row = 0; row < glyph.height; ++row)
+			{
+				const int y = glyphY + static_cast<int>(row);
+				if (y < 0 || y >= g_context->height)
+					continue;
+				uint32* destination = reinterpret_cast<uint32*>(static_cast<uint8*>(m_cachedBuffer) + y * m_bufferPitch);
+				const uint8* source = &glyph.bits[row * glyph.stride];
+				for (uint32 column = 0; column < glyph.width; ++column)
+				{
+					const int x = glyphX + static_cast<int>(column);
+					if (x >= 0 && x < g_context->width && (source[column >> 3] & (0x80 >> (column & 7))))
+						destination[x] = color;
+				}
+			}
+			penX += glyph.advance;
+		}
+	}
+	gEnv->profiler->setEnd(ePe_FlushTextTime);
 }
 
 
@@ -294,9 +442,8 @@ SrVertexBuffer* SrSoftRenderer::AllocateNormalizedVertexBuffer( uint32 count, bo
 		ret->data = (uint8*)(m_normalizeVertexBuffer + m_normalizeVBAllocSize);
 		ret->elementCount = count;
 		ret->elementSize = sizeof(SrRendVertex);
-
 		m_normlizedVBs.push_back(ret);
-			
+
 		m_normalizeVBAllocSize += count;
 
 		return ret;

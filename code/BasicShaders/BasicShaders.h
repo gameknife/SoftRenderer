@@ -3,9 +3,9 @@
   
   @author yikaiming
 
-  @breif 着色模式抽象基类以及基础flat, gourand, phong着色模式的实现类
+  @breif 锟斤拷色模式锟斤拷锟斤拷锟斤拷锟斤拷约锟斤拷锟斤拷锟絝lat, gourand, phong锟斤拷色模式锟斤拷实锟斤拷锟斤拷
 
-  更改日志 history
+  锟斤拷锟斤拷锟斤拷志 history
   ver:1.0
    
  */
@@ -27,6 +27,7 @@ public:
 	virtual void SRFASTCALL ProcessVertex( void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;
 	virtual void SRFASTCALL ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false ) const;
 	virtual void SRFASTCALL ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const;
+	virtual uint32 GetPixelDependencyFlags() const { return ePd_LocalPixel; }
 };
 
 class SrGourandShader : public SrSwShader
@@ -38,6 +39,7 @@ public:
 	virtual void SRFASTCALL ProcessVertex( void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;
 	virtual void SRFASTCALL ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false ) const;
 	virtual void SRFASTCALL ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const;
+	virtual uint32 GetPixelDependencyFlags() const { return ePd_LocalPixel; }
 };
 
 class SrPhongShader : public SrSwShader
@@ -49,6 +51,7 @@ public:
 	virtual void SRFASTCALL ProcessVertex( void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;
 	virtual void SRFASTCALL ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false ) const;
 	virtual void SRFASTCALL ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context , uint32 address) const;
+	virtual uint32 GetPixelDependencyFlags() const { return ePd_LocalPixel; }
 };
 
 
@@ -62,6 +65,7 @@ public:
 	virtual void SRFASTCALL ProcessVertex( void* vOut, void* vOut1, void* vOut2, const void* vInRef0, const void* vInRef1, const void* vInRef2, const SrShaderContext* context ) const;
 	virtual void SRFASTCALL ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false ) const;
 	virtual void SRFASTCALL ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const;
+	virtual uint32 GetPixelDependencyFlags() const { return ePd_ReadsFullGBuffer; }
 };
 
 
