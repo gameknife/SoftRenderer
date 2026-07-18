@@ -18,6 +18,7 @@
 #include "SrProfiler.h"
 #include "SrSwShader.h"
 #include "SrFragmentBuffer.h"
+#include "SrPerformance.h"
 #include <gl/GL.h>
 #include <fstream>
 
@@ -46,6 +47,9 @@ namespace
 
 	SrCachedFont g_bigFontCache;
 	SrCachedFont g_smallFontCache;
+	SrTextLines g_inFlightTextLines;
+	SrVertexBufferArray g_inFlightNormalizedVBs;
+	uint32 g_inFlightFrameNumber = 0;
 
 	static bool BuildFontCache(HFONT font, SrCachedFont& cache)
 	{
@@ -95,6 +99,74 @@ namespace
 		}
 		return hash;
 	}
+
+	static void WriteFrameHash(uint32 frameNumber, const void* colorBuffer, int colorPitch)
+	{
+		const char* hashOutput = getenv("SR_HASH_OUTPUT");
+		if (!hashOutput || !hashOutput[0])
+			return;
+		uint64_t colorHash = 1469598103934665603ULL;
+		uint64_t depthHash = 1469598103934665603ULL;
+		uint64_t gbufferHash = 1469598103934665603ULL;
+		uint64_t winnerHash = 1469598103934665603ULL;
+		uint32 activePixels = 0;
+		for (int y = 0; y < g_context->height; ++y)
+			colorHash = HashBytes(colorHash, static_cast<const uint8*>(colorBuffer) + y * colorPitch,
+				g_context->width * sizeof(uint32));
+		const uint32 pixelCount = g_context->width * g_context->height;
+		depthHash = HashBytes(depthHash, fBuffer->zBuffer, pixelCount * sizeof(float));
+		for (uint32 i = 0; i < pixelCount; ++i)
+		{
+			if (fBuffer->zBuffer[i] < 0.f) ++activePixels;
+			gbufferHash = HashBytes(gbufferHash, fBuffer->fBuffer[i].data, sizeof(fBuffer->fBuffer[i].data));
+			const uint32 winner = fBuffer->fBuffer[i].primitive ? fBuffer->fBuffer[i].drawSequence : 0xffffffffu;
+			winnerHash = HashBytes(winnerHash, &winner, sizeof(winner));
+		}
+		std::ifstream existing(hashOutput, std::ios::binary | std::ios::ate);
+		const bool emptyOutput = !existing || existing.tellg() == 0;
+		existing.close();
+		const std::vector<SrWorkerFrameStats>& workerStats = gEnv->profiler->getWorkerStats();
+		uint32 workerJobs = 0;
+		uint32 activeWorkers = 0;
+		float workerBusySum = 0.f;
+		float workerBusyMax = 0.f;
+		for (uint32 i = 0; i < workerStats.size(); ++i)
+		{
+			workerJobs += workerStats[i].jobs;
+			workerBusySum += workerStats[i].busyMilliseconds;
+			workerBusyMax = (std::max)(workerBusyMax, workerStats[i].busyMilliseconds);
+			if (workerStats[i].jobs > 0) ++activeWorkers;
+		}
+		const float workerBusyMean = activeWorkers ? workerBusySum / activeWorkers : 0.f;
+		const float flushMilliseconds = gEnv->profiler->getTime(ePe_FlushTime);
+		const float workerBusyRatio = flushMilliseconds > 0.f && !workerStats.empty()
+			? workerBusySum / (flushMilliseconds * workerStats.size()) : 0.f;
+		std::ofstream stream(hashOutput, std::ios::app);
+		if (emptyOutput)
+			stream << "frame,color_hash,depth_hash,gbuffer_hash,winner_hash,active_pixels,flush_ms,vertex_ms,raster_ms,pixel_ms,bin_ms,bin_bounds_ms,bin_count_ms,bin_prefix_ms,bin_scatter_ms,tile_size,tile_count,tile_jobs,relaxed_ssao,active_tiles,empty_tiles,bin_refs,batches,main_jobs,worker_jobs,active_workers,worker_busy_ms,worker_busy_max_ms,worker_busy_ratio,worker_balance,tile_busy_ratio,tile_worker_balance\n";
+		stream << frameNumber << ',' << colorHash << ',' << depthHash << ',' << gbufferHash << ',' << winnerHash << ',' << activePixels << ','
+			<< gEnv->profiler->getTime(ePe_FlushTime) << ','
+			<< gEnv->profiler->getTime(ePe_VertexShaderTime) << ','
+			<< gEnv->profiler->getTime(ePe_RasterizeShaderTime) << ','
+			<< gEnv->profiler->getTime(ePe_PixelShaderTime) << ','
+			<< gEnv->profiler->getTime(ePe_BinningTime) << ','
+			<< gEnv->profiler->getTime(ePe_BinBoundsTime) << ','
+			<< gEnv->profiler->getTime(ePe_BinCountTime) << ','
+			<< gEnv->profiler->getTime(ePe_BinPrefixTime) << ','
+			<< gEnv->profiler->getTime(ePe_BinScatterTime) << ','
+			<< gEnv->profiler->getCount(ePe_TileSize) << ','
+			<< gEnv->profiler->getCount(ePe_TileCount) << ','
+			<< gEnv->profiler->getCount(ePe_TileJobCount) << ','
+			<< gEnv->profiler->getCount(ePe_RelaxedSsao) << ','
+			<< gEnv->profiler->getCount(ePe_ActiveTileCount) << ','
+			<< gEnv->profiler->getCount(ePe_EmptyTileCount) << ','
+			<< gEnv->profiler->getCount(ePe_BinReferenceCount) << ','
+			<< gEnv->profiler->getCount(ePe_BatchCountTile) << ','
+			<< gEnv->profiler->getCount(ePe_MainThreadTaskNum) << ','
+			<< workerJobs << ',' << activeWorkers << ',' << workerBusySum << ',' << workerBusyMax << ','
+			<< workerBusyRatio << ',' << (workerBusyMean > 0.f ? workerBusyMax / workerBusyMean : 0.f) << ','
+			<< gEnv->profiler->getTileBusyRatio() << ',' << gEnv->profiler->getTileWorkerBalance() << '\n';
+	}
 }
 
 SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
@@ -136,6 +208,7 @@ SrSoftRenderer::~SrSoftRenderer(void)
 
 bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 {
+	PERFORMANCEAPI_INSTRUMENT("Renderer.Init");
 	//////////////////////////////////////////////////////////////////////////
 	// create d3d device for Show Soft Buffer
 	if( NULL == ( m_d3d9 = Direct3DCreate9( D3D_SDK_VERSION ) ) )
@@ -168,11 +241,11 @@ bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 	BuildFontCache(m_bigFont, g_bigFontCache);
 	BuildFontCache(m_smallFont, g_smallFontCache);
 
+	m_normalizeVertexBuffer = (SrRendVertex*)_mm_malloc_custom( SR_NORMALIZE_VB_MAX_SIZE * sizeof(SrRendVertex), 16 );
+
 	// ������դ��������
 	m_rasterizer = new SrRasterizer;
 	m_rasterizer->Init(this);
-
-	m_normalizeVertexBuffer = (SrRendVertex*)_mm_malloc_custom( SR_NORMALIZE_VB_MAX_SIZE * sizeof(SrRendVertex), 16 );
 
 	m_shaderConstants = (float4*)_mm_malloc_custom( eSC_ShaderConstantCount * sizeof(float4), 16 );
 	memset(m_shaderConstants, 0, eSC_ShaderConstantCount * sizeof(float4));
@@ -184,6 +257,24 @@ bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 
 bool SrSoftRenderer::ShutdownRenderer()
 {
+	if (m_rasterizer)
+	{
+		if (g_context->IsFeatureEnable(eRFeature_TileBinning) && m_rasterizer->WaitForFrameAsync() &&
+			m_rasterizer->IsFrameSurfaceReady())
+		{
+			WriteFrameHash(g_inFlightFrameNumber, m_cachedBuffer, m_bufferPitch);
+			m_textLines.swap(g_inFlightTextLines);
+			FlushText();
+			m_textLines.clear();
+			m_drawSurface->UnlockRect();
+			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
+				delete g_inFlightNormalizedVBs[i];
+			g_inFlightNormalizedVBs.clear();
+			m_rasterizer->MarkFrameReadyForPresent();
+		}
+		m_rasterizer->PresentPendingFrame();
+	}
+
 	for (uint32 i=0; i < m_swHandles.size(); ++i)
 	{
 		FreeLibrary( m_swHandles[i] );
@@ -220,6 +311,7 @@ bool SrSoftRenderer::HwClear()
 
 bool SrSoftRenderer::Swap()
 {
+	PERFORMANCEAPI_INSTRUMENT("Main.Swap");
 	m_renderState |= eRS_Swaping;
 
 	m_hwDevice->Present(NULL, NULL, NULL, NULL);
@@ -230,6 +322,7 @@ bool SrSoftRenderer::Swap()
 
 void SrSoftRenderer::BeginFrame()
 {
+	PERFORMANCEAPI_INSTRUMENT("Main.BeginFrame");
 	m_renderState |= eRs_Rendering;
 	m_frameCount++;
 
@@ -238,98 +331,79 @@ void SrSoftRenderer::BeginFrame()
 
 void SrSoftRenderer::EndFrame()
 {
-		D3DLOCKED_RECT lockinfo;
-		memset(&lockinfo,0,sizeof(lockinfo));
-
-		HRESULT res = m_drawSurface->LockRect(&lockinfo,NULL,D3DLOCK_DISCARD);
-		if (res!=S_OK)
+	PERFORMANCEAPI_INSTRUMENT("Main.EndFrame");
+	const bool tileBinning = g_context->IsFeatureEnable(eRFeature_TileBinning) != FALSE;
+	if (tileBinning)
+	{
+		const bool completedFrame = m_rasterizer->WaitForFrameAsync();
+		if (completedFrame && m_rasterizer->IsFrameSurfaceReady())
 		{
-			// FATAL ERROR
-			return;			
+			WriteFrameHash(g_inFlightFrameNumber, m_cachedBuffer, m_bufferPitch);
+			m_textLines.swap(g_inFlightTextLines);
+			FlushText();
+			m_textLines.clear();
+			m_drawSurface->UnlockRect();
+			m_textLines.swap(g_inFlightTextLines);
+			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
+				delete g_inFlightNormalizedVBs[i];
+			g_inFlightNormalizedVBs.clear();
+			m_rasterizer->MarkFrameReadyForPresent();
+		}
+		else if (completedFrame)
+		{
+			g_inFlightTextLines.clear();
+			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
+				delete g_inFlightNormalizedVBs[i];
+			g_inFlightNormalizedVBs.clear();
 		}
 
+		// No render worker is active in this hand-off window. This keeps the
+		// profiler reset and overlay generation free of cross-frame races.
+		gEnv->profiler->Update();
+		m_rasterizer->SubmitFrameAsync();
+		g_inFlightFrameNumber = m_frameCount;
+		g_inFlightTextLines.swap(m_textLines);
+		g_inFlightNormalizedVBs.swap(m_normlizedVBs);
+
+		// Geometry is already running. Present/Lock stays on the D3D main
+		// thread, then releases the coordinator to continue into raster work.
+		m_rasterizer->PresentPendingFrame();
+		{
+			PERFORMANCEAPI_INSTRUMENT("Main.LockFrameSurface");
+			D3DLOCKED_RECT lockinfo;
+			memset(&lockinfo, 0, sizeof(lockinfo));
+			const HRESULT result = m_drawSurface->LockRect(&lockinfo, NULL, D3DLOCK_DISCARD);
+			if (result == S_OK)
+			{
+				m_cachedBuffer = lockinfo.pBits;
+				m_bufferPitch = lockinfo.Pitch;
+				m_rasterizer->SignalFrameSurface(true);
+			}
+			else
+				m_rasterizer->SignalFrameSurface(false);
+		}
+	}
+	else
+	{
+		gEnv->profiler->Update();
+		D3DLOCKED_RECT lockinfo;
+		memset(&lockinfo, 0, sizeof(lockinfo));
+		if (m_drawSurface->LockRect(&lockinfo, NULL, D3DLOCK_DISCARD) != S_OK)
+			return;
 		m_cachedBuffer = lockinfo.pBits;
 		m_bufferPitch = lockinfo.Pitch;
 		m_rasterizer->Flush();
-
-		const char* hashOutput = getenv("SR_HASH_OUTPUT");
-		if (hashOutput && hashOutput[0])
-		{
-			uint64_t colorHash = 1469598103934665603ULL;
-			uint64_t depthHash = 1469598103934665603ULL;
-			uint64_t gbufferHash = 1469598103934665603ULL;
-			uint64_t winnerHash = 1469598103934665603ULL;
-			uint32 activePixels = 0;
-			for (int y = 0; y < g_context->height; ++y)
-				colorHash = HashBytes(colorHash, static_cast<const uint8*>(m_cachedBuffer) + y * m_bufferPitch,
-					g_context->width * sizeof(uint32));
-			const uint32 pixelCount = g_context->width * g_context->height;
-			depthHash = HashBytes(depthHash, fBuffer->zBuffer, pixelCount * sizeof(float));
-			for (uint32 i = 0; i < pixelCount; ++i)
-			{
-				if (fBuffer->zBuffer[i] < 0.f) ++activePixels;
-				gbufferHash = HashBytes(gbufferHash, fBuffer->fBuffer[i].data, sizeof(fBuffer->fBuffer[i].data));
-				const uint32 winner = fBuffer->fBuffer[i].primitive ? fBuffer->fBuffer[i].drawSequence : 0xffffffffu;
-				winnerHash = HashBytes(winnerHash, &winner, sizeof(winner));
-			}
-			std::ifstream existing(hashOutput, std::ios::binary | std::ios::ate);
-			const bool emptyOutput = !existing || existing.tellg() == 0;
-			existing.close();
-			const std::vector<SrWorkerFrameStats>& workerStats = gEnv->profiler->getWorkerStats();
-			uint32 workerJobs = 0;
-			uint32 activeWorkers = 0;
-			float workerBusySum = 0.f;
-			float workerBusyMax = 0.f;
-			for (uint32 i = 0; i < workerStats.size(); ++i)
-			{
-				workerJobs += workerStats[i].jobs;
-				workerBusySum += workerStats[i].busyMilliseconds;
-				workerBusyMax = (std::max)(workerBusyMax, workerStats[i].busyMilliseconds);
-				if (workerStats[i].jobs > 0) ++activeWorkers;
-			}
-			const float workerBusyMean = activeWorkers ? workerBusySum / activeWorkers : 0.f;
-			const float flushMilliseconds = gEnv->profiler->getTime(ePe_FlushTime);
-			const float workerBusyRatio = flushMilliseconds > 0.f && !workerStats.empty()
-				? workerBusySum / (flushMilliseconds * workerStats.size()) : 0.f;
-			std::ofstream stream(hashOutput, std::ios::app);
-			if (emptyOutput)
-				stream << "frame,color_hash,depth_hash,gbuffer_hash,winner_hash,active_pixels,flush_ms,vertex_ms,raster_ms,pixel_ms,bin_ms,bin_bounds_ms,bin_count_ms,bin_prefix_ms,bin_scatter_ms,tile_size,tile_count,tile_jobs,relaxed_ssao,active_tiles,empty_tiles,bin_refs,batches,worker_jobs,active_workers,worker_busy_ms,worker_busy_max_ms,worker_busy_ratio,worker_balance,tile_busy_ratio,tile_worker_balance\n";
-			stream << m_frameCount << ',' << colorHash << ',' << depthHash << ',' << gbufferHash << ',' << winnerHash << ',' << activePixels << ','
-				<< gEnv->profiler->getTime(ePe_FlushTime) << ','
-				<< gEnv->profiler->getTime(ePe_VertexShaderTime) << ','
-				<< gEnv->profiler->getTime(ePe_RasterizeShaderTime) << ','
-				<< gEnv->profiler->getTime(ePe_PixelShaderTime) << ','
-				<< gEnv->profiler->getTime(ePe_BinningTime) << ','
-				<< gEnv->profiler->getTime(ePe_BinBoundsTime) << ','
-				<< gEnv->profiler->getTime(ePe_BinCountTime) << ','
-				<< gEnv->profiler->getTime(ePe_BinPrefixTime) << ','
-				<< gEnv->profiler->getTime(ePe_BinScatterTime) << ','
-				<< gEnv->profiler->getCount(ePe_TileSize) << ','
-				<< gEnv->profiler->getCount(ePe_TileCount) << ','
-				<< gEnv->profiler->getCount(ePe_TileJobCount) << ','
-				<< gEnv->profiler->getCount(ePe_RelaxedSsao) << ','
-				<< gEnv->profiler->getCount(ePe_ActiveTileCount) << ','
-				<< gEnv->profiler->getCount(ePe_EmptyTileCount) << ','
-				<< gEnv->profiler->getCount(ePe_BinReferenceCount) << ','
-				<< gEnv->profiler->getCount(ePe_BatchCountTile) << ','
-				<< workerJobs << ',' << activeWorkers << ',' << workerBusySum << ',' << workerBusyMax << ','
-				<< workerBusyRatio << ',' << (workerBusyMean > 0.f ? workerBusyMax / workerBusyMean : 0.f) << ','
-				<< gEnv->profiler->getTileBusyRatio() << ',' << gEnv->profiler->getTileWorkerBalance() << '\n';
-		}
-
+		WriteFrameHash(m_frameCount, m_cachedBuffer, m_bufferPitch);
 		FlushText();
 		m_drawSurface->UnlockRect();
- 
 		m_textLines.clear();
-
+		Swap();
+		for (uint32 i = 0; i < m_normlizedVBs.size(); ++i)
+			delete m_normlizedVBs[i];
+		m_normlizedVBs.clear();
+		m_normalizeVBAllocSize = 0;
+	}
 	m_renderState &= ~eRs_Rendering;
-
-	Swap();
-	for (uint32 i = 0; i < m_normlizedVBs.size(); ++i)
-		delete m_normlizedVBs[i];
-	m_normlizedVBs.clear();
-
-	m_normalizeVBAllocSize = 0;
 }
 
 void* SrSoftRenderer::getBuffer()

@@ -7,6 +7,8 @@
 #include "SrSoftRenderer.h"
 #include "SrSwShader.h"
 #include "SrProfiler.h"
+#include "SrBitmap.h"
+#include "SrPerformance.h"
 #include <atomic>
 #include <cstdlib>
 
@@ -109,6 +111,7 @@ namespace
 
 	static void RasterTileJob(uint32 tileIndex, void* opaque)
 	{
+		PERFORMANCEAPI_INSTRUMENT("Job.RasterTile");
 		SrTileFrameJobs& jobs = *static_cast<SrTileFrameJobs*>(opaque);
 		const SrTileRect rect = jobs.layout->GetRect(tileIndex);
 		for (uint32 y = rect.y0; y < rect.y1; ++y)
@@ -141,6 +144,7 @@ namespace
 
 	static void DeferredTileJob(uint32 tileIndex, void* opaque)
 	{
+		PERFORMANCEAPI_INSTRUMENT("Job.DeferredTile");
 		SrTileFrameJobs& jobs = *static_cast<SrTileFrameJobs*>(opaque);
 		const SrTileRect rect = jobs.layout->GetRect(tileIndex);
 		ShadeDeferredTile(tileIndex, rect, jobs);
@@ -148,6 +152,7 @@ namespace
 
 	static void PostTileJob(uint32 tileIndex, void* opaque)
 	{
+		PERFORMANCEAPI_INSTRUMENT("Job.PostTile");
 		SrTileFrameJobs& jobs = *static_cast<SrTileFrameJobs*>(opaque);
 		PostTile(jobs.layout->GetRect(tileIndex), jobs);
 	}
@@ -164,18 +169,22 @@ namespace
 			triangle.p[1] = *reinterpret_cast<SrRendVertex*>(primitive->vb->data + primitive->ib->data[i * 3 + 1] * primitive->vb->elementSize);
 			triangle.p[2] = *reinterpret_cast<SrRendVertex*>(primitive->vb->data + primitive->ib->data[i * 3 + 2] * primitive->vb->elementSize);
 			triangle.primitive = primitive;
-			SrRasterizer::RasterizeTriangle_Clip(triangle, g_context->viewport.n, g_context->viewport.f);
+			SrRasterizer::RasterizeTriangle_Clip(triangle, primitive->zNear, primitive->zFar);
 		}
 	}
 
 	static void GeometryJob(uint32 drawIndex, void* opaque)
 	{
+		PERFORMANCEAPI_INSTRUMENT("Job.Geometry");
 		SrGeometryJobs& jobs = *static_cast<SrGeometryJobs*>(opaque);
 		SrRendPrimitve* primitive = (*jobs.draws)[drawIndex];
+		if (!primitive->sourceVb)
+			return;
 		for (uint32 i = 0; i < primitive->vb->elementCount; ++i)
 		{
 			void* output = primitive->vb->data + i * primitive->vb->elementSize;
-			const SrRendVertex input = *static_cast<SrRendVertex*>(output);
+			const void* source = primitive->sourceVb->data + i * primitive->sourceVb->elementSize;
+			const SrRendVertex input = *static_cast<const SrRendVertex*>(source);
 			primitive->shader->ProcessVertex(output, NULL, NULL, &input, NULL, NULL, &primitive->shaderConstants);
 		}
 		jobs.vertexCount.fetch_add(primitive->vb->elementCount, std::memory_order_relaxed);
@@ -186,6 +195,7 @@ namespace
 
 	static void BinCountJob(uint32 chunk, void* opaque)
 	{
+		PERFORMANCEAPI_INSTRUMENT("Job.BinCount");
 		SrBinnerJobs& jobs = *static_cast<SrBinnerJobs*>(opaque);
 		const uint32 tileCount = jobs.layout->GetTileCount();
 		uint32* counts = &(*jobs.counts)[chunk * tileCount];
@@ -217,6 +227,7 @@ namespace
 
 	static void BinScatterJob(uint32 chunk, void* opaque)
 	{
+		PERFORMANCEAPI_INSTRUMENT("Job.BinScatter");
 		SrBinnerJobs& jobs = *static_cast<SrBinnerJobs*>(opaque);
 		const uint32 tileCount = jobs.layout->GetTileCount();
 		uint32* cursors = &(*jobs.starts)[chunk * tileCount];
@@ -235,8 +246,9 @@ namespace
 	}
 }
 
-void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32* backBuffer, uint32* gpuBuffer)
+void SrRasterizer::FlushTileBinning()
 {
+	PERFORMANCEAPI_INSTRUMENT("Render.TileFrame");
 	gEnv->profiler->setBegin(ePe_VertexShaderTime);
 	m_tileDraws.assign(m_rendPrimitives.begin(), m_rendPrimitives.end());
 	int submittedTriangleCount = 0;
@@ -255,8 +267,19 @@ void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32
 	geometryJobs.draws = &m_tileDraws;
 	geometryJobs.outputs = &m_tileDrawTriangles;
 	geometryJobs.vertexCount.store(0);
-	m_rasTaskDispatcher->RunBatch(static_cast<uint32>(m_tileDraws.size()), &geometryJobs, GeometryJob);
+	m_rasTaskDispatcher->RunBatchWorkerOnly(static_cast<uint32>(m_tileDraws.size()), &geometryJobs, GeometryJob,
+		this, WaitForFrameSurface);
 	gEnv->profiler->setIncrement(ePe_VertexCount, geometryJobs.vertexCount.load());
+	if (!m_frameSurfaceReady)
+	{
+		gEnv->profiler->setEnd(ePe_VertexShaderTime);
+		return;
+	}
+	uint32* memBuffer = (uint32*)m_MemSBuffer->getBuffer();
+	uint32* backBuffer = (uint32*)m_BackSBuffer->getBuffer();
+	uint32* gpuBuffer = (uint32*)m_renderer->getBuffer();
+	uint32* outBuffer = (g_context->IsFeatureEnable(eRFeature_JitAA) ||
+		g_context->IsFeatureEnable(eRFeature_DotCoverageRendering)) ? memBuffer : gpuBuffer;
 	m_tilePreparedTriangles.clear();
 	uint32 preparedCount = 0;
 	for (uint32 draw = 0; draw < m_tileDraws.size(); ++draw)
@@ -285,7 +308,7 @@ void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32
 	m_tileTriangleBounds.resize(m_tilePreparedTriangleRefs.size());
 	gEnv->profiler->setBegin(ePe_BinningTime);
 	bool hasFullGBufferShader = false;
-	const uint32 participantCount = m_rasTaskDispatcher->GetParticipantCount();
+	const uint32 participantCount = m_rasTaskDispatcher->GetWorkerParticipantCount();
 	const uint32 chunkCount = m_tilePreparedTriangleRefs.empty() ? 0 : (std::min<uint32>)(static_cast<uint32>(m_tilePreparedTriangleRefs.size()), participantCount * 2);
 	if (chunkCount > 0)
 	{
@@ -295,7 +318,7 @@ void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32
 		m_tileDependencyFlags.assign(chunkCount, 0);
 		SrBinnerJobs binner = { &m_tileLayout, &m_tileTriangleBounds, chunkCount, &m_tileBinCounts, &m_tileBinStarts, &m_tileBins, &m_tilePreparedTriangleRefs, &m_tileDependencyFlags };
 		gEnv->profiler->setBegin(ePe_BinCountTime);
-		m_rasTaskDispatcher->RunBatch(chunkCount, &binner, BinCountJob);
+		m_rasTaskDispatcher->RunBatchWorkerOnly(chunkCount, &binner, BinCountJob, NULL, NULL);
 		gEnv->profiler->setEnd(ePe_BinCountTime);
 		for (uint32 chunk = 0; chunk < chunkCount; ++chunk)
 			hasFullGBufferShader |= m_tileDependencyFlags[chunk] != 0;
@@ -314,7 +337,7 @@ void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32
 		gEnv->profiler->setEnd(ePe_BinPrefixTime);
 		m_tileBins.triangleRefs.resize(m_tileBins.offsets.back());
 		gEnv->profiler->setBegin(ePe_BinScatterTime);
-		m_rasTaskDispatcher->RunBatch(chunkCount, &binner, BinScatterJob);
+		m_rasTaskDispatcher->RunBatchWorkerOnly(chunkCount, &binner, BinScatterJob, NULL, NULL);
 		gEnv->profiler->setEnd(ePe_BinScatterTime);
 	}
 	else
@@ -365,7 +388,7 @@ void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32
 
 	gEnv->profiler->setEnd(ePe_ClearTime);
 	gEnv->profiler->setBegin(ePe_RasterizeShaderTime);
-	m_rasTaskDispatcher->RunBatch(m_tileLayout.GetTileCount(), &jobs, RasterTileJob);
+	m_rasTaskDispatcher->RunBatchWorkerOnly(m_tileLayout.GetTileCount(), &jobs, RasterTileJob, NULL, NULL);
 	if (relaxedSsao)
 		fBuffer->DisableRelaxedTileReads();
 	gEnv->profiler->addTileBatchStats(m_rasTaskDispatcher->GetLastBatchBusyRatio(), m_rasTaskDispatcher->GetLastBatchBalance());
@@ -378,14 +401,14 @@ void SrRasterizer::FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32
 	if (!relaxedSsao && hasFullGBufferShader && hasDeferredWinner)
 	{
 		gEnv->profiler->setBegin(ePe_PixelShaderTime);
-		m_rasTaskDispatcher->RunBatch(m_tileLayout.GetTileCount(), &jobs, DeferredTileJob);
+		m_rasTaskDispatcher->RunBatchWorkerOnly(m_tileLayout.GetTileCount(), &jobs, DeferredTileJob, NULL, NULL);
 		gEnv->profiler->addTileBatchStats(m_rasTaskDispatcher->GetLastBatchBusyRatio(), m_rasTaskDispatcher->GetLastBatchBalance());
 		gEnv->profiler->setIncrement(ePe_TileJobCount, m_tileLayout.GetTileCount());
 		gEnv->profiler->setEnd(ePe_PixelShaderTime);
 	}
 	else if (!relaxedSsao && jobs.temporalPost && !jobs.fusePost)
 	{
-		m_rasTaskDispatcher->RunBatch(m_tileLayout.GetTileCount(), &jobs, PostTileJob);
+		m_rasTaskDispatcher->RunBatchWorkerOnly(m_tileLayout.GetTileCount(), &jobs, PostTileJob, NULL, NULL);
 		gEnv->profiler->addTileBatchStats(m_rasTaskDispatcher->GetLastBatchBusyRatio(), m_rasTaskDispatcher->GetLastBatchBalance());
 		gEnv->profiler->setIncrement(ePe_TileJobCount, m_tileLayout.GetTileCount());
 	}

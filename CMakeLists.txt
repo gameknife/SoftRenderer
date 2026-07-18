@@ -144,6 +144,32 @@ sr_set_runtime_layout(AdvanceShaders "shader")
 
 add_dependencies(SoftRenderer SrSwRendererCpu BasicShaders AdvanceShaders)
 
+set(SR_SUPERLUMINAL_ROOT "C:/Program Files/Superluminal/Performance/API" CACHE PATH
+	"Optional Superluminal Performance API installation")
+set(SR_SUPERLUMINAL_HEADER "${SR_SUPERLUMINAL_ROOT}/include/Superluminal/PerformanceAPI.h")
+if(EXISTS "${SR_SUPERLUMINAL_HEADER}")
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(SR_SUPERLUMINAL_ARCH x64)
+	else()
+		set(SR_SUPERLUMINAL_ARCH x86)
+	endif()
+	set(SR_SUPERLUMINAL_LIB_DIR "${SR_SUPERLUMINAL_ROOT}/lib/${SR_SUPERLUMINAL_ARCH}")
+	foreach(target SoftRenderer SrSwRendererCpu)
+		target_include_directories(${target} PRIVATE
+			"$<$<CONFIG:Debug>:${SR_SUPERLUMINAL_ROOT}/include>"
+		)
+		target_compile_definitions(${target} PRIVATE
+			"$<$<CONFIG:Debug>:SR_SUPERLUMINAL_ENABLED=1>"
+		)
+		target_link_libraries(${target} PRIVATE
+			"$<$<CONFIG:Debug>:${SR_SUPERLUMINAL_LIB_DIR}/PerformanceAPI_MDd.lib>"
+		)
+	endforeach()
+	message(STATUS "Superluminal PerformanceAPI instrumentation enabled for Debug only (${SR_SUPERLUMINAL_ARCH})")
+else()
+	message(STATUS "Superluminal PerformanceAPI not found; instrumentation disabled")
+endif()
+
 enable_testing()
 add_executable(SoftRendererTests
 	"${SR_RENDERER_DIR}/tests/SrTileTests.cpp"

@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "BasicShaders.h"
 #include "../SrSwRendererCpu/SrFragmentBuffer.h"
+#include "../SrSwRendererCpu/SrRasterizer.h"
 
 #include "mmgr/mmgr.h"
 
@@ -569,7 +570,9 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 
 	bool jit = (gEnv->context->IsFeatureEnable(eRFeature_JitAA));
 
-	if ( !jit ||  ( ( (address - ((address /  gEnv->context->width) % 2)) % 2 != gEnv->renderer->getFrameCount() % 2) )  )
+	const SrFragment* shadedFragment = static_cast<const SrFragment*>(pIn);
+	const uint32 frameNumber = shadedFragment->primitive ? shadedFragment->primitive->frameNumber : 0;
+	if ( !jit ||  ( ( (address - ((address /  gEnv->context->width) % 2)) % 2 != frameNumber % 2) )  )
 	{
  		int y = address / gEnv->context->width;
  		int x = address % gEnv->context->width;

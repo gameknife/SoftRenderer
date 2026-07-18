@@ -72,6 +72,7 @@ class SrRasTaskDispatcher
 {
 public:
 	typedef void (*BatchFunction)(uint32 jobIndex, void* context);
+	typedef void (*MainFunction)(void* context);
 	SrRasTaskDispatcher(void);
 	~SrRasTaskDispatcher(void);
 
@@ -83,9 +84,14 @@ public:
 	void Flush();
 	void Wait();
 	void RunBatch(uint32 jobCount, void* context, BatchFunction function);
+	// Workers execute the batch while the caller performs mainFunction. The
+	// caller never consumes batch jobs and only waits after mainFunction returns.
+	void RunBatchWorkerOnly(uint32 jobCount, void* context, BatchFunction function,
+		void* mainContext, MainFunction mainFunction);
 	bool HasActiveBatch() const { return m_batchActive.load(std::memory_order_acquire); }
 	void ExecuteBatch(uint32 participantIndex);
 	uint32 GetParticipantCount() const;
+	uint32 GetWorkerParticipantCount() const;
 	float GetLastBatchBusyRatio() const { return m_lastBatchBusyRatio; }
 	float GetLastBatchBalance() const { return m_lastBatchBalance; }
 

@@ -17,13 +17,17 @@
 #include "SrRasTasks.h"
 #include "SrSoftRenderer.h"
 #include "SrFragmentBuffer.h"
+#include "SrPerformance.h"
 
 #include "mmgr/mmgr.h"
 
 SrFragmentBuffer* fBuffer = NULL;						/// fragment Buffer
+static const uint32 SR_FRAME_VERTEX_CAPACITY = 1024 * 1024 * 10;
 
 SrRasterizer::SrRasterizer(void)
-	: m_rendPrimitiveUsed(0)
+	: m_rendPrimitiveUsed(0), m_buildPrimitiveUsed(0), m_renderVertexBuffer(NULL),
+	  m_frameSurfaceReady(false), m_presentPending(false), m_surfaceReadyForRender(false),
+	  m_frameRequested(false), m_frameComplete(false), m_frameInFlight(false), m_stopFrameThread(false)
 {
 	m_MemSBuffer = NULL;
 	m_BackSBuffer = NULL;
@@ -48,15 +52,122 @@ void SrRasterizer::Init(SrSoftRenderer* renderer)
 	m_rasTaskDispatcher->Init();
 
 	m_renderer = renderer;
+	m_renderVertexBuffer = static_cast<SrRendVertex*>(_mm_malloc_custom(
+		SR_FRAME_VERTEX_CAPACITY * sizeof(SrRendVertex), 16));
+	assert(m_renderVertexBuffer != NULL);
+	m_frameThread = std::thread(&SrRasterizer::FrameThreadMain, this);
 }
 
 SrRasterizer::~SrRasterizer(void)
 {
+	StopFrameThread();
 	delete fBuffer;
 	m_rasTaskDispatcher->Destroy();
 	delete m_rasTaskDispatcher;
 	for (uint32 i = 0; i < m_rendPrimitivePool.size(); ++i)
 		delete m_rendPrimitivePool[i];
+	for (uint32 i = 0; i < m_buildPrimitivePool.size(); ++i)
+		delete m_buildPrimitivePool[i];
+	_mm_free_custom(m_renderVertexBuffer);
+}
+
+void SrRasterizer::FrameThreadMain()
+{
+	SrSetCurrentThreadName("Renderer Coordinator");
+	for (;;)
+	{
+		std::unique_lock<std::mutex> lock(m_frameMutex);
+		m_frameRequestCondition.wait(lock, [this] { return m_frameRequested || m_stopFrameThread; });
+		if (m_stopFrameThread)
+			break;
+		m_frameRequested = false;
+		lock.unlock();
+		{
+			PERFORMANCEAPI_INSTRUMENT("Renderer.CoordinatorFrame");
+			Flush();
+		}
+		lock.lock();
+		m_frameComplete = true;
+		lock.unlock();
+		m_frameCompleteCondition.notify_one();
+	}
+}
+
+void SrRasterizer::WaitForFrameSurface(void* context)
+{
+	PERFORMANCEAPI_INSTRUMENT("Renderer.WaitForSurface");
+	SrRasterizer* rasterizer = static_cast<SrRasterizer*>(context);
+	std::unique_lock<std::mutex> lock(rasterizer->m_frameMutex);
+	rasterizer->m_surfaceReadyCondition.wait(lock, [rasterizer] {
+		return rasterizer->m_surfaceReadyForRender || rasterizer->m_stopFrameThread;
+	});
+}
+
+void SrRasterizer::SubmitFrameAsync()
+{
+	PERFORMANCEAPI_INSTRUMENT("Main.SubmitFrame");
+	assert(!m_frameInFlight);
+	m_rendPrimitives.swap(m_buildRendPrimitives);
+	m_rendPrimitivesRHZ.swap(m_buildRendPrimitivesRHZ);
+	m_rendDynamicVertex.swap(m_buildDynamicVertex);
+	m_rendPrimitivePool.swap(m_buildPrimitivePool);
+	m_rendPrimitiveUsed = m_buildPrimitiveUsed;
+	m_buildPrimitiveUsed = 0;
+	std::swap(m_renderVertexBuffer, m_renderer->m_normalizeVertexBuffer);
+	m_renderer->m_normalizeVBAllocSize = 0;
+
+	{
+		std::lock_guard<std::mutex> lock(m_frameMutex);
+		m_frameComplete = false;
+		m_surfaceReadyForRender = false;
+		m_frameInFlight = true;
+		m_frameRequested = true;
+	}
+	m_frameRequestCondition.notify_one();
+}
+
+bool SrRasterizer::WaitForFrameAsync()
+{
+	PERFORMANCEAPI_INSTRUMENT("Main.WaitForPreviousFrame");
+	std::unique_lock<std::mutex> lock(m_frameMutex);
+	if (!m_frameInFlight)
+		return false;
+	m_frameCompleteCondition.wait(lock, [this] { return m_frameComplete; });
+	m_frameInFlight = false;
+	return true;
+}
+
+void SrRasterizer::SignalFrameSurface(bool ready)
+{
+	{
+		std::lock_guard<std::mutex> lock(m_frameMutex);
+		m_frameSurfaceReady = ready;
+		m_surfaceReadyForRender = true;
+	}
+	m_surfaceReadyCondition.notify_one();
+}
+
+void SrRasterizer::StopFrameThread()
+{
+	if (!m_frameThread.joinable())
+		return;
+	WaitForFrameAsync();
+	{
+		std::lock_guard<std::mutex> lock(m_frameMutex);
+		m_stopFrameThread = true;
+		m_surfaceReadyForRender = true;
+	}
+	m_frameRequestCondition.notify_one();
+	m_surfaceReadyCondition.notify_all();
+	m_frameThread.join();
+}
+
+void SrRasterizer::PresentPendingFrame()
+{
+	if (!m_presentPending)
+		return;
+	m_renderer->Swap();
+	m_presentPending = false;
 }
 
 /**
@@ -69,25 +180,31 @@ SrRasterizer::~SrRasterizer(void)
  */
 bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 {
+	PERFORMANCEAPI_INSTRUMENT("Main.DrawPrimitive");
 	if (!primitive)
 	{
 		return false;
 	}
 
 	float start = gEnv->timer->getRealTime();
+	const bool asyncFrame = g_context->IsFeatureEnable(eRFeature_TileBinning) != FALSE;
+	std::vector<SrRendPrimitve*>& primitivePool = asyncFrame ? m_buildPrimitivePool : m_rendPrimitivePool;
+	uint32& primitiveUsed = asyncFrame ? m_buildPrimitiveUsed : m_rendPrimitiveUsed;
+	std::list<SrRendPrimitve*>& drawList = asyncFrame ? m_buildRendPrimitives : m_rendPrimitives;
 
 	SrRendPrimitve* transformed = NULL;
-	if (m_rendPrimitiveUsed < m_rendPrimitivePool.size())
-		transformed = m_rendPrimitivePool[m_rendPrimitiveUsed];
+	if (primitiveUsed < primitivePool.size())
+		transformed = primitivePool[primitiveUsed];
 	else
 	{
 		transformed = new SrRendPrimitve();
-		m_rendPrimitivePool.push_back(transformed);
+		primitivePool.push_back(transformed);
 	}
-	++m_rendPrimitiveUsed;
+	++primitiveUsed;
 
 	// vb,ib����
 	float start1 = gEnv->timer->getRealTime();
+	transformed->sourceVb = NULL;
 	transformed->vb = &transformed->frameVb;
 	transformed->vb->data = reinterpret_cast<uint8*>(m_renderer->m_normalizeVertexBuffer + m_renderer->m_normalizeVBAllocSize);
 	transformed->vb->elementCount = primitive->vb->elementCount;
@@ -118,8 +235,14 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 	}
 
 
-	memcpy(transformed->vb->data, primitive->cachedVb->data,
-		primitive->cachedVb->elementSize * primitive->cachedVb->elementCount);
+	if (!primitive->cachedVb)
+		return false;
+	transformed->sourceVb = primitive->cachedVb;
+	// The tile path reads cachedVb directly and writes VS results out of place.
+	// Keep the copy for the legacy in-place vertex task until that path is retired.
+	if (!g_context->IsFeatureEnable(eRFeature_TileBinning))
+		memcpy(transformed->vb->data, transformed->sourceVb->data,
+			transformed->sourceVb->elementSize * transformed->sourceVb->elementCount);
 
 	// ���ib
 	//memcpy(transformed.ib->data, primitive->ib->data, primitive->ib->count * sizeof(uint32));
@@ -132,10 +255,13 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
 	memcpy( transformed->shaderConstants.shaderConstants, m_renderer->m_shaderConstants, eSC_ShaderConstantCount * sizeof(float4) );
 	transformed->shaderConstants.alphaTest = primitive->material->m_alphaTest;
 	transformed->shaderConstants.culling = true;
-	transformed->drawSequence = static_cast<uint32>(m_rendPrimitives.size());
+	transformed->drawSequence = static_cast<uint32>(drawList.size());
+	transformed->frameNumber = m_renderer->getFrameCount();
+	transformed->zNear = g_context->viewport.n;
+	transformed->zFar = g_context->viewport.f;
 
 	// �ύ��Ⱦprimitive
-	m_rendPrimitives.push_back( transformed );
+	drawList.push_back( transformed );
 
 	gEnv->profiler->IncreaseTime(ePe_DrawCallTime, gEnv->timer->getRealTime() - start);
 
@@ -156,6 +282,7 @@ bool SrRasterizer::DrawPrimitive( SrPrimitve* primitive )
  */
 void SrRasterizer::Flush()
 {
+	PERFORMANCEAPI_INSTRUMENT("Render.Flush");
 	gEnv->profiler->setBegin(ePe_FlushTime);
 	gEnv->profiler->setBegin(ePe_ClearTime);
 
@@ -164,6 +291,19 @@ void SrRasterizer::Flush()
 
 	// clear ��������
 	fBuffer->GetPixelIndicesBuffer()->Clear();
+
+	if (g_context->IsFeatureEnable(eRFeature_TileBinning))
+	{
+		FlushTileBinning();
+		gEnv->profiler->setBegin(ePe_PostProcessTime);
+		m_rendPrimitives.clear();
+		m_rendPrimitivesRHZ.clear();
+		m_rendDynamicVertex.clear();
+		m_rendPrimitiveUsed = 0;
+		gEnv->profiler->setEnd(ePe_PostProcessTime);
+		gEnv->profiler->setEnd(ePe_FlushTime);
+		return;
+	}
 
 	// Fragment Buffer �� OutBaffer��Clear
 	uint32* memBuffer = (uint32*)m_MemSBuffer->getBuffer();
@@ -179,19 +319,6 @@ void SrRasterizer::Flush()
 	if (g_context->IsFeatureEnable(eRFeature_JitAA) || g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 	{
 		outBuffer = memBuffer;
-	}
-
-	if (g_context->IsFeatureEnable(eRFeature_TileBinning))
-	{
-		FlushTileBinning(outBuffer, memBuffer, backBuffer, gpuBuffer);
-		gEnv->profiler->setBegin(ePe_PostProcessTime);
-		m_rendPrimitives.clear();
-		m_rendPrimitivesRHZ.clear();
-		m_rendDynamicVertex.clear();
-		m_rendPrimitiveUsed = 0;
-		gEnv->profiler->setEnd(ePe_PostProcessTime);
-		gEnv->profiler->setEnd(ePe_FlushTime);
-		return;
 	}
 
 	// clear the OutBuffer
@@ -548,14 +675,23 @@ void SrRasterizer::ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* 
 
 bool SrRasterizer::DrawLine( const float3& from, const float3& to )
 {
-	m_rendDynamicVertex.push_back( float4(from, 1.f) );
-	m_rendDynamicVertex.push_back( float4(to, 1.f) );
+	std::vector<float4>& vertices = g_context->IsFeatureEnable(eRFeature_TileBinning)
+		? m_buildDynamicVertex : m_rendDynamicVertex;
+	vertices.push_back( float4(from, 1.f) );
+	vertices.push_back( float4(to, 1.f) );
 	return true;
 }
 
 bool SrRasterizer::DrawRHZPrimitive( SrRendPrimitve& rendPrimitive )
 {
-	rendPrimitive.drawSequence = static_cast<uint32>(m_rendPrimitives.size() + m_rendPrimitivesRHZ.size());
+	std::list<SrRendPrimitve*>& draws = g_context->IsFeatureEnable(eRFeature_TileBinning)
+		? m_buildRendPrimitives : m_rendPrimitives;
+	std::list<SrRendPrimitve*>& rhzDraws = g_context->IsFeatureEnable(eRFeature_TileBinning)
+		? m_buildRendPrimitivesRHZ : m_rendPrimitivesRHZ;
+	rendPrimitive.drawSequence = static_cast<uint32>(draws.size() + rhzDraws.size());
+	rendPrimitive.frameNumber = m_renderer->getFrameCount();
+	rendPrimitive.zNear = g_context->viewport.n;
+	rendPrimitive.zFar = g_context->viewport.f;
 	// ���shaderConstants
 // 	rendPrimitive.shaderConstants.matrixs = m_renderer->m_matrixStack; // matrixStack����
 // 	rendPrimitive.shaderConstants.textureStage = m_renderer->m_textureStages; // ����stage����
@@ -564,7 +700,7 @@ bool SrRasterizer::DrawRHZPrimitive( SrRendPrimitve& rendPrimitive )
 // 	rendPrimitive.shaderConstants.alphaTest = true;
 // 	rendPrimitive.shaderConstants.culling = false;
 
-	m_rendPrimitivesRHZ.push_back(&rendPrimitive);
+	rhzDraws.push_back(&rendPrimitive);
 	return true;
 }
 void SrRendPrimitve::operator delete(void *memoryToBeDeallocated)

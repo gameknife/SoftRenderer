@@ -98,27 +98,21 @@
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 #endif
 
-extern std::map<const void*, void*> m_align_pt_mapper;
-
 inline void* _mm_malloc_16byte(size_t sz, size_t align)
 {
-	if(sz <= 0)   {
+	if (sz == 0) {
 		return NULL;
 	}
-	unsigned char* pSystemPointer = (unsigned char* )_mm_malloc(sz + 15, 16);
-	if(NULL == pSystemPointer)   {
-		return NULL;
-	}
-	size_t offset = 16 - (((unsigned int)pSystemPointer ) % 16);
-
-	m_align_pt_mapper[pSystemPointer + offset] = pSystemPointer;
-
-	return pSystemPointer + offset;
+	// _mm_malloc already guarantees the requested alignment. The previous
+	// manual adjustment advanced an already aligned allocation by 16 bytes
+	// after reserving only 15 bytes of padding, leaving every object one byte
+	// short and corrupting the heap during construction.
+	return _mm_malloc(sz, align);
 }
 
 inline void _mm_free_16byte(void* p)
 {
-	_mm_free(m_align_pt_mapper[p]);
+	_mm_free(p);
 }
 
 #define _mm_malloc_custom _mm_malloc_16byte

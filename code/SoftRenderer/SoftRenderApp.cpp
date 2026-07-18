@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "SrPerformance.h"
 #include "SoftRenderApp.h"
 #include "resource.h"
 #include <MMSystem.h>
@@ -217,6 +218,7 @@ static Quat g_rot = Quat::CreateIdentity();
 
 bool SoftRenderApp::Update()
 {
+	PERFORMANCEAPI_INSTRUMENT("Frame");
 
 	gEnv->profiler->setBegin(ePe_FrameTime);
 
@@ -240,10 +242,9 @@ bool SoftRenderApp::Update()
 
 	if (m_curr_task >= 0 && static_cast<size_t>(m_curr_task) < m_tasks.size())
 	{
+		PERFORMANCEAPI_INSTRUMENT("Main.SceneUpdate");
 		m_tasks[m_curr_task]->OnUpdate();
 	}
-
-	gEnv->profiler->Update();
 
 	gEnv->renderer->EndFrame();
 

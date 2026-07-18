@@ -3,7 +3,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 
 cd /d "%~dp0"
 set "ROOT=%CD%"
-set "BUILD_DIR=%ROOT%\out\cmake-win32"
+set "BUILD_DIR=%ROOT%\out\cmake-x64"
 set "RUNTIME_DIR=%BUILD_DIR%\runtime\Release"
 
 where cmake >nul 2>&1
@@ -39,8 +39,8 @@ if exist "%BUILD_DIR%\CMakeCache.txt" (
     )
 )
 
-echo Configuring Win32 Release build...
-cmake -S "%ROOT%" -B "%BUILD_DIR%" -G "!GENERATOR!" -A Win32
+echo Configuring x64 Release build...
+cmake -S "%ROOT%" -B "%BUILD_DIR%" -G "!GENERATOR!" -A x64
 if errorlevel 1 goto :build_failed
 
 echo Building SoftRenderer...

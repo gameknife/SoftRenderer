@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "SrRasTaskDispatcher.h"
 #include "SrProfiler.h"
+#include "SrPerformance.h"
 
 #include "mmgr/mmgr.h"
 
@@ -27,6 +28,9 @@ SrTaskThread::~SrTaskThread()
  */
 int SrTaskThread::Run()
 {
+	char threadName[32];
+	sprintf_s(threadName, "Renderer Worker %d", m_threadId);
+	SrSetCurrentThreadName(threadName);
 	while(true)
 	{
 		m_waitFlag->Wait();
@@ -49,6 +53,7 @@ int SrTaskThread::Run()
 
 			if (m_threadId < 16)
 				gEnv->profiler->setIncrement( (EProfilerElement)(ePe_Thread0TaskNum + m_threadId) );
+			PERFORMANCEAPI_INSTRUMENT("Worker.LegacyJob");
 			// ִ������
 			task->Execute();
 		}
@@ -183,6 +188,7 @@ void SrRasTaskDispatcher::Flush()
  */
 void SrRasTaskDispatcher::Wait()
 {
+	PERFORMANCEAPI_INSTRUMENT("Dispatcher.WaitWorkers");
 	if( g_context->IsFeatureEnable(eRFeature_MThreadRendering) )
 	{
 		SrTaskThreadPool::iterator it = m_pool.begin();
@@ -202,6 +208,7 @@ void SrRasTaskDispatcher::Wait()
 
 void SrRasTaskDispatcher::RunBatch(uint32 jobCount, void* context, BatchFunction function)
 {
+	PERFORMANCEAPI_INSTRUMENT("Dispatcher.RunBatchCooperative");
 	if (jobCount == 0 || function == NULL)
 		return;
 
@@ -253,14 +260,82 @@ void SrRasTaskDispatcher::RunBatch(uint32 jobCount, void* context, BatchFunction
 	gEnv->profiler->setIncrement(ePe_BatchCountTile);
 }
 
+void SrRasTaskDispatcher::RunBatchWorkerOnly(uint32 jobCount, void* context, BatchFunction function,
+	void* mainContext, MainFunction mainFunction)
+{
+	PERFORMANCEAPI_INSTRUMENT("Renderer.RunBatchWorkerOnly");
+	const bool useWorkers = g_context->IsFeatureEnable(eRFeature_MThreadRendering) && !m_pool.empty();
+	if (jobCount == 0 || function == NULL)
+	{
+		if (mainFunction)
+			mainFunction(mainContext);
+		return;
+	}
+
+	const uint32 participantCount = useWorkers ? static_cast<uint32>(m_pool.size()) : 1;
+	const uint32 targetChunks = participantCount * 8;
+	m_batchState.nextJob.store(0, std::memory_order_relaxed);
+	m_batchState.jobCount = jobCount;
+	m_batchState.grainSize = jobCount > targetChunks ? (std::max<uint32>)(1, jobCount / targetChunks) : 1;
+	m_batchState.context = context;
+	m_batchState.function = function;
+	for (uint32 i = 0; i < participantCount; ++i)
+	{
+		m_batchWorkerStats[i].jobs = 0;
+		m_batchWorkerStats[i].busyTicks = 0;
+	}
+
+	m_batchActive.store(true, std::memory_order_release);
+	LARGE_INTEGER batchBegin, batchEnd;
+	QueryPerformanceCounter(&batchBegin);
+	if (useWorkers)
+		for (SrTaskThreadPool::iterator it = m_pool.begin(); it != m_pool.end(); ++it)
+			(*it)->SetReady();
+
+	if (mainFunction)
+		mainFunction(mainContext);
+	if (useWorkers)
+		Wait();
+	else
+		ExecuteBatch(0);
+	QueryPerformanceCounter(&batchEnd);
+	m_batchActive.store(false, std::memory_order_release);
+
+	uint64_t busyTicksSum = 0;
+	uint64_t busyTicksMax = 0;
+	for (uint32 i = 0; i < participantCount; ++i)
+	{
+		busyTicksSum += m_batchWorkerStats[i].busyTicks;
+		busyTicksMax = (std::max)(busyTicksMax, m_batchWorkerStats[i].busyTicks);
+		const float busyMs = static_cast<float>(static_cast<double>(m_batchWorkerStats[i].busyTicks) * 1000.0 /
+			static_cast<double>(m_batchTimerFrequency.QuadPart));
+		gEnv->profiler->addWorkerStats(i + 1, m_batchWorkerStats[i].jobs, busyMs);
+		if (i < 16)
+			gEnv->profiler->setIncrement(static_cast<EProfilerElement>(ePe_Thread0TaskNum + i), m_batchWorkerStats[i].jobs);
+	}
+	const uint64_t batchTicks = static_cast<uint64_t>(batchEnd.QuadPart - batchBegin.QuadPart);
+	m_lastBatchBusyRatio = batchTicks ? static_cast<float>(static_cast<double>(busyTicksSum) /
+		(static_cast<double>(batchTicks) * participantCount)) : 0.f;
+	const double meanBusyTicks = static_cast<double>(busyTicksSum) / participantCount;
+	m_lastBatchBalance = meanBusyTicks > 0.0 ? static_cast<float>(busyTicksMax / meanBusyTicks) : 0.f;
+	gEnv->profiler->setIncrement(ePe_BatchCountTile);
+}
+
 uint32 SrRasTaskDispatcher::GetParticipantCount() const
 {
 	return g_context->IsFeatureEnable(eRFeature_MThreadRendering)
 		? static_cast<uint32>(m_pool.size() + 1) : 1;
 }
 
+uint32 SrRasTaskDispatcher::GetWorkerParticipantCount() const
+{
+	return g_context->IsFeatureEnable(eRFeature_MThreadRendering) && !m_pool.empty()
+		? static_cast<uint32>(m_pool.size()) : 1;
+}
+
 void SrRasTaskDispatcher::ExecuteBatch(uint32 participantIndex)
 {
+	PERFORMANCEAPI_INSTRUMENT("Worker.ExecuteBatch");
 	_mm_setcsr(0x1f80);
 	LARGE_INTEGER begin, end;
 	QueryPerformanceCounter(&begin);

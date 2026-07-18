@@ -229,7 +229,7 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 
 	if (g_context->IsFeatureEnable(eRFeature_InterlaceRendering))
 	{
-		if (line % 2 == gEnv->renderer->getFrameCount() % 2)
+		if (line % 2 == primitive->frameNumber % 2)
 		{
 			return;
 		}
@@ -250,7 +250,7 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 		// ���������dotRendering
 		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 		{
-			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
+			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == primitive->frameNumber % 2;
 			if (omitThisFrame)
 			{
 				// TODO
@@ -287,7 +287,7 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 
 	if (g_context->IsFeatureEnable(eRFeature_InterlaceRendering))
 	{
-		if (line % 2 == gEnv->renderer->getFrameCount() % 2)
+		if (line % 2 == primitive->frameNumber % 2)
 		{
 			return;
 		}
@@ -311,7 +311,7 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 		// ���������dotRendering
 		if (g_context->IsFeatureEnable(eRFeature_DotCoverageRendering))
 		{
-			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == gEnv->renderer->getFrameCount() % 2;
+			bool omitThisFrame = (address - ((address / g_context->width) % 2)) % 2 == primitive->frameNumber % 2;
 			if (omitThisFrame)
 			{
 				// TODO

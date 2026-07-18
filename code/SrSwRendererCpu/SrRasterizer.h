@@ -15,6 +15,9 @@
 #include "SrShader.h"
 #include "SrTileTypes.h"
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 class SrRasTaskDispatcher;
 class SrSoftRenderer;
@@ -76,12 +79,16 @@ inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1
  */
 SR_ALIGN struct SrRendPrimitve
 {
-	SrVertexBuffer*		vb;					///< vertex buffer
+	const SrVertexBuffer*	sourceVb;			///< immutable normalized VS input
+	SrVertexBuffer*		vb;					///< frame-local VS output
 	SrVertexBuffer		frameVb;			///< frame-local VS output descriptor
 	SrIndexBuffer*		ib;
 	SrShaderContext		shaderConstants;
 	const SrSwShader*			shader;
 	uint32				drawSequence;
+	uint32				frameNumber;
+	float				zNear;
+	float				zFar;
 
 	void * operator new(size_t size);
 	void operator delete(void *memoryToBeDeallocated);
@@ -124,7 +131,16 @@ public:
 
 	// ֡ĩβ���Ի����primitive������Ⱦ
 	void Flush();
-	void FlushTileBinning(uint32* outBuffer, uint32* memBuffer, uint32* backBuffer, uint32* gpuBuffer);
+	void FlushTileBinning();
+	static void WaitForFrameSurface(void* context);
+	void SubmitFrameAsync();
+	bool WaitForFrameAsync();
+	void SignalFrameSurface(bool ready);
+	void StopFrameThread();
+	void FrameThreadMain();
+	bool IsFrameSurfaceReady() const { return m_frameSurfaceReady; }
+	void MarkFrameReadyForPresent() { m_frameSurfaceReady = false; m_presentPending = true; }
+	void PresentPendingFrame();
 
 	// ��դ��primitive���
 	static void ProcessRasterizer( SrRendPrimitve* in_primitive, SrFragment* out_gBuffer );
@@ -157,10 +173,13 @@ public:
 	static int Draw_Clip_Line(int x0,int y0, int x1, int y1, int color, uint32 *dest_buffer, int lpitch);
 public:
 	std::list<SrRendPrimitve*> m_rendPrimitives;			///< ��ȾPrimitive���У�ÿ֡����DrawPrimitive���ú󻺴������flush����ʱɾ��
+	std::list<SrRendPrimitve*> m_buildRendPrimitives;
 
 	std::list<SrRendPrimitve*> m_rendPrimitivesRHZ;		///< ��ȾPrimitive���У�ÿ֡����DrawPrimitive���ú󻺴������flush����ʱɾ��
+	std::list<SrRendPrimitve*> m_buildRendPrimitivesRHZ;
 
 	std::vector<float4> m_rendDynamicVertex;
+	std::vector<float4> m_buildDynamicVertex;
 	SrTileLayout m_tileLayout;
 	SrTileBins m_tileBins;
 	std::vector<SrRendPrimitve*> m_tileDraws;
@@ -175,7 +194,22 @@ public:
 	std::vector<uint32> m_tileShadedPixels;
 	std::vector<std::atomic<LONG> > m_tileReady;
 	std::vector<SrRendPrimitve*> m_rendPrimitivePool;
+	std::vector<SrRendPrimitve*> m_buildPrimitivePool;
 	uint32 m_rendPrimitiveUsed;
+	uint32 m_buildPrimitiveUsed;
+	SrRendVertex* m_renderVertexBuffer;
+	bool m_frameSurfaceReady;
+	bool m_presentPending;
+	bool m_surfaceReadyForRender;
+	bool m_frameRequested;
+	bool m_frameComplete;
+	bool m_frameInFlight;
+	bool m_stopFrameThread;
+	std::thread m_frameThread;
+	std::mutex m_frameMutex;
+	std::condition_variable m_frameRequestCondition;
+	std::condition_variable m_frameCompleteCondition;
+	std::condition_variable m_surfaceReadyCondition;
 
 	SrTexture* m_MemSBuffer;								///< ��̬��������ڻ���jitAA����ʱ�ĵ�ǰ֡
 	SrTexture* m_BackSBuffer;								///< ��̬��������ڻ���jitAA����ʱ����һ֡
