@@ -21,50 +21,20 @@
 */
 SR_ALIGN struct float33
 {
-public:
 	union
 	{
 		float _m[3][3];
 		float m[9];
 		SR_ALIGN struct{ float m00; float m01; float m02; float m10; float m11; float m12; float m20; float m21; float m22; float m30; float m31; float m32; };
 	};
-public:
 
-	float33()
-	{
-	}
+	// 保持为 trivial POD 聚合（原 float33 在 float44 union 中未直接嵌套，
+	// 但为与 float2/3/4 风格一致同样移除构造函数）。
+	// 构造方式：
+	//   float33{p00, p01, ..., p22}   9 分量
+	//   float33_from_ptr(p)           由 float* 加载
 
-	float33( const float * const p )
-	{
-		for( int i = 0 ; i < 9 ; ++i)
-		{
-			m[i] = p[i];
-		}
-	}
-
-	float33(const float3& v1, const float3& v2, const float3& v3 )
-	{
-		m00 = v1.x; m01 = v1.y; m02 = v1.z;
-		m10 = v2.x; m11 = v2.y; m12 = v2.z;
-		m20 = v3.x; m21 = v3.y; m22 = v3.z;
-	}
-
-	float33( const float p00 , const float p01 , const float p02
-		, const float p10 , const float p11 , const float p12
-		, const float p20 , const float p21 , const float p22 )
-	{
-		m[0] = p00;
-		m[1] = p01;
-		m[2] = p02;
-		m[3] = p10;
-		m[4] = p11;
-		m[5] = p12;
-		m[6] = p20;
-		m[7] = p21;
-		m[8] = p22;
-	}
-
-	const float * operator []( const int p ) const 
+	const float * operator []( const int p ) const
 	{
 		return _m[p];
 	}
@@ -117,13 +87,13 @@ public:
 		__m128 line2 = _mm_set_ps( 0, m[7], m[4], m[1] );
 		__m128 line3 = _mm_set_ps( 0, m[8], m[5], m[2] );
 
-		tmp.x = *((float*)&_mm_dot_ps( p.m128, line1));
-		tmp.y = *((float*)&_mm_dot_ps( p.m128, line2));
-		tmp.z = *((float*)&_mm_dot_ps( p.m128, line3));
+		tmp.x = _mm_cvtss_f32( _mm_dot_ps( p.m128, line1));
+		tmp.y = _mm_cvtss_f32( _mm_dot_ps( p.m128, line2));
+		tmp.z = _mm_cvtss_f32( _mm_dot_ps( p.m128, line3));
 #else
-		float3 tmp( p.x * m[0] + p.y * m[3] + p.z * m[6]
+		float3 tmp{ p.x * m[0] + p.y * m[3] + p.z * m[6]
 		, p.x * m[1] + p.y * m[4] + p.z * m[7]
-		, p.x * m[2] + p.y * m[5] + p.z * m[8] );
+		, p.x * m[2] + p.y * m[5] + p.z * m[8] };
 #endif
 		return tmp;
 	}		
@@ -173,7 +143,6 @@ public:
 */
 SR_ALIGN struct float44
 {
-public:
 	union
 	{
 		float _m[4][4];
@@ -185,49 +154,18 @@ public:
 		struct{float3 row0_float3, row1_float3, row2_float3, row3_float3;};
 		struct{float4 row0_float4, row1_float4, row2_float4, row3_float4;};
 	};
-public:
 
-	float44()
-	{
-	}
-
-	float44( const float * const p )
-	{
-		for( int i = 0 ; i < 16 ; ++i)
-		{
-			m[i] = p[i];
-		}
-	}
-
-	float44( const float p00 , const float p01 , const float p02 , const float p03 
-		, const float p10 , const float p11 , const float p12 , const float p13
-		, const float p20 , const float p21 , const float p22 , const float p23
-		, const float p30 , const float p31 , const float p32 , const float p33 )
-	{
-		m[0] = p00;
-		m[1] = p01;
-		m[2] = p02;
-		m[3] = p03;
-		m[4] = p10;
-		m[5] = p11;
-		m[6] = p12;
-		m[7] = p13;
-		m[8] = p20;
-		m[9] = p21;
-		m[10] = p22;
-		m[11] = p23;
-		m[12] = p30;
-		m[13] = p31;
-		m[14] = p32;
-		m[15] = p33;
-	}
+	// 保持为 trivial POD 聚合，以便 float3/float4 row*_float* 可作为本 union 的成员。
+	// 构造方式：
+	//   float44{p00..p33}    16 分量
+	//   float44_from_ptr(p)  由 float* 加载
 
 	/**
 	 *@brief 取元素
-	 *@return float * 
-	 *@param const int p 
+	 *@return float *
+	 *@param const int p
 	 */
-	const float * operator []( const int p ) const 
+	const float * operator []( const int p ) const
 	{
 		return _m[p];
 	}
@@ -347,10 +285,10 @@ public:
 	 */
 	float4 operator *( const float4 & p ) const
 	{
-		float4 tmp( p.x * m[0] + p.y * m[4] + p.z * m[8] + p.w * m[12]
+		float4 tmp{ p.x * m[0] + p.y * m[4] + p.z * m[8] + p.w * m[12]
 		, p.x * m[1] + p.y * m[5] + p.z * m[9] + p.w * m[13]
 		, p.x * m[2] + p.y * m[6] + p.z * m[10] + p.w * m[14]
-		, p.x * m[3] + p.y * m[7] + p.z * m[11] + p.w * m[15]);
+		, p.x * m[3] + p.y * m[7] + p.z * m[11] + p.w * m[15]};
 		return tmp;
 	}
 	/**
@@ -360,9 +298,9 @@ public:
 	 */
 	float3 operator *( const float3 & p ) const
 	{
-		float3 tmp( p.x * m[0] + p.y * m[4] + p.z * m[8] + m[12]
+		float3 tmp{ p.x * m[0] + p.y * m[4] + p.z * m[8] + m[12]
 		, p.x * m[1] + p.y * m[5] + p.z * m[9] + m[13]
-		, p.x * m[2] + p.y * m[6] + p.z * m[10] + m[14] );
+		, p.x * m[2] + p.y * m[6] + p.z * m[10] + m[14] };
 		return tmp;
 	}		
 	/**
@@ -404,9 +342,9 @@ public:
 	 */
 	float3 MultVector3( const float3 &p )
 	{
-		float3 tmp( m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12]
+		float3 tmp{ m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12]
 		, m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13]
-		, m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14] );
+		, m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14] };
 		return tmp;
 	}
 	/**
@@ -422,13 +360,13 @@ public:
 		__m128 line2 = _mm_set_ps( 0, m[9], m[5], m[1] );
 		__m128 line3 = _mm_set_ps( 0, m[10], m[6], m[2] );
 
-		tmp.x = *((float*)&_mm_dot_ps( p.m128, line1));
-		tmp.y = *((float*)&_mm_dot_ps( p.m128, line2));
-		tmp.z = *((float*)&_mm_dot_ps( p.m128, line3));
+		tmp.x = _mm_cvtss_f32( _mm_dot_ps( p.m128, line1));
+		tmp.y = _mm_cvtss_f32( _mm_dot_ps( p.m128, line2));
+		tmp.z = _mm_cvtss_f32( _mm_dot_ps( p.m128, line3));
 #else
-		float3 tmp( m[0] * p.x + m[4] * p.y + m[8] * p.z
+		float3 tmp{ m[0] * p.x + m[4] * p.y + m[8] * p.z
 			, m[1] * p.x + m[5] * p.y + m[9] * p.z
-			, m[2] * p.x + m[6] * p.y + m[10] * p.z );
+			, m[2] * p.x + m[6] * p.y + m[10] * p.z };
 #endif
 
 		return tmp;
@@ -447,7 +385,7 @@ public:
 		float3 front = ( to - from ).normalize();
 		float3 right = ( up % front ).normalize();
 		float3 tup = ( front % right ).normalize();
-		float3 tfrom = float3( from.dot( right ), from.dot( tup ) , from.dot( front ) );
+		float3 tfrom{ from.dot( right ), from.dot( tup ) , from.dot( front ) };
 
 		_m[0][0] = right.x; _m[1][0] = right.y; _m[2][0] = right.z;
 		_m[0][1] = tup.x; _m[1][1] = tup.y; _m[2][1] = tup.z;
@@ -470,7 +408,7 @@ public:
 		float3 front = ( to - from ).normalize();
 		float3 right = ( front % up ).normalize();
 		float3 tup = ( right % front ).normalize();
-		float3 tfrom = float3( float3::dot(from, right) , float3::dot(from, tup) , float3::dot(from, front) );
+		float3 tfrom{ float3::dot(from, right) , float3::dot(from, tup) , float3::dot(from, front) };
 
 		_m[0][0] = right.x; _m[1][0] = right.y; _m[2][0] = right.z;
 		_m[0][1] = tup.x; _m[1][1] = tup.y; _m[2][1] = tup.z;
@@ -646,7 +584,7 @@ public:
 	 *@param const Quat & q 
 	 *@param const float3 & t 
 	 */
-	void float44::Set( const float3& s, const Quat& q, const float3& t ) {
+	void Set( const float3& s, const Quat& q, const float3& t ) {
 		float vxvx=q.v.x*q.v.x;					float vzvz=q.v.z*q.v.z;					float vyvy=q.v.y*q.v.y; 
 		float vxvy=q.v.x*q.v.y;					float vxvz=q.v.x*q.v.z;					float vyvz=q.v.y*q.v.z; 
 		float svx=q.w*q.v.x;					float svy=q.w*q.v.y;					float svz=q.w*q.v.z;
@@ -659,36 +597,62 @@ public:
 	 *@brief 取得行优先的矩阵的位移值
 	 *@return float3 
 	 */
-	float3 float44::GetTranslate() const
+	float3 GetTranslate() const
 	{
 #ifdef SR_USE_SIMD
-		return float3(m30, m31, m32);
+		return float3{m30, m31, m32};
 		//return row3_float3;
 #else
-		return float3(m30, m31, m32);
+		return float3{m30, m31, m32};
 #endif
 	}
 
 	/**
 	 *@brief 静态函数：构造单位矩阵
-	 *@return float44 
+	 *@return float44
 	 */
-	static float44 float44::CreateIdentity()
+	static float44 CreateIdentity()
 	{
-		return float44( 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 1 , 0, 0 , 0 , 0 , 1 );
+		return float44{ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 1 , 0, 0 , 0 , 0 , 1 };
 	}
 
 	/**
 	 *@brief 静态函数：构造0矩阵
-	 *@return float44 
+	 *@return float44
 	 */
-	static float44 float44::CreateZero()
+	static float44 CreateZero()
 	{
-		return float44( 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 );
+		return float44{ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0, 0 , 0 , 0 , 0 };
 	}
 };
 
 typedef float44 float44;
 typedef float33 float33;
+
+// 由于 float33/float44 已改为 trivial POD（无用户声明构造函数），
+// 提供以下工厂函数替代原先的"组合"构造函数。
+// 原 float33(const float3& v1, const float3& v2, const float3& v3)
+inline float33 float33_from_rows( const float3& v1, const float3& v2, const float3& v3 )
+{
+	float33 r;
+	r.m00 = v1.x; r.m01 = v1.y; r.m02 = v1.z;
+	r.m10 = v2.x; r.m11 = v2.y; r.m12 = v2.z;
+	r.m20 = v3.x; r.m21 = v3.y; r.m22 = v3.z;
+	return r;
+}
+
+// 原 float33(const float* p) / float44(const float* p)
+inline float33 float33_from_ptr( const float* p )
+{
+	float33 r;
+	for( int i = 0 ; i < 9 ; ++i) r.m[i] = p[i];
+	return r;
+}
+inline float44 float44_from_ptr( const float* p )
+{
+	float44 r;
+	for( int i = 0 ; i < 16 ; ++i) r.m[i] = p[i];
+	return r;
+}
 
 #endif

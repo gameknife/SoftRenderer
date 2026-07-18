@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "InputManager.h"
 #include <MiniFB.h>
+#include <algorithm>
 
 namespace
 {

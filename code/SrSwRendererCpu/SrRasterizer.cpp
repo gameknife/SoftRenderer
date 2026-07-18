@@ -676,8 +676,8 @@ bool SrRasterizer::DrawLine( const float3& from, const float3& to )
 {
 	std::vector<float4>& vertices = g_context->IsFeatureEnable(eRFeature_TileBinning)
 		? m_buildDynamicVertex : m_rendDynamicVertex;
-	vertices.push_back( float4(from, 1.f) );
-	vertices.push_back( float4(to, 1.f) );
+	vertices.push_back( float4_from_v_w(from, 1.f) );
+	vertices.push_back( float4_from_v_w(to, 1.f) );
 	return true;
 }
 

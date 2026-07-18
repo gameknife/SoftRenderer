@@ -35,7 +35,7 @@ public:
 	// 实体access
 	SrEntity* CreateEntity(const char* name, const char* meshFilename, 
 		const char* matFilename, 
-		const float3& pos = float3(0,0,0),
+		const float3& pos = float3{0,0,0},
 		const Quat& rot = Quat::CreateIdentity(),
 		SrEntity* ent = NULL);
 

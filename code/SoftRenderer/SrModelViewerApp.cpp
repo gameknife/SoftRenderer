@@ -74,7 +74,7 @@ void SrModelViewerApp::OnInit()
 				std::string mtlfile = filename + file + ".mtl";
 				m_ent = m_scene->CreateEntity(file, objfile.c_str(), mtlfile.c_str());
 				m_ents.push_back( m_ent );
-				m_ent->SetScale(float3(40,40,40));
+				m_ent->SetScale(float3{40,40,40});
 			}
 		}
 
@@ -85,7 +85,7 @@ void SrModelViewerApp::OnInit()
 
 	// �������
 	m_camera = m_scene->CreateCamera("cam0");
-	m_camera->setPos(float3(0,0,-15));
+	m_camera->setPos(float3{0,0,-15});
 	m_camera->setFov(68.0f);
 	m_camera->Rotate( 0.1f, 0.3f );
 	m_scene->PushCamera(m_camera);
@@ -96,7 +96,7 @@ void SrModelViewerApp::OnInit()
 	SrLight* lt = gEnv->sceneMgr->AddLight();
 	lt->diffuseColor = SR_ARGB_F( 255, 255, 239, 216 ) * 2.0f;
 	lt->specularColor = SR_ARGB_F( 255, 255, 239, 216 );
-	lt->worldPos = float3( 1000.f, 1000.f, -1000.f);
+	lt->worldPos = float3{ 1000.f, 1000.f, -1000.f};
 	lt->radius = 100.f;
 
 	// ��������豸�ص�
@@ -315,8 +315,8 @@ void SrModelViewerApp::SwitchSSAO()
 }
 void SrModelViewerApp::updateCam()
 {
-	m_camera->setPos( float3(0,0,0) );
-	m_camera->Move( float3(0,0,-m_camdist));
+	m_camera->setPos( float3{0,0,0} );
+	m_camera->Move( float3{0,0,-m_camdist});
 }
 
 void SrModelViewerApp::selectEnt(int index)

@@ -32,7 +32,9 @@ typedef unsigned char uint8;
 // namespace srmath
 // {
 static inline float isqrtf(float x) {return 1.f/sqrtf(x);}
-static inline void sincosf (float angle, float* pSin, float* pCos) {	*pSin = float(sin(angle));	*pCos = float(cos(angle));	}
+// glibc declares sincosf as extern in <math.h>; use a distinct name to avoid
+// the static/extern linkage clash under GCC.
+static inline void sr_sincosf (float angle, float* pSin, float* pCos) {	*pSin = float(sin(angle));	*pCos = float(cos(angle));	}
 
 // 数学结构置前声明
 
@@ -245,16 +247,16 @@ static inline float4 uint32_2_float4( uint32 p )
 #else
 
 #ifdef SR_COLOR_RGBA
-	return float4(  (float)( ( p & 0xFF0000 ) >> 16 ) / (float)0xFF
+	return float4{  (float)( ( p & 0xFF0000 ) >> 16 ) / (float)0xFF
 		, (float)( ( p & 0xFF00 ) >> 8 ) / (float)0xFF
 		, (float)( ( p & 0xFF ) >> 0 )  / (float)0xFF
 		,(float)( ( p & 0xFF000000 ) >> 24 ) / (float)0xFF
-		);
+		};
 #else
-	return float4( (float)( ( p & 0xFF000000 ) >> 24 ) / (float)0xFF
+	return float4{ (float)( ( p & 0xFF000000 ) >> 24 ) / (float)0xFF
 		, (float)( ( p & 0xFF0000 ) >> 16 ) / (float)0xFF
 		, (float)( ( p & 0xFF00 ) >> 8 ) / (float)0xFF
-		, (float)( ( p & 0xFF ) ) / (float)0xFF );
+		, (float)( ( p & 0xFF ) ) / (float)0xFF };
 #endif
 #endif
 }
@@ -320,9 +322,9 @@ static inline uint32 SrColorMulFloat( uint32& color1, float ratio )
 }
 
 #ifdef SR_COLOR_RGBA
-#define SR_ARGB_F( a, r, g, b ) float4( r / 255.f, g / 255.f, b / 255.f, a / 255.f )
+#define SR_ARGB_F( a, r, g, b ) float4{ r / 255.f, g / 255.f, b / 255.f, a / 255.f }
 #else
-#define SR_ARGB_F( a, r, g, b ) float4( a / 255.f, r / 255.f, g / 255.f, b / 255.f )
+#define SR_ARGB_F( a, r, g, b ) float4{ a / 255.f, r / 255.f, g / 255.f, b / 255.f }
 #endif
 
 static inline float SrRandomFloat(float min, float max)

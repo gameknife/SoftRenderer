@@ -40,7 +40,7 @@ enum ERendererType
 class IRenderer
 {
 public:
-	IRenderer::IRenderer( ERendererType type ):m_rendererType(type)
+	IRenderer( ERendererType type ):m_rendererType(type)
 	{
 		m_matrixStack.assign( eMd_Count, float44::CreateIdentity() );
 		m_frameCount = 0;

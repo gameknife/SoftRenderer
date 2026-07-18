@@ -24,13 +24,13 @@ SR_ALIGN struct Quat
 
 	 Quat() {}
 
-	 Quat( float W, float X, float Y, float Z, bool bNorm = false ) 
-		: w(W),v(X,Y,Z)	
+	 Quat( float W, float X, float Y, float Z, bool bNorm = false )
+		: w(W), v{X, Y, Z}
 	{
 		if (bNorm) Normalize();
-		assert(IsValid()); 
+		assert(IsValid());
 	}
-	 Quat( float angle, const float3 &axis) : w(angle),v(axis) {};
+	 Quat( float angle, const float3 &axis) : w(angle), v(axis) {};
 
 	// 四元数 单乘
 	void operator *= (float op) {	w*=op; v*=op;	}
@@ -54,12 +54,12 @@ SR_ALIGN struct Quat
 	 void SetRotationZ( float r );
 	static Quat CreateRotationZ( float r );
 
-	float3 GetColumn0() const {return float3(2*(v.x*v.x+w*w)-1,2*(v.y*v.x+v.z*w),2*(v.z*v.x-v.y*w));}
-	float3 GetColumn1() const {return float3(2*(v.x*v.y-v.z*w),2*(v.y*v.y+w*w)-1,2*(v.z*v.y+v.x*w));}
-	float3 GetColumn2() const {return float3(2*(v.x*v.z+v.y*w),2*(v.y*v.z-v.x*w),2*(v.z*v.z+w*w)-1);}
-	float3 GetRow0() const {return float3(2*(v.x*v.x+w*w)-1,2*(v.x*v.y-v.z*w),2*(v.x*v.z+v.y*w));}
-	float3 GetRow1() const {return float3(2*(v.y*v.x+v.z*w),2*(v.y*v.y+w*w)-1,2*(v.y*v.z-v.x*w));}
-	float3 GetRow2() const	{return float3(2*(v.z*v.x-v.y*w),2*(v.z*v.y+v.x*w),2*(v.z*v.z+w*w)-1);}
+	float3 GetColumn0() const {return float3{2*(v.x*v.x+w*w)-1,2*(v.y*v.x+v.z*w),2*(v.z*v.x-v.y*w)};}
+	float3 GetColumn1() const {return float3{2*(v.x*v.y-v.z*w),2*(v.y*v.y+w*w)-1,2*(v.z*v.y+v.x*w)};}
+	float3 GetColumn2() const {return float3{2*(v.x*v.z+v.y*w),2*(v.y*v.z-v.x*w),2*(v.z*v.z+w*w)-1};}
+	float3 GetRow0() const {return float3{2*(v.x*v.x+w*w)-1,2*(v.x*v.y-v.z*w),2*(v.x*v.z+v.y*w)};}
+	float3 GetRow1() const {return float3{2*(v.y*v.x+v.z*w),2*(v.y*v.y+w*w)-1,2*(v.y*v.z-v.x*w)};}
+	float3 GetRow2() const	{return float3{2*(v.z*v.x-v.y*w),2*(v.z*v.y+v.x*w),2*(v.z*v.z+w*w)-1};}
 
 	 void Invert( void );
 	 Quat GetInverted() const;
@@ -190,7 +190,7 @@ inline  Quat Quat::CreateRotationX( float r )
 inline  void Quat::SetRotationX( float r ) 
 { 
 	float s,c; 
-	sincosf(float(r*(float)0.5),&s,&c); w=c; v.x=s; v.y=0; v.z=0;	
+	sr_sincosf(float(r*(float)0.5),&s,&c); w=c; v.x=s; v.y=0; v.z=0;
 }
 
 inline  Quat Quat::CreateRotationY( float r ) 
@@ -199,7 +199,7 @@ inline  Quat Quat::CreateRotationY( float r )
 }
 inline  void Quat::SetRotationY( float r ) 
 { 
-	float s,c; sincosf(float(r*(float)0.5),&s,&c); w=c; v.x=0; v.y=s; v.z=0;	
+	float s,c; sr_sincosf(float(r*(float)0.5),&s,&c); w=c; v.x=0; v.y=s; v.z=0;
 }
 
 inline  Quat Quat::CreateRotationZ( float r ) 
@@ -208,7 +208,7 @@ inline  Quat Quat::CreateRotationZ( float r )
 }
 inline  void Quat::SetRotationZ( float r ) 
 { 
-	float s,c; sincosf(float(r*(float)0.5),&s,&c); w=c; v.x=0; v.y=0; v.z=s;	
+	float s,c; sr_sincosf(float(r*(float)0.5),&s,&c); w=c; v.x=0; v.y=0; v.z=s;
 }
 
 inline  void	Quat::Normalize(void)	

@@ -89,7 +89,7 @@ static inline float4 CalculateTangentSpaceVector(const float3& position1, const 
 		flip = -1.f;
 	}
 
-	return float4( tangent, flip);
+	return float4_from_v_w( tangent, flip);
 }
 
 /**

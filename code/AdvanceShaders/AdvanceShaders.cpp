@@ -63,9 +63,9 @@ void SrSkinSimShader::ProcessPatch( void* vOut, void* vOut1, void* vOut2, const 
 	float3 pos2 = inTHREE[1]->tangent.xyz;
 	float3 pos3 = inTHREE[2]->tangent.xyz;
 
-	float2 uv1(inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w);
-	float2 uv2(inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w);
-	float2 uv3(inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w);
+	float2 uv1{inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w};
+	float2 uv2{inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w};
+	float2 uv3{inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w};
 
 	outTHREE[0]->tangent = CalculateTangentSpaceVector(pos1, pos2, pos3, uv1, uv2, uv3);
 	outTHREE[1]->tangent = CalculateTangentSpaceVector(pos2, pos1, pos3, uv2, uv1, uv3);
@@ -88,7 +88,7 @@ void SrSkinSimShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2, const
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
 	// normal,tangent处理到世界空间
-	out->normal_ty = float4( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
+	out->normal_ty = float4_from_v_w( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 
 	// 暂时把pos存入tangent，供geometry阶段计算tangent
 	out->tangent.xyz = in->pos.xyz;// * out->pos.w;
@@ -136,7 +136,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
 	// 采样diffuse颜色
-	float2 tc0(in->worldpos_tx.w, in->normal_ty.w);
+	float2 tc0{in->worldpos_tx.w, in->normal_ty.w};
 
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
@@ -156,7 +156,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	float3 binormalDir = tangentDir % normalDir;
 
 	// 利用世界空间的 切线，法线，副法线 构造从切线空间到世界空间的转换矩阵
-	float33 tangent2world( tangentDir, binormalDir, normalDir );
+	float33 tangent2world = float33_from_rows( tangentDir, binormalDir, normalDir );
 
 	// 采样normal
 	uint32 nor = context->Tex2D( tc0, 1 );
@@ -164,7 +164,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 
 	// 将0-1处理到-1到1空间
 	float3 normalTangent = norf.xyz;
-	normalTangent = (normalTangent - float3(0.5f)) * 2.f;
+	normalTangent = (normalTangent - float3{0.5f, 0.5f, 0.5f}) * 2.f;
 
 	// 将采样到的切线空间法线转换到世界空间
 	normalDir = tangent2world * normalTangent;
@@ -179,12 +179,12 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	viewReflWS.reflect(viewWS, normalDir);
 
 	// 采样反射纹理
-	uint32 refl = context->Tex2D( (float2(viewReflWS.x, viewReflWS.y) * 0.5f + float2(0.5f, 0.5f)), 3 );
+	uint32 refl = context->Tex2D( (float2{viewReflWS.x, viewReflWS.y} * 0.5f + float2{0.5f, 0.5f}), 3 );
 	float4 reflf = uint32_2_float4(refl);
 
 	// 取得全局天光，并利用normal作快速天光模拟
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
-	float4 specularAcc(0.f);
+	float4 specularAcc{0.f, 0.f, 0.f, 0.f};
 
 	// 调用shading lib的皮肤光照计算函数，计算diffuse和specular的光照累积
 	CalcLightsSkin(context, in->worldpos_tx.xyz, normalDir, viewWS, matSSS, diffuseAcc, specularAcc);
@@ -198,7 +198,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	specularAcc += (reflf * diffuseAcc) * rim;
 
 	// rim light
-	//specularAcc += ( float4( 1.f, 1.f, 0.95686f, 0.847f ) * diffuseAcc ) * rim;
+	//specularAcc += ( float4{ 1.f, 1.f, 0.95686f, 0.847f } * diffuseAcc ) * rim;
 
 	diffuseAcc = diffuseAcc * matDiff * cBuffer->difColor;
 	// 光照方程2：材质反射色 * 镜面反射光照聚集
@@ -225,9 +225,9 @@ void SrFresnelNormalShader::ProcessPatch( void* vOut, void* vOut1, void* vOut2, 
 	float3 pos2 = inTHREE[1]->tangent.xyz;
 	float3 pos3 = inTHREE[2]->tangent.xyz;
 
-	float2 uv1(inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w);
-	float2 uv2(inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w);
-	float2 uv3(inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w);
+	float2 uv1{inTHREE[0]->worldpos_tx.w, inTHREE[0]->normal_ty.w};
+	float2 uv2{inTHREE[1]->worldpos_tx.w, inTHREE[1]->normal_ty.w};
+	float2 uv3{inTHREE[2]->worldpos_tx.w, inTHREE[2]->normal_ty.w};
 
 	outTHREE[0]->tangent = CalculateTangentSpaceVector(pos1, pos2, pos3, uv1, uv2, uv3);
 	outTHREE[1]->tangent = CalculateTangentSpaceVector(pos2, pos1, pos3, uv2, uv1, uv3);
@@ -249,7 +249,7 @@ void SrFresnelNormalShader::ProcessVertex( void* vOut, void* vOut1, void* vOut2,
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
 	// normal,tangent处理到世界空间
-	out->normal_ty = float4( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
+	out->normal_ty = float4_from_v_w( (context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 
 	// 暂时把pos存入tangent，供geometry阶段计算tangent
 	out->tangent.xyz = in->pos.xyz;// * out->pos.w;
@@ -288,7 +288,7 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
 	// 采样diffuse颜色
-	float2 tc0(in->worldpos_tx.w, in->normal_ty.w);
+	float2 tc0{in->worldpos_tx.w, in->normal_ty.w};
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 
@@ -303,14 +303,14 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	float3 binormalDir = tangentDir % normalDir;
 
 	// 利用世界空间的 切线，法线，副法线 构造从切线空间到世界空间的转换矩阵
-	float33 tangent2world( tangentDir, binormalDir, normalDir );
+	float33 tangent2world = float33_from_rows( tangentDir, binormalDir, normalDir );
 
 	// 采样normal
 	uint32 nor = context->Tex2D( tc0, 1 );
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;
-	normalTangent = (normalTangent - float3(0.5f)) * 2.f;
+	normalTangent = (normalTangent - float3{0.5f, 0.5f, 0.5f}) * 2.f;
 	//normalTangent.y *= -1;
 
 	// 将采样到的切线空间法线转换到世界空间
@@ -326,12 +326,12 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	viewReflWS.reflect(viewWS, normalDir);
 
 	// 采样反射纹理
-	uint32 refl = context->Tex2D( (float2(viewReflWS.x, viewReflWS.y) * 0.5f + float2(0.5f, 0.5f)), 3 );
+	uint32 refl = context->Tex2D( (float2{viewReflWS.x, viewReflWS.y} * 0.5f + float2{0.5f, 0.5f}), 3 );
 	float4 reflf = uint32_2_float4(refl) * 0.25f;
 
 
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
-	float4 specularAcc(0.f);
+	float4 specularAcc{0.f, 0.f, 0.f, 0.f};
 
 	CalcLights(context, in->worldpos_tx.xyz, normalDir, viewWS, diffuseAcc, specularAcc);
 
@@ -361,7 +361,7 @@ void SRFASTCALL SrHairShader::ProcessVertex( void* vOut, void* vOut1, void* vOut
 	out->worldpos_tx = (context->matrixs[eMd_World] * in->pos);
 	out->worldpos_tx.w = in->texcoord.x;
 	// normal,tangent处理到世界空间
-	out->normal_ty = float4((context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
+	out->normal_ty = float4_from_v_w((context->matrixs[eMd_World].RotateVector3(in->normal)), in->texcoord.y);
 }
 
 void SRFASTCALL SrHairShader::ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final /*= false */ ) const
@@ -396,7 +396,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
 	// 采样diffuse颜色
-	float2 tc0( in->worldpos_tx.w, in->normal_ty.w );
+	float2 tc0{ in->worldpos_tx.w, in->normal_ty.w };
 	uint32 col = context->Tex2D( tc0, 0 );
 	float4 matDiff = uint32_2_float4(col);
 
@@ -407,7 +407,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 	float3 normalDir = in->normal_ty.xyz;
 	normalDir.normalize();
 
-	// 	*out = float4_2_uint32(float4((normalDir * 0.5f + float3(0.5f)),1.f));
+	// 	*out = float4_2_uint32(float4{(normalDir * 0.5f + float3(0.5f)),1.f});
 	// 	return;
 
 
@@ -416,7 +416,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 	viewWS.normalize();
 
 	float4 diffuseAcc = gEnv->sceneMgr->GetSkyLightColor() * (normalDir.y * 0.4f + 0.6f);
-	float4 specularAcc(0.f);
+	float4 specularAcc{0.f, 0.f, 0.f, 0.f};
 
 	CalcLightsKajiya_Kay(context, in->worldpos_tx.xyz, normalDir, in->tangent.xyz, viewWS, diffuseAcc, specularAcc);
 

@@ -40,31 +40,15 @@ public:
 };
 /**
 	*@brief float2 二维向量类，提供二维向量的基本运算操作。
+*@remark 保持为 trivial POD 聚合，以便能作为 float4 等匿名 union 成员（C++ 标准禁止匿名聚合中包含带用户声明构造函数的成员）。使用 float2{a,b} 聚合初始化。
 */
 struct float2
 {
-public:
 	union
 	{
 		float m[2];
 		struct { float x; float y; };
 	};
-
-	float2()
-	{
-	}
-
-	float2( const float * const p )
-	{
-		x = p[0];
-		y = p[1];
-	}
-
-	float2( const float px , const float py )
-	{
-		x = px;
-		y = py;
-	}
 
 	inline float2 & operator += ( const float2 & p )
 	{
@@ -99,12 +83,12 @@ public:
 
 	inline float2 operator + ( const float2 & p ) const
 	{
-		float2 tmp( x + p.x , y + p.y );
+		float2 tmp{ x + p.x , y + p.y };
 		return tmp;
 	}
 	inline float2 operator - ( const float2 & p ) const
 	{
-		float2 tmp( x - p.x , y - p.y );
+		float2 tmp{ x - p.x , y - p.y };
 		return tmp;
 	}
 	inline float operator % ( const float2 & p ) const
@@ -113,17 +97,17 @@ public:
 	}
 	inline float2 operator * ( const float2 & p ) const
 	{
-		float2 tmp( x * p.x , y * p.y );
+		float2 tmp{ x * p.x , y * p.y };
 		return tmp;
 	}
 	inline float2 operator * ( const float p ) const
 	{
-		float2 tmp( x * p , y * p );
+		float2 tmp{ x * p , y * p };
 		return tmp;
 	}
 	inline float2 operator / ( const float p ) const
 	{
-		float2 tmp( x / p , y / p );
+		float2 tmp{ x / p , y / p };
 		return tmp;
 	}
 
@@ -201,7 +185,6 @@ public:
 */
 SR_ALIGN struct float3
 {
-public:
 	union
 	{
 		float m[3];
@@ -212,48 +195,11 @@ public:
 		#endif
 	};
 
-	float3()
-	{
-	}
-
-	float3( const float px , const float py , const float pz )
-	{
-// #ifdef SR_USE_SIMD
-// 		m128 = _mm_set_ps(0, pz, py, px);
-// #else
-		x = px;
-		y = py;
-		z = pz;
-//#endif
-	}
-
-	/**
-	 *@brief float3的快捷建立方式 float3( float2(x,y),z );
-	 *@return  
-	 *@param const float2 pxy 
-	 *@param const float pz 
-	 */
-	float3( const float2& pxy , const float pz )
-	{
-#ifdef SR_USE_SIMD
-		m128 = _mm_set_ps(0, pz, pxy.x, pxy.y);
-#else
-		x = pxy.x;
-		y = pxy.y;
-		z = pz;
-#endif
-	}
-
-	float3( const float px)
-	{
-#ifdef SR_USE_SIMD
-		m128 = _mm_set_ps1(px);
-#else
-		x = px;
-		y = px;
-		z = px;
-#endif
-	}
+	// 保持为 trivial POD 聚合，以便能作为 float4 等匿名 union 成员。
+	// 构造方式：
+	//   float3{px, py, pz}         三分量
+	//   float3{px, px, px}         广播单值（原 float3(px)）
+	//   float3_from_xy_z(xy, z)    由 float2 + z 拼装（原 float3(float2, z)）
 
 	inline float3 & operator += ( const float3 & p )
 	{
@@ -464,7 +410,7 @@ public:
 	inline float dot( const float3& rhs ) const
 	{
 #ifdef SR_USE_SIMD
-	return *(float*)(&_mm_dot_ps( m128, rhs.m128 ));
+	return _mm_cvtss_f32( _mm_dot_ps( m128, rhs.m128 ) );
  #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
 #endif
@@ -473,7 +419,7 @@ public:
 	static inline float dot( const float3& lhs, const float3& rhs )
 	{
 #ifdef SR_USE_SIMD
-		return *(float*)(&_mm_dot_ps( lhs.m128, rhs.m128 ));
+		return _mm_cvtss_f32( _mm_dot_ps( lhs.m128, rhs.m128 ) );
 #else
 		return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
 #endif
@@ -493,7 +439,6 @@ public:
 */
 SR_ALIGN struct float4
 {
-public:
 	union
 	{
 		SR_ALIGN float m[4];
@@ -504,13 +449,13 @@ public:
 #else
 		SR_ALIGN struct { float a , r , g , b; };
 #endif
-		SR_ALIGN struct { 
+		SR_ALIGN struct {
 			float3 xyz;
 		};
-		SR_ALIGN struct { 
+		SR_ALIGN struct {
 			float3 rgb;
 		};
-		SR_ALIGN struct { 
+		SR_ALIGN struct {
 			float2 xy; float2 zw;
 		};
 
@@ -519,52 +464,12 @@ public:
 #endif
 	};
 
-	float4()
-	{
-	}
-
-	float4( const float * const p )
-	{
-#ifdef SR_USE_SIMD
- 		m128 = _mm_loadr_ps( p );
-#else
-		x = p[0];
-		y = p[1];
-		z = p[2];
-		w = p[3];
-#endif
-	}
-
-	float4( const float px , const float py , const float pz , const float pw )
-	{
-// #ifdef SR_USE_SIMD
-// 		m128 = _mm_set_ps(pw, pz, py, px);
-// #else
-		x = px;
-		y = py;
-		z = pz;
-		w = pw;
-//#endif
-	}
-
-	float4( const float px )
-	{
-#ifdef SR_USE_SIMD
-		m128 = _mm_set_ps1(px);
-#else
-		x = px;y = px;z = px;w = px;
-#endif
-	}
-
-	float4( const float3& v, const float pw )
-	{
-#ifdef SR_USE_SIMD
-			m128 = v.m128;
-			w = pw;
-#else
-			x = v.x;y = v.y; z = v.z; w = pw;
-#endif
-	}
+	// 保持为 trivial POD 聚合，以便 float3 xyz / float2 xy 等可作为本 union 的成员。
+	// 构造方式：
+	//   float4{x, y, z, w}            四分量
+	//   float4{x, x, x, x}            广播单值（原 float4(px)）
+	//   float4_from_v_w(v3, w)        由 float3 + w 拼装（原 float4(float3, w)）
+	//   float4_from_ptr(p)            由 float* 加载（原 float4(const float*)）
 
 	inline float4 & operator += ( const float4 & p )
 	{
@@ -592,10 +497,10 @@ public:
 	}
 	inline float4 & operator %= ( const float4 & p )
 	{
-		float4 tmp	( w * p.x + x * p.w - z * p.y + y * p.z
+		float4 tmp	{ w * p.x + x * p.w - z * p.y + y * p.z
 			, w * p.y + y * p.w - x * p.z + z * p.x
 			, w * p.z + z * p.w - y * p.x + x * p.y
-			, w * p.w - x * p.x - y * p.y - z * p.z );
+			, w * p.w - x * p.x - y * p.y - z * p.z };
 		x = tmp.x;
 		y = tmp.y;
 		z = tmp.z;
@@ -666,10 +571,10 @@ public:
 
 	inline float4 operator % ( const float4 & p ) const
 	{
-		float4 tmp	( w * p.x + x * p.w - z * p.y + y * p.z
+		float4 tmp	{ w * p.x + x * p.w - z * p.y + y * p.z
 			, w * p.y + y * p.w - x * p.z + z * p.x
 			, w * p.z + z * p.w - y * p.x + x * p.y
-			, w * p.w - x * p.x - y * p.y - z * p.z );
+			, w * p.w - x * p.x - y * p.y - z * p.z };
 		return tmp;
 	}
 	inline float4 operator * ( const float4 & p ) const
@@ -782,6 +687,47 @@ public:
 		return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
 	}
 };
+
+// 由于 float2/float3/float4 已改为 trivial POD（无用户声明构造函数），
+// 提供以下工厂函数替代原先的"组合"构造函数，保持调用点简洁。
+// 基本场景请直接使用聚合初始化：float3{a,b,c}、float4{x,y,z,w}。
+
+// 原 float3(const float2& pxy, const float pz)
+inline float3 float3_from_xy_z( const float2& pxy, float pz )
+{
+#ifdef SR_USE_SIMD
+	float3 r;
+	r.m128 = _mm_set_ps(0, pz, pxy.x, pxy.y);
+	return r;
+#else
+	return float3{ pxy.x, pxy.y, pz };
+#endif
+}
+
+// 原 float4(const float3& v, const float pw)
+inline float4 float4_from_v_w( const float3& v, float pw )
+{
+#ifdef SR_USE_SIMD
+	float4 r;
+	r.m128 = v.m128;
+	r.w = pw;
+	return r;
+#else
+	return float4{ v.x, v.y, v.z, pw };
+#endif
+}
+
+// 原 float4(const float* p) —— 从内存加载（反转通道顺序以兼容原实现）
+inline float4 float4_from_ptr( const float* p )
+{
+#ifdef SR_USE_SIMD
+	float4 r;
+	r.m128 = _mm_loadr_ps( p );
+	return r;
+#else
+	return float4{ p[0], p[1], p[2], p[3] };
+#endif
+}
 
 // 特化的向量插值
 
