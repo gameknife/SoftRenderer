@@ -23,8 +23,7 @@
 // SIMD����
 //#define SR_USE_SIMD
 
-// Windows Header Files:
-#include <windows.h>
+#include "SrPlatform.h"
 
 #include <future>
 
@@ -32,7 +31,7 @@
 // stl
 #include <iostream>
 // �޸İ汾��vector��֧���ڴ����
-#if _MSC_VER <= 1600
+#if defined(_MSC_VER) && _MSC_VER <= 1600
 #include "myvector"
 #else
 #include <vector>
@@ -53,10 +52,16 @@
 #endif
 
 // �ڴ����
+#ifdef _MSC_VER
 #define SR_ALIGN _CRT_ALIGN(16)
+#else
+#define SR_ALIGN
+#endif
 
 // fastcall����
+#ifdef _MSC_VER
 #define SRFASTCALL __fastcall
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // ���߰�
@@ -107,12 +112,21 @@ inline void* _mm_malloc_16byte(size_t sz, size_t align)
 	// manual adjustment advanced an already aligned allocation by 16 bytes
 	// after reserving only 15 bytes of padding, leaving every object one byte
 	// short and corrupting the heap during construction.
+#ifdef _MSC_VER
 	return _mm_malloc(sz, align);
+#else
+	void* memory = NULL;
+	return posix_memalign(&memory, align, sz) == 0 ? memory : NULL;
+#endif
 }
 
 inline void _mm_free_16byte(void* p)
 {
+#ifdef _MSC_VER
 	_mm_free(p);
+#else
+	free(p);
+#endif
 }
 
 #define _mm_malloc_custom _mm_malloc_16byte
@@ -156,6 +170,7 @@ struct GlobalEnvironment
 	SrScene*				sceneMgr;
 	ILogger*				logger;
 	SrRendContext*			context;
+	bool (*present)(HWND window, const void* buffer);
 };
 extern GlobalEnvironment* gEnv;
 

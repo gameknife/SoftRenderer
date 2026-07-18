@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "SrLogger.h"
+#include <chrono>
+#include <ctime>
 
 const int LOG_FILE_SZIE = 1024 * 50;
 
@@ -9,9 +11,6 @@ SrLogger::SrLogger(void)
 	m_data = new char[LOG_FILE_SZIE];
 	m_size = 0;
 
-	AllocConsole();
-	freopen("CONOUT$","w+t",stdout);  
-	freopen("CONIN$","r+t",stdin);
 }
 
 SrLogger::~SrLogger(void)
@@ -20,49 +19,32 @@ SrLogger::~SrLogger(void)
 
 	delete[] m_data;
 
-	fclose(stdout);
-	fclose(stdin);
-	FreeConsole();
 }
 
 void SrLogger::Log( const char* line )
 {
 	uint32 length = strlen(line);
 	
-	// »º´æ×°²»ÏÂÁË£¬Ð´ÈëÎÄ¼þ
+	// ç¼“å­˜è£…ä¸ä¸‹äº†ï¼Œå†™å…¥æ–‡ä»¶
 	if (m_size + length + 2 > LOG_FILE_SZIE)
 	{
 		FlushToFile();
 	}
 	
-	// ×°Èë»º´æ
+	// è£…å…¥ç¼“å­˜
 	{
-		SYSTEMTIME time;
-		GetSystemTime(&time);
+		const std::time_t now = std::time(NULL);
+		std::tm time;
+#ifdef _WIN32
+		localtime_s(&time, &now);
+#else
+		localtime_r(&now, &time);
+#endif
 
 		char* buffer = new char[length + 100];
 
-		int infoType = 0;
-		static HANDLE consolehwnd;
-		consolehwnd = GetStdHandle(STD_OUTPUT_HANDLE);
-
-		switch(line[1])
-		{
-		case '0':
-			SetConsoleTextAttribute(consolehwnd, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE );
-			break;
-		case '1':
-			SetConsoleTextAttribute(consolehwnd, FOREGROUND_BLUE | FOREGROUND_GREEN );
-			break;
-		case '2':
-			SetConsoleTextAttribute(consolehwnd, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY );
-			break;
-		case '3':
-			SetConsoleTextAttribute(consolehwnd, FOREGROUND_RED | FOREGROUND_INTENSITY );
-			break;
-		}
-
-		sprintf(buffer, "[%d/%d/%d %d:%d(+8)] %s \r\n", time.wYear, time.wMonth, time.wDay, (time.wHour + 8) % 24, time.wMinute, line + 2);
+		std::snprintf(buffer, length + 100, "[%d/%d/%d %02d:%02d] %s\n",
+			time.tm_year + 1900, time.tm_mon + 1, time.tm_mday, time.tm_hour, time.tm_min, line + 2);
 
 
 		memcpy( m_data + m_size, buffer, strlen(buffer) );
@@ -78,7 +60,7 @@ void SrLogger::Log( const char* line )
 void SrLogger::Log( const char* format, va_list args )
 {
 	char buffer[512];
-	vsprintf( buffer, format, args );
+	vsnprintf( buffer, sizeof(buffer), format, args );
 
 	Log( buffer );
 }
@@ -93,9 +75,7 @@ void SrLogger::FlushToFile()
 
 	fopen_s( &pFile, path.c_str(), "ab");
 
-	fwrite( m_data, 1, m_size, pFile );
-
-	fclose(pFile);
+	if (pFile) { fwrite( m_data, 1, m_size, pFile ); fclose(pFile); }
 
 	// remove size to 0
 	m_size = 0;

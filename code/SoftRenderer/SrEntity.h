@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  更改日志 history
+  鏇存敼鏃ュ織 history
   ver:1.0
    
  */
@@ -21,13 +21,13 @@ public:
 
 	float44 getWorldMatrix();
 	
-	void SetPos( float3& pos );
-	void SetRotation( Quat& rot );
+	void SetPos( const float3& pos );
+	void SetRotation( const Quat& rot );
 
 	void MoveLocal( float3& trans );
 	void RotateLocal( float3& angle );
 
-	void SetScale( float3& scale);
+	void SetScale( const float3& scale);
 
 	void Update();
 	virtual void Update(float fElapsedTime) {}
@@ -62,4 +62,3 @@ protected:
 };
 
 #endif
-

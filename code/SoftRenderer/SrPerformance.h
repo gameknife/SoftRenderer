@@ -1,7 +1,10 @@
 #ifndef SrPerformance_h__
 #define SrPerformance_h__
 
-#include <windows.h>
+#include "SrPlatform.h"
+#if defined(__APPLE__) || defined(__linux__)
+#include <pthread.h>
+#endif
 
 #if defined(SR_SUPERLUMINAL_ENABLED)
 #include <Superluminal/PerformanceAPI.h>
@@ -16,6 +19,7 @@ inline void SrSetCurrentThreadName(const char* name)
 	PerformanceAPI::SetCurrentThreadName(name);
 #endif
 
+#ifdef _WIN32
 	typedef HRESULT (WINAPI *SetThreadDescriptionFunction)(HANDLE, PCWSTR);
 	HMODULE kernel = GetModuleHandleW(L"Kernel32.dll");
 	SetThreadDescriptionFunction setThreadDescription = kernel
@@ -26,6 +30,13 @@ inline void SrSetCurrentThreadName(const char* name)
 	const int length = MultiByteToWideChar(CP_UTF8, 0, name, -1, wideName, static_cast<int>(sizeof(wideName) / sizeof(wideName[0])));
 	if (length > 0)
 		setThreadDescription(GetCurrentThread(), wideName);
+#elif defined(__APPLE__)
+	pthread_setname_np(name);
+#elif defined(__linux__)
+	char shortName[16];
+	std::snprintf(shortName, sizeof(shortName), "%.15s", name);
+	pthread_setname_np(pthread_self(), shortName);
+#endif
 }
 
 #endif

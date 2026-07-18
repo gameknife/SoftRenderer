@@ -1,54 +1,43 @@
 cmake_minimum_required(VERSION 3.20)
+project(SoftRenderer LANGUAGES C CXX)
 
-project(SoftRenderer LANGUAGES CXX RC)
-
-if(NOT WIN32 OR NOT MSVC)
-    message(FATAL_ERROR "SoftRenderer requires the Microsoft Visual C++ toolchain on Windows.")
-endif()
-
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+include(FetchContent)
+set(MINIFB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(MINIFB_BUILD_VERSION_INFO OFF CACHE BOOL "" FORCE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    option(SR_LINUX_WAYLAND "Use MiniFB's native Wayland backend on Linux" ON)
+    set(MINIFB_USE_WAYLAND_API ${SR_LINUX_WAYLAND} CACHE BOOL "" FORCE)
+endif()
+FetchContent_Declare(minifb
+    GIT_REPOSITORY https://github.com/emoon/minifb.git
+    GIT_TAG v0.10.1
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(minifb)
+
+find_package(Threads REQUIRED)
 
 set(SR_CODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/code")
 set(SR_CORE_DIR "${SR_CODE_DIR}/SoftRenderer")
 set(SR_RENDERER_DIR "${SR_CODE_DIR}/SrSwRendererCpu")
-set(SR_THIRDPARTY_DIR "${SR_CODE_DIR}/thirdparty")
 set(SR_RUNTIME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(SR_DXSDK_ARCH x64)
-else()
-    set(SR_DXSDK_ARCH x86)
-endif()
-
-find_library(SR_DXGUID_LIBRARY
-    NAMES dxguid
-    PATHS "${SR_THIRDPARTY_DIR}/dxsdk/lib/${SR_DXSDK_ARCH}"
-    NO_DEFAULT_PATH
-    REQUIRED
-)
-
-set(SR_COMMON_INCLUDE_DIRS
-    "${SR_CORE_DIR}"
-    "${SR_RENDERER_DIR}"
-    "${SR_THIRDPARTY_DIR}/dxsdk/include"
-)
+set(SR_COMMON_INCLUDE_DIRS "${SR_CORE_DIR}" "${SR_RENDERER_DIR}")
 
 function(sr_configure_target target)
     target_include_directories(${target} PRIVATE ${SR_COMMON_INCLUDE_DIRS})
-    target_compile_definitions(${target} PRIVATE
-        WIN32
-        _WINDOWS
-        _MBCS
-        _CRT_SECURE_NO_WARNINGS
-        SR_USE_SIMD
-    )
-
-    target_compile_options(${target} PRIVATE
-        /W3
-        /fp:fast
-    )
+    if(MSVC)
+        target_compile_options(${target} PRIVATE /W3 /fp:fast)
+        target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
+    else()
+        target_compile_options(${target} PRIVATE -Wall -Wno-unused-variable -Wno-unused-function -ffast-math -fms-extensions)
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
+            target_compile_definitions(${target} PRIVATE SR_USE_SIMD)
+        endif()
+    endif()
 endfunction()
 
 function(sr_set_runtime_layout target subdirectory)
@@ -56,8 +45,9 @@ function(sr_set_runtime_layout target subdirectory)
     if(NOT "${subdirectory}" STREQUAL "")
         set(output_directory "${output_directory}/${subdirectory}")
     endif()
-
     set_target_properties(${target} PROPERTIES
+        # The always-true generator expression prevents Visual Studio and
+        # other multi-config generators from appending a Release subfolder.
         RUNTIME_OUTPUT_DIRECTORY "$<1:${output_directory}>"
         LIBRARY_OUTPUT_DIRECTORY "$<1:${output_directory}>"
         ARCHIVE_OUTPUT_DIRECTORY "$<1:${output_directory}>"
@@ -66,9 +56,7 @@ endfunction()
 
 set(SR_APP_SOURCES
     "${SR_CORE_DIR}/InputManager.cpp"
-    "${SR_CORE_DIR}/Keyboard.cpp"
     "${SR_CORE_DIR}/mmgr/mmgr.cpp"
-    "${SR_CORE_DIR}/Mouse.cpp"
     "${SR_CORE_DIR}/SoftRenderApp.cpp"
     "${SR_CORE_DIR}/main.cpp"
     "${SR_CORE_DIR}/SrBitmap.cpp"
@@ -89,18 +77,14 @@ set(SR_APP_SOURCES
     "${SR_CORE_DIR}/SrTexture.cpp"
     "${SR_CORE_DIR}/stdafx.cpp"
     "${SR_CORE_DIR}/util/memfile.cpp"
-    "${SR_CORE_DIR}/SoftRenderer.rc"
 )
 
-add_executable(SoftRenderer WIN32 ${SR_APP_SOURCES})
+add_executable(SoftRenderer ${SR_APP_SOURCES})
 sr_configure_target(SoftRenderer)
-target_link_libraries(SoftRenderer PRIVATE
-    d3d9
-    dinput8
-    winmm
-    opengl32
-    "${SR_DXGUID_LIBRARY}"
-)
+target_link_libraries(SoftRenderer PRIVATE minifb Threads::Threads ${CMAKE_DL_LIBS})
+if(APPLE)
+    target_link_options(SoftRenderer PRIVATE -Wl,-export_dynamic)
+endif()
 sr_set_runtime_layout(SoftRenderer "")
 
 set(SR_RENDERER_SOURCES
@@ -112,74 +96,40 @@ set(SR_RENDERER_SOURCES
     "${SR_RENDERER_DIR}/SrRasterizer_Algo.cpp"
     "${SR_RENDERER_DIR}/SrRasterize_Clip.cpp"
     "${SR_RENDERER_DIR}/SrSoftRenderer.cpp"
-	"${SR_RENDERER_DIR}/SrTileRenderer.cpp"
-	"${SR_RENDERER_DIR}/SrTileBinner.cpp"
+    "${SR_RENDERER_DIR}/SrTileRenderer.cpp"
+    "${SR_RENDERER_DIR}/SrTileBinner.cpp"
 )
-
 add_library(SrSwRendererCpu SHARED ${SR_RENDERER_SOURCES})
 sr_configure_target(SrSwRendererCpu)
-target_compile_definitions(SrSwRendererCpu PRIVATE SRSWRENDERERCPU_EXPORTS)
-target_link_libraries(SrSwRendererCpu PRIVATE
-    d3d9
-    "${SR_DXGUID_LIBRARY}"
-)
+target_link_libraries(SrSwRendererCpu PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+if(WIN32)
+    target_link_libraries(SrSwRendererCpu PRIVATE gdi32)
+endif()
+set_target_properties(SrSwRendererCpu PROPERTIES PREFIX "")
 sr_set_runtime_layout(SrSwRendererCpu "renderer")
 
-add_library(BasicShaders SHARED
-    "${SR_CODE_DIR}/BasicShaders/BasicShaders.cpp"
-)
+add_library(BasicShaders SHARED "${SR_CODE_DIR}/BasicShaders/BasicShaders.cpp")
 sr_configure_target(BasicShaders)
-target_compile_definitions(BasicShaders PRIVATE BASICSHADERS_EXPORTS)
-set_target_properties(BasicShaders PROPERTIES OUTPUT_NAME BasicShaders SUFFIX ".swsl")
+set_target_properties(BasicShaders PROPERTIES PREFIX "" OUTPUT_NAME BasicShaders SUFFIX ".swsl")
 sr_set_runtime_layout(BasicShaders "shader")
 
-add_library(AdvanceShaders SHARED
-    "${SR_CODE_DIR}/AdvanceShaders/AdvanceShaders.cpp"
-)
+add_library(AdvanceShaders SHARED "${SR_CODE_DIR}/AdvanceShaders/AdvanceShaders.cpp")
 sr_configure_target(AdvanceShaders)
-target_compile_definitions(AdvanceShaders PRIVATE ADVANCESHADERS_EXPORTS)
-set_target_properties(AdvanceShaders PROPERTIES OUTPUT_NAME AdvanceShaders SUFFIX ".swsl")
+set_target_properties(AdvanceShaders PROPERTIES PREFIX "" OUTPUT_NAME AdvanceShaders SUFFIX ".swsl")
 sr_set_runtime_layout(AdvanceShaders "shader")
+
+if(APPLE)
+    foreach(target SrSwRendererCpu BasicShaders AdvanceShaders)
+        target_link_options(${target} PRIVATE -Wl,-undefined,dynamic_lookup)
+    endforeach()
+endif()
 
 add_dependencies(SoftRenderer SrSwRendererCpu BasicShaders AdvanceShaders)
 
-set(SR_SUPERLUMINAL_ROOT "C:/Program Files/Superluminal/Performance/API" CACHE PATH
-	"Optional Superluminal Performance API installation")
-set(SR_SUPERLUMINAL_HEADER "${SR_SUPERLUMINAL_ROOT}/include/Superluminal/PerformanceAPI.h")
-if(EXISTS "${SR_SUPERLUMINAL_HEADER}")
-	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set(SR_SUPERLUMINAL_ARCH x64)
-	else()
-		set(SR_SUPERLUMINAL_ARCH x86)
-	endif()
-	set(SR_SUPERLUMINAL_LIB_DIR "${SR_SUPERLUMINAL_ROOT}/lib/${SR_SUPERLUMINAL_ARCH}")
-	foreach(target SoftRenderer SrSwRendererCpu)
-		target_include_directories(${target} PRIVATE
-			"$<$<CONFIG:Debug>:${SR_SUPERLUMINAL_ROOT}/include>"
-		)
-		target_compile_definitions(${target} PRIVATE
-			"$<$<CONFIG:Debug>:SR_SUPERLUMINAL_ENABLED=1>"
-		)
-		target_link_libraries(${target} PRIVATE
-			"$<$<CONFIG:Debug>:${SR_SUPERLUMINAL_LIB_DIR}/PerformanceAPI_MDd.lib>"
-		)
-	endforeach()
-	message(STATUS "Superluminal PerformanceAPI instrumentation enabled for Debug only (${SR_SUPERLUMINAL_ARCH})")
-else()
-	message(STATUS "Superluminal PerformanceAPI not found; instrumentation disabled")
-endif()
-
 enable_testing()
-add_executable(SoftRendererTests
-	"${SR_RENDERER_DIR}/tests/SrTileTests.cpp"
-	"${SR_RENDERER_DIR}/SrTileBinner.cpp"
-)
+add_executable(SoftRendererTests "${SR_RENDERER_DIR}/tests/SrTileTests.cpp" "${SR_RENDERER_DIR}/SrTileBinner.cpp")
 target_include_directories(SoftRendererTests PRIVATE "${SR_RENDERER_DIR}")
 sr_set_runtime_layout(SoftRendererTests "")
 add_test(NAME SoftRenderer.TileLayout COMMAND SoftRendererTests)
 
-set_property(TARGET SoftRenderer PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:SoftRenderer>")
-
 install(TARGETS SoftRenderer RUNTIME DESTINATION .)
-install(TARGETS SrSwRendererCpu RUNTIME DESTINATION renderer)
-install(TARGETS BasicShaders AdvanceShaders RUNTIME DESTINATION shader)

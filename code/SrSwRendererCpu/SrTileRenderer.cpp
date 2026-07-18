@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrTileRenderer.h"
 #include "SrRasterizer.h"
 #include "SrRasTaskDispatcher.h"

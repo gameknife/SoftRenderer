@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrMesh.h"
 #include "SrObjLoader.h"
 #include "SrMaterial.h"

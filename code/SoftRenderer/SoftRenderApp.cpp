@@ -1,8 +1,8 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrPerformance.h"
 #include "SoftRenderApp.h"
-#include "resource.h"
-#include <MMSystem.h>
+#include <MiniFB.h>
+#include <filesystem>
 #include "SrMesh.h"
 #include "InputManager.h"
 #include "SrProfiler.h"
@@ -18,75 +18,28 @@ SrRendContext* g_context = NULL;
 typedef IRenderer* (*fnLoadRenderer)(GlobalEnvironment* pgEnv);
 typedef void (*fnFreeRenderer)();
 
-// Forward declarations of functions included in this code module:
+// MiniFB destroys its window data before returning MFB_STATE_EXIT on macOS.
+// Keep a single authoritative live pointer so renderer shutdown cannot present
+// to (or close) the stale HWND retained by the renderer and input manager.
+static mfb_window* g_miniFBWindow = NULL;
 
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
-
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE:  Processes messages for the main window.
-//
-//  WM_COMMAND	- process the application menu
-//  WM_PAINT	- Paint the main window
-//  WM_DESTROY	- post a quit message and return
-//
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static bool PresentMiniFB(HWND window, const void* buffer)
 {
-	int wmId, wmEvent;
-	PAINTSTRUCT ps;
-	HDC hdc;
+	if (!window)
+		return true;
 
-	switch (message)
-	{
-	case WM_COMMAND:
-		wmId    = LOWORD(wParam);
-		wmEvent = HIWORD(wParam);
-		// Parse the menu selections:
-// 		switch (wmId)
-// 		{
-// 		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-//		}
-		break;
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		// TODO: Add any drawing code here...
-		EndPaint(hWnd, &ps);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
-	return 0;
+	mfb_window* liveWindow = g_miniFBWindow;
+	if (reinterpret_cast<mfb_window*>(window) != liveWindow)
+		return false;
+
+	const mfb_update_state state = mfb_update(liveWindow, const_cast<void*>(buffer));
+	if (state < 0)
+		g_miniFBWindow = NULL;
+	return state >= 0;
 }
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
-}
-
 
 SoftRenderApp::SoftRenderApp(void)
+	: m_hWnd(NULL), m_currRendererIndex(0), m_curr_task(0), m_lastTitleUpdate(0.f)
 {
 }
 
@@ -95,63 +48,33 @@ SoftRenderApp::~SoftRenderApp(void)
 {
 }
 
-BOOL SoftRenderApp::Init( HINSTANCE hInstance)
+BOOL SoftRenderApp::Init()
 {
 	m_curr_task = 0;
 
 	gEnv = new GlobalEnvironment;
+	memset(gEnv, 0, sizeof(GlobalEnvironment));
 	gEnv->logger = new SrLogger();
+	gEnv->present = PresentMiniFB;
 
 	GtLogInfo("///////////////////////////////////\n");
 	GtLogInfo("SoftRenderer Init...\n\n");
 
-	WNDCLASSEX wcex;
-
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= WndProc;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= 0;
-	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SOFTRENDERER));
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= NULL;//MAKEINTRESOURCE(IDC_SOFTRENDERER);
-	wcex.lpszClassName	= "SoftRenderer Window Class";
-	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SOFTRENDERER));
-
-	RegisterClassEx(&wcex);
-
-
-	m_hInst = hInstance; // Store instance handle in our global variable
-
 	const int createWidth = getenv("SR_WIDTH") ? (std::max)(1, atoi(getenv("SR_WIDTH"))) : 854;
 	const int createHeight = getenv("SR_HEIGHT") ? (std::max)(1, atoi(getenv("SR_HEIGHT"))) : 480;
-
-	m_hWnd = CreateWindow("SoftRenderer Window Class", "SoftRenderer", WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, createWidth, createHeight, NULL, NULL, hInstance, NULL);
-
-	RECT realRect;
-	GetClientRect(m_hWnd, &realRect);
-
-	int width = realRect.right - realRect.left;
-	int height = realRect.bottom - realRect.top;
-	width = createWidth * 2 - width;
-	height = createHeight * 2 - height;
-
-	MoveWindow(m_hWnd, GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2, GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2, width, height, FALSE);
+	g_miniFBWindow = getenv("SR_HEADLESS") ? NULL : mfb_open("SoftRenderer", createWidth, createHeight);
+	m_hWnd = reinterpret_cast<HWND>(g_miniFBWindow);
 
 	GtLog("Window Created. width=%d height=%d", createWidth, createHeight);
 
-	if (!m_hWnd)
+	if (!m_hWnd && !getenv("SR_HEADLESS"))
 	{
 		return FALSE;
 	}
 
 	
 
-	// ������Դ������
+	// 锟斤拷锟斤拷锟斤拷源锟斤拷锟斤拷锟斤拷
 	GtLogInfo("Creating ResourceManger...");
 	gEnv->resourceMgr = new SrResourceManager;
 	GtLog("- Loading Shader List...");
@@ -159,7 +82,7 @@ BOOL SoftRenderApp::Init( HINSTANCE hInstance)
 	GtLog("- Creating Default Procedura Medias...");
 	gEnv->resourceMgr->InitDefaultMedia();
 
-	// ����Render������
+	// 锟斤拷锟斤拷Render锟斤拷锟斤拷锟斤拷
 	GtLogInfo("Creating Render Context...");
 	g_context = new SrRendContext(createWidth, createHeight, 32);
 	gEnv->context = g_context;
@@ -177,14 +100,6 @@ BOOL SoftRenderApp::Init( HINSTANCE hInstance)
 
 	gEnv->profiler = new SrProfiler;
 	GtLogInfo("[Profiler] initialized.");
-
-	// ��ʾ����
-	ShowWindow(m_hWnd, getenv("SR_HEADLESS") ? SW_HIDE : SW_SHOWNORMAL);
-	UpdateWindow(m_hWnd);
-
-	// �л�����
-	SetFocus(m_hWnd);
-	SetForegroundWindow(m_hWnd);
 
 	GtLogInfo("Math Lib Struct Size:");
 #define OUTPUT_SIZE( x ) \
@@ -250,6 +165,27 @@ bool SoftRenderApp::Update()
 
 	gEnv->profiler->setEnd(ePe_FrameTime);
 
+	// Updating the native title every frame can perturb the timings we are
+	// trying to display, so refresh it at a human-readable rate instead.
+	const float now = gEnv->timer->getRealTime();
+	if (g_miniFBWindow && now - m_lastTitleUpdate >= 0.25f)
+	{
+		const float frameMs = gEnv->profiler->getAverageTime(ePe_FrameTime);
+		const float fps = frameMs > 0.001f ? 1000.f / frameMs : 0.f;
+		char title[512];
+		std::snprintf(title, sizeof(title),
+			"SoftRenderer | %s | %.1f FPS  %.2f ms | Flush %.2f  VS %.2f  RS %.2f  PS %.2f ms | %dx%d | %d workers",
+			SrGetCpuModelName().c_str(), fps, frameMs,
+			gEnv->profiler->getAverageTime(ePe_FlushTime),
+			gEnv->profiler->getAverageTime(ePe_VertexShaderTime),
+			gEnv->profiler->getAverageTime(ePe_RasterizeShaderTime),
+			gEnv->profiler->getAverageTime(ePe_PixelShaderTime),
+			g_context->width, g_context->height,
+			(std::max)(0, g_context->processorNum - 1));
+		mfb_set_title(g_miniFBWindow, title);
+		m_lastTitleUpdate = now;
+	}
+
 	return true;
 }
 
@@ -265,6 +201,16 @@ void SoftRenderApp::Destroy()
 	}
 
 	ShutdownRenderers();
+	mfb_window* liveWindow = g_miniFBWindow;
+	g_miniFBWindow = NULL;
+	m_hWnd = NULL;
+	if (liveWindow)
+	{
+		// mfb_close only requests closure. Pump once so MiniFB can release its
+		// platform data while this pointer is still known to be valid.
+		mfb_close(liveWindow);
+		mfb_update_events(liveWindow);
+	}
 
 	delete g_context;
 	delete gEnv->resourceMgr;
@@ -296,41 +242,26 @@ void SoftRenderApp::Run()
 	uint32 renderedFrames = 0;
 	for(;;)
 	{
-		MSG msg;
-
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		// A present call can observe Escape/window-close and destroy MiniFB's
+		// platform data. Do not poll the stale copy retained in m_hWnd.
+		if (m_hWnd && !g_miniFBWindow)
 		{
-			if (msg.message != WM_QUIT)
+			m_hWnd = NULL;
+			break;
+		}
+		if (g_miniFBWindow)
+		{
+			mfb_window* liveWindow = g_miniFBWindow;
+			if (mfb_update_events(liveWindow) < 0)
 			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			else
-			{
-				
+				g_miniFBWindow = NULL;
+				m_hWnd = NULL;
 				break;
 			}
 		}
-		else
-		{
-		
-			if (!Update())
-			{
-				// need to clean the message loop (WM_QUIT might cause problems in the case of a restart)
-				// another message loop might have WM_QUIT already so we cannot rely only on this 
-				while(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
-				break;
-			}
-			++renderedFrames;
-			if (fixedFrames && renderedFrames >= fixedFrames)
-				break;
-		}
-
-		//Update();
+		if (!Update()) break;
+		++renderedFrames;
+		if (fixedFrames && renderedFrames >= fixedFrames) break;
 	}
 }
 
@@ -428,42 +359,21 @@ void SoftRenderApp::LoadShaderList()
 
 bool SoftRenderApp::InitRenderers()
 {
-	std::string dir = "\\renderer\\";
-	std::string path = "\\renderer\\*.dll";
+	std::string dir = "renderer";
 	getMediaPath(dir);
-	getMediaPath(path);
-
-	WIN32_FIND_DATAA fd;
-	HANDLE hff = FindFirstFileA(path.c_str(), &fd);
-	BOOL bIsFind = TRUE;
-
-	while(hff && bIsFind)
+	if (std::filesystem::exists(dir))
 	{
-		if(fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(dir))
 		{
-			// do not get into
+			if (!entry.is_regular_file() || entry.path().filename().string().find("SrSwRendererCpu") == std::string::npos) continue;
+			const std::string rendererPath = entry.path().string();
+			HMODULE handle = LoadLibraryA(rendererPath.c_str());
+			if (!handle) { GtLogError("Unable to load renderer: %s", SrGetLastDynamicLibraryError()); continue; }
+			fnLoadRenderer load = reinterpret_cast<fnLoadRenderer>(GetProcAddress(handle, "LoadRenderer"));
+			if (!load) { FreeLibrary(handle); continue; }
+			m_renderers.push_back(load(gEnv));
+			m_rendHandles.push_back(handle);
 		}
-		else
-		{
-			std::string fullpath = dir + fd.cFileName;
-
-			// load dll shaders
-			HMODULE hDllHandle = 0;
-			hDllHandle = LoadLibraryA( fullpath.c_str() );
-			if (hDllHandle)
-			{
-				fnLoadRenderer fnLoad = (fnLoadRenderer)(GetProcAddress( hDllHandle, "LoadRenderer" ));
-
-				IRenderer* renderer = fnLoad(gEnv);
-				//renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32);
-
-
-				m_renderers.push_back(renderer);
-
-				m_rendHandles.push_back(hDllHandle);
-			}		
-		}
-		bIsFind = FindNextFileA(hff, &fd);
 	}
 
 	if ( m_renderers.empty() )

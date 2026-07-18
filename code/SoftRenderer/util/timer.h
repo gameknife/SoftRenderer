@@ -13,7 +13,7 @@
 #ifndef timer_h__
 #define timer_h__
 
-#include <MMSystem.h>
+#include <chrono>
 
 class SrTimer
 {
@@ -30,15 +30,14 @@ public:
 
 	void Init()
 	{
-		m_time = timeGetTime() / 1000.f;
+		m_start = Clock::now();
+		m_time = 0.f;
 		m_elapsedTime = 0;
-		QueryPerformanceFrequency(&m_freq); // 获取cpu时钟周期
-		QueryPerformanceCounter(&m_qpcStart);
 	}
 
 	void Update()
 	{
-		float newTime = timeGetTime() / 1000.f;
+		float newTime = getRealTime();
 		m_elapsedTime = newTime - m_time;
 		m_time = newTime;
 	}
@@ -55,27 +54,20 @@ public:
 
 	float getTime()
 	{
-		float newTime = timeGetTime() / 1000.f;
-		return newTime;
+		return getRealTime();
 	}
 
 	float getRealTime()
 	{
-		LARGE_INTEGER now;
-		QueryPerformanceCounter(&now); // 获取cpu时钟计数
-		// Keep the value relative to application start. Converting an absolute
-		// QPC value to float loses millisecond precision after a long uptime.
-		return static_cast<float>(static_cast<double>(now.QuadPart - m_qpcStart.QuadPart) /
-			static_cast<double>(m_freq.QuadPart));
+		return std::chrono::duration<float>(Clock::now() - m_start).count();
 	}
 
 private:
 	float m_time;
 	float m_elapsedTime;
 
-	// high precision
-	LARGE_INTEGER m_freq;
-	LARGE_INTEGER m_qpcStart;
+	typedef std::chrono::steady_clock Clock;
+	Clock::time_point m_start;
 };
 
 #endif

@@ -1,144 +1,36 @@
-/**
-  @file thread.h
-  
-  @brief 线程封装 线程工具
-
-  @author Kaiming
-
-  更改日志 history
-  ver:1.0
-   
- */
-
 #ifndef thread_h__
 #define thread_h__
 
-#include <process.h>
-///////////////////////////////////////////////////////////////////////////////
-// IThread
-///////////////////////////////////////////////////////////////////////////////
+#include <atomic>
+#include <thread>
 
-class IThread 
+class IThread
 {
-public :
-
-	IThread(): m_hThread(INVALID_HANDLE_VALUE)	{}
-
-	virtual ~IThread() 
+public:
+	IThread() : m_thread(NULL), m_stop(false) {}
+	virtual ~IThread()
 	{
-		if (m_hThread != INVALID_HANDLE_VALUE)
-		{
-			::CloseHandle(m_hThread);
-		}
+		if (m_thread && m_thread->joinable()) m_thread->detach();
+		delete m_thread;
 	}
 
-	HANDLE GetHandle() const;
-
-	void Wait() const;
-
-	bool Wait(DWORD timeoutMillis) const;
-
-	void Start();
-
+	HANDLE GetHandle() const { return reinterpret_cast<HANDLE>(m_thread); }
+	void Wait() const { if (m_thread && m_thread->joinable()) m_thread->join(); }
+	bool Wait(DWORD) const { Wait(); return true; }
+	void Start() { if (!m_thread) m_thread = new std::thread(&IThread::ThreadFunction, this); }
+	void Terminate(DWORD = 0) { m_stop.store(true); }
+	bool StopRequested() const { return m_stop.load(); }
 	virtual int Run() = 0;
 
-	void Terminate(
-		DWORD exitCode = 0);
-
-private :
-
-	
-
-	static unsigned int __stdcall ThreadFunction(void *pV);
-
-	HANDLE m_hThread;
-
-	// No copies do not implement
-	IThread(const IThread &rhs);
-	IThread &operator=(const IThread &rhs);
+private:
+	static void ThreadFunction(IThread* thread)
+	{
+		try { thread->Run(); } catch (...) {}
+	}
+	mutable std::thread* m_thread;
+	std::atomic<bool> m_stop;
+	IThread(const IThread&);
+	IThread& operator=(const IThread&);
 };
-
-inline HANDLE IThread::GetHandle() const
-{
-	return m_hThread;
-}
-
-inline void IThread::Start()
-{
-	if (m_hThread == INVALID_HANDLE_VALUE)
-	{
-		unsigned int threadID = 0;
-
-		m_hThread = (HANDLE)::_beginthreadex(0, 0, ThreadFunction, (void*)this, 0, &threadID);
-
-		if (m_hThread == INVALID_HANDLE_VALUE)
-		{
-			
-		}
-	}
-	else
-	{
-		
-	}
-}
-
-inline void IThread::Wait() const
-{
-	if (!Wait(INFINITE))
-	{
-		
-	}
-}
-
-inline bool IThread::Wait(DWORD timeoutMillis) const
-{
-
-	bool ok;
-
-	DWORD result = ::WaitForSingleObject(m_hThread, timeoutMillis);
-	if (result == WAIT_TIMEOUT)
-	{
-		ok = false;
-	}
-	else if (result == WAIT_OBJECT_0)
-	{
-		ok = true;
-	}
-	else
-	{
-		
-	}
-
-	return ok;
-}
-
-inline unsigned int __stdcall IThread::ThreadFunction(void *pV)
-{
-	int result = 0;
-
-	IThread* pThis = (IThread*)pV;
-
-	if (pThis)
-	{
-		try
-		{
-			result = pThis->Run();
-		}
-		catch(...)
-		{
-		}
-	}
-
-	return result;
-}
-
-inline void IThread::Terminate(
-						DWORD exitCode /* = 0 */)
-{
-	if (!::TerminateThread(m_hThread, exitCode))
-	{
-		
-	}
-}
 
 #endif

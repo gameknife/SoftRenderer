@@ -1,253 +1,117 @@
-#include "StdAfx.h"
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
+#include "stdafx.h"
 #include "InputManager.h"
-#include "Keyboard.h"
-#include "Mouse.h"
+#include <MiniFB.h>
 
-#include "mmgr/mmgr.h"
-SrInputManager::SrInputManager(void)
+namespace
 {
+	struct KeyBinding { mfb_key source; EKeyId target; };
+	static const KeyBinding kBindings[] = {
+		{MFB_KB_KEY_ESCAPE, eKI_Escape}, {MFB_KB_KEY_UP, eKI_Up}, {MFB_KB_KEY_DOWN, eKI_Down},
+		{MFB_KB_KEY_LEFT, eKI_Left}, {MFB_KB_KEY_RIGHT, eKI_Right},
+		{MFB_KB_KEY_LEFT_SHIFT, eKI_LShift}, {MFB_KB_KEY_LEFT_ALT, eKI_LAlt},
+		{MFB_KB_KEY_LEFT_CONTROL, eKI_LCtrl}, {MFB_KB_KEY_SPACE, eKI_Space},
+		{MFB_KB_KEY_A, eKI_A}, {MFB_KB_KEY_D, eKI_D}, {MFB_KB_KEY_J, eKI_J},
+		{MFB_KB_KEY_K, eKI_K}, {MFB_KB_KEY_N, eKI_N}, {MFB_KB_KEY_P, eKI_P},
+		{MFB_KB_KEY_S, eKI_S}, {MFB_KB_KEY_W, eKI_W}, {MFB_KB_KEY_GRAVE_ACCENT, eKI_Tilde}
+	};
 }
 
+SrInputManager::SrInputManager() : m_window(NULL), m_mouseX(0), m_mouseY(0) {}
+SrInputManager::~SrInputManager() {}
 
-SrInputManager::~SrInputManager(void)
+HRESULT SrInputManager::Init(HWND window)
 {
-}
-
-//-----------------------------------------------------------------------------
-// Name: InitDirectInput()
-// Desc: Initialize the DirectInput variables.
-//-----------------------------------------------------------------------------
-HRESULT SrInputManager::Init( HWND hDlg )
-{
-	HRESULT hr;
-
-	m_hWnd = hDlg;
-
-	if( FAILED( hr = DirectInput8Create( GetModuleHandle( NULL ), DIRECTINPUT_VERSION,
-		IID_IDirectInput8, ( VOID** )&m_pDI, NULL ) ) )
-		return hr;
-
-	if (!AddInputDevice(new Keyboard(this))) return false;
-	if (!AddInputDevice(new Mouse(this))) return false;
-
-	//ClearKeyState();
-
+	m_window = window;
+	m_keys.assign(MFB_KB_KEY_LAST + 1, SKeyState(eKI_Unknown));
+	m_keyDown.assign(MFB_KB_KEY_LAST + 1, 0);
+	m_mouseDown.assign(8, 0);
+	for (size_t i = 0; i < sizeof(kBindings) / sizeof(kBindings[0]); ++i)
+		m_keys[kBindings[i].source] = SKeyState(kBindings[i].target);
+	if (window)
+	{
+		m_mouseX = mfb_get_mouse_x(reinterpret_cast<mfb_window*>(window));
+		m_mouseY = mfb_get_mouse_y(reinterpret_cast<mfb_window*>(window));
+	}
 	return S_OK;
-}
-
-//-----------------------------------------------------------------------------
-// Name: FreeDirectInput()
-// Desc: Initialize the DirectInput variables.
-//-----------------------------------------------------------------------------
-void SrInputManager::FreeDirectInput()
-{
-	// Release any DirectInput objects.
-	//SAFE_RELEASE( m_pMouse );
-	m_pDI->Release();
-}
-
-InputDeviceBase::InputDeviceBase( SrInputManager* creator, const char* deviceName, const GUID& guid ):m_creator(creator)
-	,m_guid(guid)
-{
-
-}
-
-bool InputDeviceBase::CreateDirectInputDevice(const DIDATAFORMAT* dataFormat, DWORD coopLevel, DWORD bufSize)
-{
-	HRESULT hr = m_creator->getDI()->CreateDevice(m_guid, &m_pDevice, 0);
-
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	// get capabilities
-	DIDEVCAPS caps;
-	caps.dwSize = sizeof(DIDEVCAPS);
-	m_pDevice->GetCapabilities(&caps);
-
-	if (caps.dwFlags & DIDC_POLLEDDEVICE)
-	{
-		m_bNeedsPoll = true;
-	}
-
-	if (!dataFormat)
-	{
-		// build a custom one, here
-	}
-
-	hr = m_pDevice->SetDataFormat(dataFormat);
-	if (FAILED(hr)) 
-	{
-		return false;
-	}				
-
-	m_pDataFormat	= dataFormat;
-	m_dwCoopLevel	= coopLevel;
-
-	hr = m_pDevice->SetCooperativeLevel( m_creator->getHwnd(), m_dwCoopLevel);
-	if (FAILED(hr)) 
-	{
-		return false;
-	}						
-
-	DIPROPDWORD dipdw = {{sizeof(DIPROPDWORD), sizeof(DIPROPHEADER), 0, DIPH_DEVICE}, bufSize};
-	hr = m_pDevice->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph);	
-	if (FAILED(hr)) 
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool InputDeviceBase::Acquire()
-{
-	if (!m_pDevice) return false;
-
-	HRESULT hr = m_pDevice->Acquire();
-
-	unsigned char maxAcquire = 10;
-
-	while (hr == DIERR_INPUTLOST && maxAcquire > 0)
-	{
-		hr = m_pDevice->Acquire();
-		--maxAcquire;
-	}
-
-	if (FAILED(hr) || maxAcquire == 0) return false;
-
-	return true;
-}
-
-///////////////////////////////////////////
-bool InputDeviceBase::Unacquire()
-{
-	return (m_pDevice && SUCCEEDED(m_pDevice->Unacquire()));
-}
-
-InputDeviceBase::~InputDeviceBase()
-{
-	Unacquire();
-	m_pDevice->Release();
-}
-
-bool SrInputManager::PostInputEvent( SInputEvent& event )
-{
-	InputEventListeners::iterator it = m_listeners.begin();
-
-	for (; it != m_listeners.end(); ++it)
-	{
-		if (*it)
-		{
-			(*it)->OnInputEvent( event );
-		}
-	}
-
-	// 处理按住的情况
-	if (event.state == eIS_Pressed)
-	{
-		event.keyStatePtr->state = eIS_Down;
-		m_holdKeys.push_back(event.keyStatePtr);
-	}
-	else if (event.keyStatePtr && event.keyStatePtr->state == eIS_Released && !m_holdKeys.empty())
-	{
-		// remove hold key
-		int slot = -1;
-		int last = m_holdKeys.size()-1;
-
-		for (int i=last; i>=0; --i)
-		{
-			if (m_holdKeys[i] == event.keyStatePtr)
-			{
-				slot = i;
-				break;
-			}
-		}
-		if (slot != -1)
-		{
-			m_holdKeys[slot] = m_holdKeys[last];
-			m_holdKeys.pop_back();
-		}
-	}
-
-	return true;
-}
-
-void SrInputManager::AddListener( IInputEventListener* listener )
-{
-	InputEventListeners::iterator it = m_listeners.begin();
-
-	for (; it != m_listeners.end(); ++it)
-	{
-		if (*it == listener)
-		{
-			return;
-		}
-	}
-
-	m_listeners.push_back(listener);
-}
-
-void SrInputManager::RemoveListener( IInputEventListener* listener )
-{
-	InputEventListeners::iterator it = m_listeners.begin();
-
-	for (; it != m_listeners.end(); ++it)
-	{
-		if (*it == listener)
-		{
-			m_listeners.erase(it);
-			break;
-		}
-	}
-}
-
-bool SrInputManager::AddInputDevice(InputDeviceBase* pDevice)
-{
-	if (pDevice)
-	{
-		if (pDevice->Init())
-		{
-			m_inputDevices.push_back(pDevice);
-			return true;
-		}
-		delete pDevice;
-	}
-	return false;
 }
 
 void SrInputManager::Destroy()
 {
-	InputDevices::iterator it = m_inputDevices.begin();
-	for (; it != m_inputDevices.end(); ++it)
-	{
-		if ( *it )
-		{
-			delete (*it);
-		}
-	}
+	m_listeners.clear();
+	m_keys.clear();
+	m_keyDown.clear();
+	m_mouseDown.clear();
+}
 
-	FreeDirectInput();
+void SrInputManager::PostState(SKeyState& state, EDeviceId device, EInputState inputState, float value)
+{
+	if (state.keyId == eKI_Unknown) return;
+	state.state = inputState;
+	state.value = value;
+	SInputEvent event;
+	state.MakeEvent(event);
+	event.deviceId = device;
+	PostInputEvent(event);
 }
 
 void SrInputManager::Update()
 {
-	for (uint32 i=0; i < m_holdKeys.size(); ++i)
+	if (!m_window) return;
+	mfb_window* window = reinterpret_cast<mfb_window*>(m_window);
+	const uint8_t* keys = mfb_get_key_buffer(window);
+	for (size_t i = 0; i < sizeof(kBindings) / sizeof(kBindings[0]); ++i)
 	{
-		SInputEvent event;
-		m_holdKeys[i]->MakeEvent(event);
-		PostInputEvent( event );
+		const unsigned key = static_cast<unsigned>(kBindings[i].source);
+		const bool down = keys && keys[key] != 0;
+		if (down != (m_keyDown[key] != 0))
+		{
+			m_keyDown[key] = down ? 1 : 0;
+			PostState(m_keys[key], eDI_Keyboard, down ? eIS_Pressed : eIS_Released, down ? 1.f : 0.f);
+		}
+		else if (down)
+			PostState(m_keys[key], eDI_Keyboard, eIS_Down, 1.f);
 	}
 
-	InputDevices::iterator it = m_inputDevices.begin();
-	for (; it != m_inputDevices.end(); ++it)
+	const uint8_t* buttons = mfb_get_mouse_button_buffer(window);
+	for (unsigned button = 1; button <= 3; ++button)
 	{
-		if ( *it )
+		const bool down = buttons && buttons[button] != 0;
+		if (down != (m_mouseDown[button] != 0))
 		{
-			(*it)->Update(true);
+			m_mouseDown[button] = down ? 1 : 0;
+			SKeyState state(static_cast<EKeyId>(eKI_Mouse1 + button - 1));
+			PostState(state, eDI_Mouse, down ? eIS_Pressed : eIS_Released, down ? 1.f : 0.f);
 		}
 	}
+
+	const int mouseX = mfb_get_mouse_x(window);
+	const int mouseY = mfb_get_mouse_y(window);
+	if (mouseX != m_mouseX) { SKeyState state(eKI_MouseX); PostState(state, eDI_Mouse, eIS_Changed, static_cast<float>(mouseX - m_mouseX)); }
+	if (mouseY != m_mouseY) { SKeyState state(eKI_MouseY); PostState(state, eDI_Mouse, eIS_Changed, static_cast<float>(mouseY - m_mouseY)); }
+	m_mouseX = mouseX;
+	m_mouseY = mouseY;
+	const float wheel = mfb_get_mouse_scroll_y(window);
+	if (wheel != 0.f)
+	{
+		SKeyState state(wheel > 0.f ? eKI_MouseWheelUp : eKI_MouseWheelDown);
+		PostState(state, eDI_Mouse, eIS_Pressed, wheel);
+	}
+}
+
+bool SrInputManager::PostInputEvent(SInputEvent& event)
+{
+	for (InputEventListeners::iterator it = m_listeners.begin(); it != m_listeners.end(); ++it)
+		if (*it) (*it)->OnInputEvent(event);
+	return true;
+}
+
+void SrInputManager::AddListener(IInputEventListener* listener)
+{
+	if (std::find(m_listeners.begin(), m_listeners.end(), listener) == m_listeners.end()) m_listeners.push_back(listener);
+}
+
+void SrInputManager::RemoveListener(IInputEventListener* listener)
+{
+	InputEventListeners::iterator it = std::find(m_listeners.begin(), m_listeners.end(), listener);
+	if (it != m_listeners.end()) m_listeners.erase(it);
 }

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrEntity.h"
 
 #include "SrMesh.h"
@@ -34,13 +34,13 @@ float44 SrEntity::getWorldMatrix()
 	return m_worldMatrix;
 }
 
-void SrEntity::SetPos( float3& pos )
+void SrEntity::SetPos( const float3& pos )
 {
 	m_pos = pos;
 	m_dirty = true;
 }
 
-void SrEntity::SetRotation( Quat& rot )
+void SrEntity::SetRotation( const Quat& rot )
 {
 	m_rot = rot;
 	m_dirty = true;
@@ -114,7 +114,7 @@ uint32 SrEntity::getMaterialCount()
 	return ret;
 }
 
-void SrEntity::SetScale( float3& scale )
+void SrEntity::SetScale( const float3& scale )
 {
 	m_scale = scale;
 

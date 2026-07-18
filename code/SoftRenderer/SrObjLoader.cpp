@@ -1,10 +1,9 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrObjLoader.h"
 #include <sstream>
 #include "SrMaterial.h"
 
 #include "mmgr/mmgr.h"
-#include <tchar.h>
 
 
 SrObjLoader::SrObjLoader(void)
@@ -136,7 +135,7 @@ void SrObjLoader::DeleteCache()
 bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& primitives )
 {
 	// Find the file
-	// ÕÒÎÄ¼ş
+	// æ‰¾æ–‡ä»¶
 
 	// File input
 	char strCommand[256] = {0};
@@ -163,17 +162,17 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 		}
 		else if( 0 == strcmp( strCommand, "g" ) )
 		{
-			// ÎïÌå
+			// ç‰©ä½“
 			flushFace = true;
 		}
 		else if( 0 == strcmp( strCommand, "usemtl" ) )
 		{
-			// ÎïÌå²ÄÖÊ
+			// ç‰©ä½“æè´¨
 			InFile >> currMtlName;
 		}
 		else if( 0 == strcmp( strCommand, "mtllib" ) )
 		{
-			// ÎïÌå²ÄÖÊ
+			// ç‰©ä½“æè´¨
 		}
 		else if( 0 == strcmp( strCommand, "v" ) )
 		{
@@ -192,14 +191,14 @@ bool SrObjLoader::LoadGeometryFromOBJ( const char* pMeshData, SrPrimitives& prim
 
 			Positions.push_back( float4( x, y, z, 1 ) );
 
-			// for3DsMax, ¼ÓÈëµãÁĞ£¬Ëæºó·½±ã×ßÃæµÄÊ±ºò£¬ÊäÈënormalºÍtc
+			// for3DsMax, åŠ å…¥ç‚¹åˆ—ï¼Œéšåæ–¹ä¾¿èµ°é¢çš„æ—¶å€™ï¼Œè¾“å…¥normalå’Œtc
 		}
 		else if( 0 == strcmp( strCommand, "vt" ) )
 		{
 			// Vertex TexCoord
 			float u, v;
 			InFile >> u >> v;
-			// for3DsMax, ¼ÓÈëµãÁĞ£¬Ëæºó·½±ã×ßÃæµÄÊ±ºò£¬ÊäÈënormalºÍtc
+			// for3DsMax, åŠ å…¥ç‚¹åˆ—ï¼Œéšåæ–¹ä¾¿èµ°é¢çš„æ—¶å€™ï¼Œè¾“å…¥normalå’Œtc
 			TexCoords.push_back( float2( u, 1-v ) );
 		}
 		else if( 0 == strcmp( strCommand, "vn")  )
@@ -420,7 +419,7 @@ struct SrMatLoadingParam
 bool SrObjLoader::LoadMaterialFromMTL( const char* strFileData )
 {
 	// Find the file
-	// ÕÒÎÄ¼ş
+	// æ‰¾æ–‡ä»¶
 
 	// File input
 	char strCommand[256] = {0};
@@ -521,6 +520,5 @@ bool SrObjLoader::LoadMaterialFromMTL( const char* strFileData )
 
 	return S_OK;
 }
-
 
 

@@ -8,7 +8,7 @@
 
  */
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrRasterizer.h"
 #include "SrProfiler.h"
 #include "SrBitmap.h"

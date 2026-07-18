@@ -24,6 +24,7 @@ class SrSoftRenderer;
 
 inline void FastRasterize( SrRendVertex* out, SrRendVertex* a, SrRendVertex* b, float ratio, float inv_ratio )
 {
+#if defined(__AVX__)
 	__m256 channel0_1_a = _mm256_loadu_ps(&(a->pos.x));
 	__m256 channel0_1_b = _mm256_loadu_ps(&(b->pos.x));
 
@@ -35,10 +36,17 @@ inline void FastRasterize( SrRendVertex* out, SrRendVertex* a, SrRendVertex* b, 
 
 	_mm256_storeu_ps(&(out->pos.x), channel0_1_a);
 	_mm256_storeu_ps(&(out->channel2.x), channel2_3_a);
+#else
+	float* destination = &out->pos.x;
+	const float* left = &a->pos.x;
+	const float* right = &b->pos.x;
+	for (int i = 0; i < 16; ++i) destination[i] = left[i] * inv_ratio + right[i] * ratio;
+#endif
 }
 
 inline void FastFinalRasterize( SrRendVertex* out, float w )
 {
+#if defined(__AVX__)
 	__m256 channel0_1_a = _mm256_loadu_ps((float*)(&(out->pos)));
 	__m256 channel0_1_b = _mm256_loadu_ps((float*)(&(out->channel2)));
 
@@ -47,6 +55,11 @@ inline void FastFinalRasterize( SrRendVertex* out, float w )
 
 	_mm256_storeu_ps((float*)(&(out->pos)), channel0_1_a);
 	_mm256_storeu_ps((float*)(&(out->channel2)), channel0_1_b);
+#else
+	out->pos /= w;
+	out->channel2 /= w;
+	out->channel3 /= w;
+#endif
 }
 
 inline void FixedRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false )
@@ -219,5 +232,4 @@ public:
 };
 
 #endif // SrRasterizer_h__
-
 

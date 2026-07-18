@@ -179,7 +179,7 @@ static inline void nvLambSkin(float NdotL,
 	) 
 {
 	subSurface = SmoothStep(-RollOff,1.0f,NdotL) - SmoothStep(1.0f,NdotL);
-	subSurface = max(0.0f,subSurface);
+	subSurface = (std::max)(0.0f,subSurface);
 }
 
 

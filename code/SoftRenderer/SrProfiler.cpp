@@ -7,14 +7,38 @@
   ver:1.0
    
  */
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrProfiler.h"
 
 #include "mmgr/mmgr.h"
+#if defined(__APPLE__)
+#include <sys/sysctl.h>
+#elif defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
 #include <intrin.h>
+#elif defined(__linux__)
+#include <fstream>
+#endif
 
-static std::string GetCpuModelName()
+static std::string TrimCpuModelName(const std::string& value)
 {
+	const std::string::size_type first = value.find_first_not_of(" \t\r\n");
+	if (first == std::string::npos)
+		return std::string();
+	const std::string::size_type last = value.find_last_not_of(" \t\r\n");
+	return value.substr(first, last - first + 1);
+}
+
+static std::string DetectCpuModelName()
+{
+#if defined(__APPLE__)
+	size_t size = 0;
+	if (sysctlbyname("machdep.cpu.brand_string", NULL, &size, NULL, 0) != 0 || size == 0)
+		return "Apple Silicon";
+	std::vector<char> model(size);
+	if (sysctlbyname("machdep.cpu.brand_string", model.data(), &size, NULL, 0) != 0)
+		return "Apple Silicon";
+	return TrimCpuModelName(model.data());
+#elif defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
 	int cpuInfo[4] = {};
 	__cpuid(cpuInfo, 0x80000000);
 	const unsigned int maxExtendedLeaf = static_cast<unsigned int>(cpuInfo[0]);
@@ -28,12 +52,39 @@ static std::string GetCpuModelName()
 	char brand[49] = {};
 	memcpy(brand, brandData, sizeof(brandData));
 
-	std::string model(brand);
-	const std::string::size_type first = model.find_first_not_of(" \t");
-	if (first == std::string::npos)
-		return "Unknown CPU";
-	const std::string::size_type last = model.find_last_not_of(" \t");
-	return model.substr(first, last - first + 1);
+	const std::string model = TrimCpuModelName(brand);
+	return model.empty() ? "Unknown CPU" : model;
+#elif defined(_WIN32)
+	const char* processor = std::getenv("PROCESSOR_IDENTIFIER");
+	return processor && processor[0] ? TrimCpuModelName(processor) : "Unknown CPU";
+#elif defined(__linux__)
+	std::ifstream cpuInfo("/proc/cpuinfo");
+	std::string line;
+	std::string fallback;
+	while (std::getline(cpuInfo, line))
+	{
+		const std::string::size_type colon = line.find(':');
+		if (colon == std::string::npos)
+			continue;
+		const std::string key = TrimCpuModelName(line.substr(0, colon));
+		const std::string value = TrimCpuModelName(line.substr(colon + 1));
+		if (value.empty())
+			continue;
+		if (key == "model name")
+			return value;
+		if (fallback.empty() && (key == "Hardware" || key == "Processor" || key == "Model"))
+			fallback = value;
+	}
+	return fallback.empty() ? "Unknown CPU" : fallback;
+#else
+	return "Unknown CPU";
+#endif
+}
+
+const std::string& SrGetCpuModelName()
+{
+	static const std::string cpuModelName = DetectCpuModelName();
+	return cpuModelName;
 }
 
 SrProfiler::SrProfiler()
@@ -150,9 +201,8 @@ void SrProfiler::Update()
 		if (workers[i].jobs > 0) ++activeWorkers;
 	}
 	const float meanBusy = activeWorkers ? totalBusy / activeWorkers : 0.f;
-	static const std::string cpuModelName = GetCpuModelName();
 	sprintf_s(buffer, "CPU: %s | Workers: %2u/%2u | Jobs: %6u | Busy mean/max: %5.2f/%5.2fms | balance: %.2f",
-		cpuModelName.c_str(),
+		SrGetCpuModelName().c_str(),
 		activeWorkers, static_cast<uint32>(workers.size()), workerJobs, meanBusy, maxBusy,
 		meanBusy > 0.f ? maxBusy / meanBusy : 0.f);
 	gEnv->renderer->DrawScreenText( buffer, 20, 40, 1, SR_UICOLOR_NORMAL );

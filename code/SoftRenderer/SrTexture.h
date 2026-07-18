@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -42,7 +42,7 @@ public:
 		gEnv->renderer->SetTextureStage( this, stage);
 	}
 
-	uint32 Get( int2& p ) const
+	uint32 Get( const int2& p ) const
 	{
 		uint32 ret = 0;
 		uint8* data = m_data;
@@ -69,7 +69,7 @@ public:
 	{
 		uint32 final = 0x00000000;
 
-		// ÔÚÕâÀï×÷warp
+		// åœ¨è¿™é‡Œä½œwarp
 		float u = p.x - floor(p.x);
 		float v = p.y - floor(p.y);
 
@@ -77,7 +77,7 @@ public:
 		{
 		case eSF_Nearest:
 			{
-				// ÁÙ½üµã²ÉÑù
+				// ä¸´è¿‘ç‚¹é‡‡æ ·
 				u *= (m_width);
 				v *= (m_height);
 
@@ -96,22 +96,22 @@ public:
 
 			break;
 		case eSF_Linear:
-			// Ë«ÏßÐÔÄÚ²å
+			// åŒçº¿æ€§å†…æ’
 		default:
 			{
-				// È¡µÃÎÆÀí¿Õ¼äµÄµØÖ·
+				// å–å¾—çº¹ç†ç©ºé—´çš„åœ°å€
 				u *= (m_width - 1);
 				v *= (m_height - 1);
 
-				// È¡Õû
+				// å–æ•´
 				int x = (int)( u );
 				int y = (int)( v );
 
-				// ¼ÆËã×ÓÏñËØÆ«ÒÆ
+				// è®¡ç®—å­åƒç´ åç§»
 				float du = u - x;
 				float dv = v - y;
 
-				// È¡µÃµØÖ·Î»ÖÃ£¬È·±£ÔÚÎÆÀí²ÉÑù·¶Î§ÄÚ
+				// å–å¾—åœ°å€ä½ç½®ï¼Œç¡®ä¿åœ¨çº¹ç†é‡‡æ ·èŒƒå›´å†…
 				int left = (x) % m_width;
 				int right = (x + 1) % m_width;
 				int up = (y) % m_height;
@@ -122,13 +122,13 @@ public:
 				assert( up >= 0 && up < m_height );
 				assert( down >= 0 && down < m_height );
 
-				// ²ÉÑù4¸öÑÕÉ«
+				// é‡‡æ ·4ä¸ªé¢œè‰²
 				uint32 lt = Get( int2(left,up) );
 				uint32 t = Get( int2(right,up) );
 				uint32 l = Get( int2(left,down) );
 				uint32 rb =  Get( int2(right,down) );
 
-				// Ê¹ÓÃËÄ¸öÑÕÉ«ºÍ×ÓÏñËØÆ«ÒÆÀ´µ÷ºÍ×îÖÕÑÕÉ«
+				// ä½¿ç”¨å››ä¸ªé¢œè‰²å’Œå­åƒç´ åç§»æ¥è°ƒå’Œæœ€ç»ˆé¢œè‰²
 				final = SrColorMulFloat(lt,((1.f-du)*(1.f-dv))) + SrColorMulFloat(t , (du*(1.f - dv))) + SrColorMulFloat(l , ((1.f-du)*dv)) + SrColorMulFloat(rb , (du*dv));
 			}
 		}
@@ -151,5 +151,4 @@ protected:
 };
 
 #endif // SrTexture_h__
-
 

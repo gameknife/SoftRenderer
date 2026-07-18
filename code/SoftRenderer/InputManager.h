@@ -3,7 +3,7 @@
   
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -12,14 +12,12 @@
 #define InputManager_h__
 
 #include "prerequisite.h"
-#include <dinput.h>
-#include <dinputd.h>
 
 struct SInputSymbol;
 struct SKeyState;
 
 /**
- *@brief ÊäÈë×´Ì¬
+ *@brief è¾“å…¥çŠ¶æ€
  */
 enum EInputState
 {
@@ -36,7 +34,7 @@ enum EInputState
 #define KI_XINPUT_BASE		512
 
 /**
- *@brief ³éÏó°´¼üÏûÏ¢
+ *@brief æŠ½è±¡æŒ‰é”®æ¶ˆæ¯
  */
 enum EKeyId
 {
@@ -210,7 +208,7 @@ enum EKeyId
 };
 
 /**
- *@brief ³éÏóÉè±¸id
+ *@brief æŠ½è±¡è®¾å¤‡id
  */
 enum EDeviceId
 {
@@ -269,66 +267,29 @@ struct IInputEventListener
 };
 typedef std::vector<IInputEventListener*> InputEventListeners;
 
-class SrInputManager;
-
-struct InputDeviceBase
-{
-	InputDeviceBase( SrInputManager* creator, const char* deviceName, const GUID& guid );
-	virtual ~InputDeviceBase();
-
-	virtual const char*		GetDeviceName() const	= 0;
-	virtual EDeviceId		GetDeviceId() const	= 0;
-
-	virtual bool			Init() = 0;
-	virtual void			Update(bool bFocus) = 0;
-
-	bool CreateDirectInputDevice(const DIDATAFORMAT* dataFormat, DWORD coopLevel, DWORD bufSize);
-	bool Acquire();
-	bool Unacquire();
-	IDirectInputDevice8*	GetDevice() {return m_pDevice;}
-	SrInputManager*			GetInputManager() {return m_creator;}
-	EDeviceId				m_deviceId;
-
-protected:
-	SrInputManager*			m_creator;
-	IDirectInputDevice8*	m_pDevice;			
-	const GUID&				m_guid;
-	const DIDATAFORMAT*			m_pDataFormat;
-	DWORD					m_dwCoopLevel;
-	bool					m_bNeedsPoll;
-};
-
-typedef std::vector<InputDeviceBase*> InputDevices;
-
 class SrInputManager
 {
 public:
 	SrInputManager(void);
 	~SrInputManager(void);
-	HRESULT Init( HWND hDlg );
+	HRESULT Init( HWND window );
 	void Destroy();
 	void Update();
-
-	void FreeDirectInput();
-
-	IDirectInput8* getDI() {return m_pDI;}
-	HWND getHwnd() {return m_hWnd;}
 
 	bool PostInputEvent(SInputEvent& event);
 
 	void AddListener( IInputEventListener* listener );
 	void RemoveListener( IInputEventListener* listener );
-	bool AddInputDevice(InputDeviceBase* pDevice);
 private:
-	HWND m_hWnd;
-
-	IDirectInput8*          m_pDI; // DirectInput interface       
+	HWND m_window;
 	InputEventListeners		m_listeners;
-	InputDevices			m_inputDevices;
-
-	std::vector<SKeyState*> m_holdKeys;
+	std::vector<SKeyState> m_keys;
+	std::vector<uint8> m_keyDown;
+	std::vector<uint8> m_mouseDown;
+	int m_mouseX;
+	int m_mouseY;
+	void PostState(SKeyState& state, EDeviceId device, EInputState inputState, float value);
 };
 
 #endif
-
 

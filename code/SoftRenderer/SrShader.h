@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  更改日志 history
+  鏇存敼鏃ュ織 history
   ver:1.0
    
  */
@@ -28,12 +28,13 @@ SR_ALIGN struct SrShaderContext
 		return &(shaderConstants[eSC_PS0]);
 	}
 
-	uint32 Tex2D(float2& texcoord, uint32 stage) const
+	uint32 Tex2D(const float2& texcoord, uint32 stage) const
 	{
 		uint32 ret = 0x00000000;
 		if (stage < textureStage.size() && textureStage[stage] != 0)
 		{
-			ret = gEnv->renderer->Tex2D(texcoord, textureStage[stage]);
+			float2 sampleCoord = texcoord;
+			ret = gEnv->renderer->Tex2D(sampleCoord, textureStage[stage]);
 		}
 		return ret;
 	}

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrRenderTexture.h"
 #include "mmgr/mmgr.h"
 

@@ -1,83 +1,21 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrModelViewerApp.h"
 #include "SrScene.h"
 #include "SrEntity.h"
 #include "SrMaterial.h"
 #include "SrCamera.h"
 
-#include <tchar.h>
-#include <io.h>
+#include <filesystem>
 
-inline bool is_end_with_slash( const TCHAR* filename )
+inline void enum_all_files_in_folder(const char* root_path, std::vector<std::string>& result, bool inc_sub_folders = false)
 {
-	size_t len = _tcslen(filename);
-	if (filename[len-1] == _T('\\') || filename[len-1] == _T('/'))
-	{
-		return true;
-	}
+	if (!root_path || !std::filesystem::exists(root_path)) return;
+	if (inc_sub_folders)
+		for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(root_path))
+			if (entry.is_regular_file()) result.push_back(entry.path().filename().string());
 	else
-	{
-		return false;
-	}
-}
-
-inline void enum_all_files_in_folder( const TCHAR* root_path,std::vector<std::string>& result,bool inc_sub_folders/*=false*/ )
-{
-
-	if(!root_path)
-	{
-		return;
-	}
-
-	//Ҫ���ҵ�Ŀ¼
-	std::string str = root_path;
-	if (!is_end_with_slash(root_path))
-	{
-		str += _T("/");
-	}
-	std::stack<std::string> path_buf;
-	path_buf.push(str);
-
-	while(path_buf.size())
-	{
-		//ȡ����ջ��item
-		std::string path = path_buf.top();
-		path_buf.pop();
-		size_t k=path_buf.size();
-
-		std::string find_path = path + _T("*.*");
-
-		_tfinddata_t file;
-		intptr_t longf = _tfindfirst(find_path.c_str(), &file);
-
-		if(longf !=-1)
-		{
-			std::string tempName;
-			while(_tfindnext(longf, &file ) != -1)
-			{
-				tempName = _T("");
-				tempName = file.name;
-				if (tempName == _T("..") || tempName == _T("."))
-				{
-					continue;
-				}
-				if (file.attrib == _A_SUBDIR)
-				{
-					if (inc_sub_folders)
-					{
-						tempName += _T("\\");
-						tempName = path + tempName;
-						path_buf.push(tempName);
-					}
-				}
-				else
-				{
-					result.push_back(tempName);
-				}
-			}
-		}
-		_findclose(longf);
-	}
+		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(root_path))
+			if (entry.is_regular_file()) result.push_back(entry.path().filename().string());
 }
 
 SrModelViewerApp::SrModelViewerApp(void)

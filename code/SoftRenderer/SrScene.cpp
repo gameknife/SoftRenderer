@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrScene.h"
 #include "SrEntity.h"
 #include "SrCamera.h"
@@ -8,7 +8,7 @@
 
 SrScene::SrScene(void)
 {
-	// ³õÊ¼»¯Ìì¹â
+	// åˆå§‹åŒ–å¤©å…‰
 	m_skyLightColor = SR_ARGB_F(255, 25, 43, 89);
 }
 
@@ -38,7 +38,7 @@ SrScene::~SrScene(void)
 	ClearLight();
 }
 
-SrEntity* SrScene::CreateEntity( const char* name, const char* meshFilename, const char* matFilename, float3& pos /*= float3(0,0,0)*/, Quat& rot /*= Quat::CreateIdentity()*/, SrEntity* pent  )
+SrEntity* SrScene::CreateEntity( const char* name, const char* meshFilename, const char* matFilename, const float3& pos, const Quat& rot, SrEntity* pent )
 {
 	SrEntityLibrary::iterator it = m_entityLib.find(name);
 

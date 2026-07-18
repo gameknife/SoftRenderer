@@ -26,16 +26,14 @@ struct SrRendContext
 			bpp = obpp / 8;
 			viewport = SrViewport(0.f,0.f,(float)width,(float)height,1.f,1000.f);
 
-			SYSTEM_INFO siSysInfo;
-			GetSystemInfo(&siSysInfo); 
-
-			processorNum = siSysInfo.dwNumberOfProcessors;
+			const int hardwareThreads = (std::max)(1u, std::thread::hardware_concurrency());
+			processorNum = hardwareThreads;
 			const char* configuredWorkers = getenv("SR_WORKER_COUNT");
 			if (configuredWorkers)
 			{
 				const int requested = atoi(configuredWorkers);
 				if (requested > 0)
-					processorNum = (std::min<int>)(requested, static_cast<int>(siSysInfo.dwNumberOfProcessors));
+					processorNum = (std::min<int>)(requested, hardwareThreads);
 			}
 	}
 
@@ -66,5 +64,4 @@ struct SrRendContext
 extern SrRendContext* g_context;
 
 #endif // SrRenderContext_h__
-
 

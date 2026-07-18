@@ -3,16 +3,41 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrBitmap.h"
 #include "SrProfiler.h"
 
 #include "mmgr/mmgr.h"
+
+#pragma pack(push, 1)
+struct SrBitmapFileHeader
+{
+	uint16 type;
+	uint32 size;
+	uint16 reserved1;
+	uint16 reserved2;
+	uint32 pixelOffset;
+};
+struct SrBitmapInfoHeader
+{
+	uint32 size;
+	int32_t width;
+	int32_t height;
+	uint16 planes;
+	uint16 bitCount;
+	uint32 compression;
+	uint32 imageSize;
+	int32_t xPixelsPerMeter;
+	int32_t yPixelsPerMeter;
+	uint32 colorsUsed;
+	uint32 colorsImportant;
+};
+#pragma pack(pop)
 
 
 SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
@@ -28,26 +53,22 @@ SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 	{
 		const char* start = bitmapfile.Data();
 
-		// »ñµÃÎÄ¼þÍ·
-		tagBITMAPFILEHEADER* header = (tagBITMAPFILEHEADER*)start;
-		tagBITMAPINFO* info = (tagBITMAPINFO*)(start + sizeof(tagBITMAPFILEHEADER));
+		// èŽ·å¾—æ–‡ä»¶å¤´
+		const SrBitmapFileHeader* header = reinterpret_cast<const SrBitmapFileHeader*>(start);
+		const SrBitmapInfoHeader* info = reinterpret_cast<const SrBitmapInfoHeader*>(start + sizeof(SrBitmapFileHeader));
 
-		// ³õÊ¼»¯debugÊý¾Ý
+		// åˆå§‹åŒ–debugæ•°æ®
 		GtLog("BMP file openup[%s] width: %d | height: %d | bpp: %d | offset: %d | size: %d kb", getName(),
-			info->bmiHeader.biWidth,
-			info->bmiHeader.biHeight,
-			info->bmiHeader.biBitCount,
-			header->bfOffBits,
-			header->bfSize / 1024 );
+			info->width, info->height, info->bitCount, header->pixelOffset, header->size / 1024 );
 
-		// »ù±¾Êý¾Ý¶ÁÈ¡
-		m_width = info->bmiHeader.biWidth;
-		m_height = abs(info->bmiHeader.biHeight);
-		m_bpp = info->bmiHeader.biBitCount / 8;
-		m_pitch = -m_width * m_bpp * m_height / info->bmiHeader.biHeight;
+		// åŸºæœ¬æ•°æ®è¯»å–
+		m_width = info->width;
+		m_height = abs(info->height);
+		m_bpp = info->bitCount / 8;
+		m_pitch = -m_width * m_bpp * m_height / info->height;
 		// copy file
 		m_rawData = (uint8*)_mm_malloc_custom( m_bpp * m_width * m_height, 16);
-		uint8* colorstart = (uint8*)(start + header->bfOffBits);
+		const uint8* colorstart = reinterpret_cast<const uint8*>(start + header->pixelOffset);
 
 		memcpy(m_rawData, colorstart, m_bpp * m_width * m_height);
 
@@ -75,4 +96,3 @@ SrBitmap::~SrBitmap(void)
 	}
 	
 }
-

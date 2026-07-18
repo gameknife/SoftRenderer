@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrResourceManager.h"
 #include "SrMesh.h"
 #include "SrRenderTexture.h"

@@ -198,7 +198,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 #ifdef FIXED_FUNCTION_RASTERIZOR
 			FixedRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, false );
 #else
-			calTri.primitive->shader->ProcessRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, false );
+			calTri.primitive->shader->ProcessRasterize( &newVertINST, &(calTri.p[0]), &(calTri.p[2]), NULL, ratio, &(calTri.primitive->shaderConstants), false );
 #endif
 		}
 
@@ -460,8 +460,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 				FixedRasterize(  leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
 				FixedRasterize(  rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, &(tri.primitive->shaderConstants), false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, &(tri.primitive->shaderConstants), false );
 #endif
 			}
 
@@ -532,8 +532,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 				FixedRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
 				FixedRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[0]), &(tri.p[2]), NULL, ratio, &(tri.primitive->shaderConstants), false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[1]), &(tri.p[2]), NULL, ratio, &(tri.primitive->shaderConstants), false );
 #endif
 
 			}
@@ -664,8 +664,8 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
 				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, &(tri.primitive->shaderConstants), false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, &(tri.primitive->shaderConstants), false );
 #endif
 			}
 
@@ -737,8 +737,8 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 				FixedRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
 				FixedRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
 #else
-				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, false );
-				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, false );
+				tri.primitive->shader->ProcessRasterize( leftVert, &(tri.p[2]), &(tri.p[0]), NULL, ratio, &(tri.primitive->shaderConstants), false );
+				tri.primitive->shader->ProcessRasterize( rightVert, &(tri.p[2]), &(tri.p[1]), NULL, ratio, &(tri.primitive->shaderConstants), false );
 #endif
 			}
 
@@ -844,4 +844,3 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 	}
 
 }
-

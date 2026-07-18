@@ -6,7 +6,7 @@ SrRendContext* g_context;
 GlobalEnvironment* gEnv;
 SrSoftRenderer* g_renderer;
 
-extern "C" __declspec(dllexport) IRenderer* LoadRenderer(GlobalEnvironment* pgEnv)
+extern "C" SR_EXPORT IRenderer* LoadRenderer(GlobalEnvironment* pgEnv)
 {
 	gEnv = pgEnv;
 	g_context = gEnv->context;
@@ -16,7 +16,7 @@ extern "C" __declspec(dllexport) IRenderer* LoadRenderer(GlobalEnvironment* pgEn
 	return g_renderer;
 }
 
-extern "C" __declspec(dllexport) void FreeRenderer()
+extern "C" SR_EXPORT void FreeRenderer()
 {
 	delete g_renderer;
 }

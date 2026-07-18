@@ -5,15 +5,17 @@
 
 #pragma once
 
+#ifdef _WIN32
 #include "targetver.h"
-
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-// Windows Header Files:
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 // C RunTime Header Files
 #include <stdlib.h>
+#ifdef _WIN32
 #include <malloc.h>
+#endif
 #include <memory.h>
 //#include <tchar.h>
 

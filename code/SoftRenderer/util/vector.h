@@ -1,11 +1,11 @@
 /**
   @file vector.h
   
-  @brief SoftRendererÊıÑ§¿â£ºÏòÁ¿Àà
+  @brief SoftRendereræ•°å­¦åº“ï¼šå‘é‡ç±»
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -39,7 +39,7 @@ public:
 	}
 };
 /**
-	*@brief float2 ¶şÎ¬ÏòÁ¿Àà£¬Ìá¹©¶şÎ¬ÏòÁ¿µÄ»ù±¾ÔËËã²Ù×÷¡£
+	*@brief float2 äºŒç»´å‘é‡ç±»ï¼Œæä¾›äºŒç»´å‘é‡çš„åŸºæœ¬è¿ç®—æ“ä½œã€‚
 */
 struct float2
 {
@@ -192,12 +192,12 @@ public:
 };
 
 /**
-	*@brief float3 ÈıÎ¬ÏòÁ¿Àà£¬Ìá¹©ÈıÎ¬ÏòÁ¿µÄ»ù±¾ÔËËã²Ù×÷¡£
-	*@remark Ìá¹©ÀàËÆ HLSL µÄÈ¡ÖµºÍ¸³Öµ·½Ê½£¬¿ÉÊ¹ÓÃv.xyÖ±½ÓÈ¡³öÇ°Á½Î»
+	*@brief float3 ä¸‰ç»´å‘é‡ç±»ï¼Œæä¾›ä¸‰ç»´å‘é‡çš„åŸºæœ¬è¿ç®—æ“ä½œã€‚
+	*@remark æä¾›ç±»ä¼¼ HLSL çš„å–å€¼å’Œèµ‹å€¼æ–¹å¼ï¼Œå¯ä½¿ç”¨v.xyç›´æ¥å–å‡ºå‰ä¸¤ä½
 
-	ÖØÔØÔËËã·û: * ÎªÏòÁ¿³Ë·¨£¬µÃÊıÎªĞÂÏòÁ¿
-			   % ÎªÏòÁ¿²æ³Ì£¬µÃÊıÎªĞÂÏòÁ¿
-			   µã»ı²»×÷ÔËËã·ûÖØÔØ£¬Ê¹ÓÃfloat3::dot»òÕß.dotÀ´ÇóÈ¡µã»ı
+	é‡è½½è¿ç®—ç¬¦: * ä¸ºå‘é‡ä¹˜æ³•ï¼Œå¾—æ•°ä¸ºæ–°å‘é‡
+			   % ä¸ºå‘é‡å‰ç¨‹ï¼Œå¾—æ•°ä¸ºæ–°å‘é‡
+			   ç‚¹ç§¯ä¸ä½œè¿ç®—ç¬¦é‡è½½ï¼Œä½¿ç”¨float3::dotæˆ–è€….dotæ¥æ±‚å–ç‚¹ç§¯
 */
 SR_ALIGN struct float3
 {
@@ -207,8 +207,9 @@ public:
 		float m[3];
 		struct { float x , y , z; };
 		struct { float r , g , b; };
-		struct { float2 xy; float z; };
+		#ifdef SR_USE_SIMD
 		__m128 m128;
+		#endif
 	};
 
 	float3()
@@ -227,7 +228,7 @@ public:
 	}
 
 	/**
-	 *@brief float3µÄ¿ì½İ½¨Á¢·½Ê½ float3( float2(x,y),z );
+	 *@brief float3çš„å¿«æ·å»ºç«‹æ–¹å¼ float3( float2(x,y),z );
 	 *@return  
 	 *@param const float2 pxy 
 	 *@param const float pz 
@@ -454,13 +455,13 @@ public:
 		return (*this);
 	}
 
-	inline float3& reflect( float3& i, float3& n)
+	inline float3& reflect( const float3& i, const float3& n)
 	{
 		*this= i - n * (i.dot(n)*2.f);
 		return *this;
 	}
 
-	inline float dot( const float3& rhs )
+	inline float dot( const float3& rhs ) const
 	{
 #ifdef SR_USE_SIMD
 	return *(float*)(&_mm_dot_ps( m128, rhs.m128 ));
@@ -482,13 +483,13 @@ public:
 
 
 /**
-	*@brief float4 ËÄÎ¬ÏòÁ¿Àà£¬Ìá¹©ËÄÎ¬ÏòÁ¿µÄ»ù±¾ÔËËã²Ù×÷¡£
-	*@remark ËÄÎ¬ÏòÁ¿ÀàÖ÷ÒªÓÃÓÚ ¸¡µãcolorµÄ²Ù×÷£¬´æ´¢·½Ê½Îªa,r,g,b
-	ÔÚmath_defÖĞÓĞfloat4 colorºÍdword colorµÄ×ª»»º¯Êı
+	*@brief float4 å››ç»´å‘é‡ç±»ï¼Œæä¾›å››ç»´å‘é‡çš„åŸºæœ¬è¿ç®—æ“ä½œã€‚
+	*@remark å››ç»´å‘é‡ç±»ä¸»è¦ç”¨äº æµ®ç‚¹colorçš„æ“ä½œï¼Œå­˜å‚¨æ–¹å¼ä¸ºa,r,g,b
+	åœ¨math_defä¸­æœ‰float4 colorå’Œdword colorçš„è½¬æ¢å‡½æ•°
 
-	ÖØÔØÔËËã·û: * ÎªÏòÁ¿³Ë·¨£¬µÃÊıÎªĞÂÏòÁ¿
-	% ÎªÏòÁ¿²æ³Ì£¬µÃÊıÎªĞÂÏòÁ¿
-	µã»ı²»×÷ÔËËã·ûÖØÔØ£¬Ê¹ÓÃfloat3::dot»òÕß.dotÀ´ÇóÈ¡µã»ı
+	é‡è½½è¿ç®—ç¬¦: * ä¸ºå‘é‡ä¹˜æ³•ï¼Œå¾—æ•°ä¸ºæ–°å‘é‡
+	% ä¸ºå‘é‡å‰ç¨‹ï¼Œå¾—æ•°ä¸ºæ–°å‘é‡
+	ç‚¹ç§¯ä¸ä½œè¿ç®—ç¬¦é‡è½½ï¼Œä½¿ç”¨float3::dotæˆ–è€….dotæ¥æ±‚å–ç‚¹ç§¯
 */
 SR_ALIGN struct float4
 {
@@ -782,16 +783,16 @@ public:
 	}
 };
 
-// ÌØ»¯µÄÏòÁ¿²åÖµ
+// ç‰¹åŒ–çš„å‘é‡æ’å€¼
 
-// ¿ìËÙÏßĞÔ²åÖµ
+// å¿«é€Ÿçº¿æ€§æ’å€¼
 template<class T>
 inline T SrFastLerp(const T& a, const T& b, float ratio, float inv_ratio)
 {
 	return (a * inv_ratio + b * ratio);
 }
 
-// ¿ìËÙÏßĞÔ²åÖµ
+// å¿«é€Ÿçº¿æ€§æ’å€¼
 template<class T>
 inline T SrLerp(const T& a, const T& b, float ratio)
 {
@@ -799,7 +800,7 @@ inline T SrLerp(const T& a, const T& b, float ratio)
 	return c;
 }
 
-// Í¸ÊÓ½ÃÕı²åÖµ
+// é€è§†çŸ«æ­£æ’å€¼
 template<class T>
 inline T SrWLerp(const T& a, const T& b, float ratio, float wa, float wb)
 {
@@ -807,7 +808,7 @@ inline T SrWLerp(const T& a, const T& b, float ratio, float wa, float wb)
 	return c;
 }
 
-// ÌØ»¯µÄ¸¡µãÏòÁ¿pow²Ù×÷
+// ç‰¹åŒ–çš„æµ®ç‚¹å‘é‡powæ“ä½œ
 static inline float4 pow( const float4& f, float pow)
 {
 	float4 ret;
@@ -820,7 +821,7 @@ static inline float4 pow( const float4& f, float pow)
 	return ret;
 }
 
-// ÌØ»¯µÄ¸¡µãÏòÁ¿pow²Ù×÷
+// ç‰¹åŒ–çš„æµ®ç‚¹å‘é‡powæ“ä½œ
 static inline float3 pow( const float3& f, float pow)
 {
 	float3 ret;

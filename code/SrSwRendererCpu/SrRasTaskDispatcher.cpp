@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SrRasTaskDispatcher.h"
 #include "SrProfiler.h"
 #include "SrPerformance.h"
@@ -6,6 +6,12 @@
 #include "mmgr/mmgr.h"
 
 CRITICAL_SECTION g_taskCS;
+
+static uint64_t SrPerformanceTicks()
+{
+	return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count());
+}
 
 SrTaskThread::SrTaskThread( int tileId, SrRasTaskDispatcher* creator ):m_creator(creator),
 	m_threadId(tileId)
@@ -31,10 +37,11 @@ int SrTaskThread::Run()
 	char threadName[32];
 	sprintf_s(threadName, "Renderer Worker %d", m_threadId);
 	SrSetCurrentThreadName(threadName);
-	while(true)
+	while(!StopRequested())
 	{
 		m_waitFlag->Wait();
 		m_waitFlag->Reset();
+		if (StopRequested()) break;
 		if (m_creator->HasActiveBatch())
 		{
 			m_creator->ExecuteBatch(static_cast<uint32>(m_threadId));
@@ -65,7 +72,7 @@ int SrTaskThread::Run()
 SrRasTaskDispatcher::SrRasTaskDispatcher(void)
 	: m_batchActive(false), m_lastBatchBusyRatio(0.f), m_lastBatchBalance(0.f)
 {
-	QueryPerformanceFrequency(&m_batchTimerFrequency);
+	m_batchTimerFrequency = 1000000000.0;
 }
 
 
@@ -130,7 +137,8 @@ void SrRasTaskDispatcher::Destroy()
 	SrTaskThreadPool::iterator it = m_pool.begin();
 	for ( ; it != m_pool.end(); ++it)
 	{
-		(*it)->Terminate();
+		(*it)->Stop();
+		(*it)->Wait();
 		delete (*it);
 	}
 }
@@ -193,7 +201,7 @@ void SrRasTaskDispatcher::Wait()
 	{
 		SrTaskThreadPool::iterator it = m_pool.begin();
 		for ( ; it != m_pool.end(); ++it)
-			::WaitForSingleObject((*it)->getWaitingHandle(), INFINITE);
+			(*it)->WaitUntilReady();
 	}
 
 	// destroy tasks
@@ -226,14 +234,13 @@ void SrRasTaskDispatcher::RunBatch(uint32 jobCount, void* context, BatchFunction
 	}
 
 	m_batchActive.store(true, std::memory_order_release);
-	LARGE_INTEGER batchBegin, batchEnd;
-	QueryPerformanceCounter(&batchBegin);
+	uint64_t batchBegin = SrPerformanceTicks(), batchEnd;
 	if (g_context->IsFeatureEnable(eRFeature_MThreadRendering))
 		for (SrTaskThreadPool::iterator it = m_pool.begin(); it != m_pool.end(); ++it)
 			(*it)->SetReady();
 	ExecuteBatch(participantCount - 1);
 	Wait();
-	QueryPerformanceCounter(&batchEnd);
+	batchEnd = SrPerformanceTicks();
 	m_batchActive.store(false, std::memory_order_release);
 
 	const uint32 mainIndex = participantCount - 1;
@@ -244,7 +251,7 @@ void SrRasTaskDispatcher::RunBatch(uint32 jobCount, void* context, BatchFunction
 		busyTicksSum += m_batchWorkerStats[i].busyTicks;
 		busyTicksMax = (std::max)(busyTicksMax, m_batchWorkerStats[i].busyTicks);
 		const float busyMs = static_cast<float>(static_cast<double>(m_batchWorkerStats[i].busyTicks) * 1000.0 /
-			static_cast<double>(m_batchTimerFrequency.QuadPart));
+			m_batchTimerFrequency);
 		const uint32 profilerIndex = i == mainIndex ? 0 : i + 1;
 		gEnv->profiler->addWorkerStats(profilerIndex, m_batchWorkerStats[i].jobs, busyMs);
 		if (i == mainIndex)
@@ -252,7 +259,7 @@ void SrRasTaskDispatcher::RunBatch(uint32 jobCount, void* context, BatchFunction
 		else if (i < 16)
 			gEnv->profiler->setIncrement(static_cast<EProfilerElement>(ePe_Thread0TaskNum + i), m_batchWorkerStats[i].jobs);
 	}
-	const uint64_t batchTicks = static_cast<uint64_t>(batchEnd.QuadPart - batchBegin.QuadPart);
+	const uint64_t batchTicks = batchEnd - batchBegin;
 	m_lastBatchBusyRatio = batchTicks ? static_cast<float>(static_cast<double>(busyTicksSum) /
 		(static_cast<double>(batchTicks) * participantCount)) : 0.f;
 	const double meanBusyTicks = participantCount ? static_cast<double>(busyTicksSum) / participantCount : 0.0;
@@ -286,8 +293,7 @@ void SrRasTaskDispatcher::RunBatchWorkerOnly(uint32 jobCount, void* context, Bat
 	}
 
 	m_batchActive.store(true, std::memory_order_release);
-	LARGE_INTEGER batchBegin, batchEnd;
-	QueryPerformanceCounter(&batchBegin);
+	uint64_t batchBegin = SrPerformanceTicks(), batchEnd;
 	if (useWorkers)
 		for (SrTaskThreadPool::iterator it = m_pool.begin(); it != m_pool.end(); ++it)
 			(*it)->SetReady();
@@ -298,7 +304,7 @@ void SrRasTaskDispatcher::RunBatchWorkerOnly(uint32 jobCount, void* context, Bat
 		Wait();
 	else
 		ExecuteBatch(0);
-	QueryPerformanceCounter(&batchEnd);
+	batchEnd = SrPerformanceTicks();
 	m_batchActive.store(false, std::memory_order_release);
 
 	uint64_t busyTicksSum = 0;
@@ -308,12 +314,12 @@ void SrRasTaskDispatcher::RunBatchWorkerOnly(uint32 jobCount, void* context, Bat
 		busyTicksSum += m_batchWorkerStats[i].busyTicks;
 		busyTicksMax = (std::max)(busyTicksMax, m_batchWorkerStats[i].busyTicks);
 		const float busyMs = static_cast<float>(static_cast<double>(m_batchWorkerStats[i].busyTicks) * 1000.0 /
-			static_cast<double>(m_batchTimerFrequency.QuadPart));
+			m_batchTimerFrequency);
 		gEnv->profiler->addWorkerStats(i + 1, m_batchWorkerStats[i].jobs, busyMs);
 		if (i < 16)
 			gEnv->profiler->setIncrement(static_cast<EProfilerElement>(ePe_Thread0TaskNum + i), m_batchWorkerStats[i].jobs);
 	}
-	const uint64_t batchTicks = static_cast<uint64_t>(batchEnd.QuadPart - batchBegin.QuadPart);
+	const uint64_t batchTicks = batchEnd - batchBegin;
 	m_lastBatchBusyRatio = batchTicks ? static_cast<float>(static_cast<double>(busyTicksSum) /
 		(static_cast<double>(batchTicks) * participantCount)) : 0.f;
 	const double meanBusyTicks = static_cast<double>(busyTicksSum) / participantCount;
@@ -336,9 +342,10 @@ uint32 SrRasTaskDispatcher::GetWorkerParticipantCount() const
 void SrRasTaskDispatcher::ExecuteBatch(uint32 participantIndex)
 {
 	PERFORMANCEAPI_INSTRUMENT("Worker.ExecuteBatch");
+#if defined(__SSE__)
 	_mm_setcsr(0x1f80);
-	LARGE_INTEGER begin, end;
-	QueryPerformanceCounter(&begin);
+#endif
+	uint64_t begin = SrPerformanceTicks(), end;
 	uint32 completed = 0;
 	for (;;)
 	{
@@ -350,9 +357,9 @@ void SrRasTaskDispatcher::ExecuteBatch(uint32 participantIndex)
 			m_batchState.function(job, m_batchState.context);
 		completed += last - first;
 	}
-	QueryPerformanceCounter(&end);
+	end = SrPerformanceTicks();
 	m_batchWorkerStats[participantIndex].jobs = completed;
-	m_batchWorkerStats[participantIndex].busyTicks = static_cast<uint64_t>(end.QuadPart - begin.QuadPart);
+	m_batchWorkerStats[participantIndex].busyTicks = end - begin;
 }
 
 /**

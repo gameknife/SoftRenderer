@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  更改日志 history
+  鏇存敼鏃ュ織 history
   ver:1.0
    
  */
@@ -32,11 +32,11 @@ public:
 	SrScene(void);
 	~SrScene(void);
 
-	// 实体access
+	// 瀹炰綋access
 	SrEntity* CreateEntity(const char* name, const char* meshFilename, 
 		const char* matFilename, 
-		float3& pos = float3(0,0,0), 
-		Quat& rot = Quat::CreateIdentity(),
+		const float3& pos = float3(0,0,0),
+		const Quat& rot = Quat::CreateIdentity(),
 		SrEntity* ent = NULL);
 
 	SrEntity* GetEntity(const char* name);
@@ -44,7 +44,7 @@ public:
 	void RemoveEntity(SrEntity* target);
 	void RemoveEntity(const char* name);
 
-	// 相机access
+	// 鐩告満access
 	SrCamera* CreateCamera(const char* name);
 	SrCamera* GetCamera(const char* name);
 
@@ -55,7 +55,7 @@ public:
 	void RenderVisbility(SrCamera* cam);
 
 
-	// 灯光
+	// 鐏厜
 	SrLight* AddLight();
 	void RemoveLight(SrLight* tgt);
 	void ClearLight();
@@ -74,5 +74,3 @@ private:
 };
 
 #endif // SrScene_h__
-
-

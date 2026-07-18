@@ -15,6 +15,8 @@
 
 #define AVGTIME_COUNT 60
 
+const std::string& SrGetCpuModelName();
+
 enum EProfilerElement
 {
 	ePe_FlushTime = 0,

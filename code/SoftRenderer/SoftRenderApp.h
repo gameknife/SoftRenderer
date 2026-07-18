@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  更改日志 history
+  鏇存敼鏃ュ織 history
   ver:1.0
    
  */
@@ -21,7 +21,7 @@ class SoftRenderApp : public IInputEventListener
 public:
 	SoftRenderApp(void);
 	virtual ~SoftRenderApp(void);
-	BOOL Init( HINSTANCE hInstance );
+	BOOL Init();
 	void Destroy();
 	void Run();
 
@@ -34,7 +34,6 @@ public:
 	void ShutdownRenderers();
 
 private:
-	HINSTANCE m_hInst;								// current instance
 	HWND m_hWnd;
 	SrApps m_tasks;
 	SrRendererList m_renderers;
@@ -46,6 +45,7 @@ private:
 	virtual bool OnInputEvent( const SInputEvent &event );
 
 	int m_curr_task;
+	float m_lastTitleUpdate;
 
 };
 

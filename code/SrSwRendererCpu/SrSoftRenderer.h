@@ -3,7 +3,7 @@
   
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -16,7 +16,7 @@
 class SrFragmentBuffer;
 
 /**
- *@brief äÖÈ¾Æ÷
+ *@brief æ¸²æŸ“å™¨
  */
 class SrSoftRenderer : public IRenderer
 {
@@ -29,44 +29,44 @@ public:
 
 	virtual const char* getName();
 
-	// Æô¶¯£¬¹Ø±Õº¯Êı
+	// å¯åŠ¨ï¼Œå…³é—­å‡½æ•°
 	bool InitRenderer(HWND hWnd, int width, int height, int bpp);
 	bool ShutdownRenderer();
 	bool Resize(uint32 width, uint32 height);
 	virtual uint32 getWidth();
 	virtual uint32 getHeight();
 
-	// Ö¡¿ØÖÆº¯Êı
+	// å¸§æ§åˆ¶å‡½æ•°
 	void BeginFrame();
 	void EndFrame();
 
-	// Ó²¼şClear
+	// ç¡¬ä»¶Clear
 	bool HwClear();
 
-	// »ñÈ¡ScreenBufferº¯Êı
+	// è·å–ScreenBufferå‡½æ•°
 	void* getBuffer();
 	
-	// ÎÆÀíÍ¨µÀÉèÖÃ
+	// çº¹ç†é€šé“è®¾ç½®
 	bool SetTextureStage( const SrTexture* texture, int stage );
 	void ClearTextureStage();
 	
-	// äÖÈ¾µ÷ÓÃ
+	// æ¸²æŸ“è°ƒç”¨
 	bool DrawPrimitive( SrPrimitve* primitive );
 	bool DrawLine(const float3& from, const float3& to);
 	bool DrawScreenText(const char* str, int x,int y, uint32 size, DWORD color = SR_UICOLOR_HIGHLIGHT);
 
-	// ShaderÉèÖÃ
+	// Shaderè®¾ç½®
 	virtual bool SetShader( const SrShader* shader );
 	virtual bool SetShaderConstant( uint32 slot, const float* constantStart, uint32 vec4Count );
 
 	virtual uint32 Tex2D( float2& texcoord, const SrTexture* texture ) const;
 
 private:
-	// ½»»»Ó²¼şÖ¡»º³å
+	// äº¤æ¢ç¡¬ä»¶å¸§ç¼“å†²
 	bool Swap();
-	// ´´½¨Ó²¼şbufferº¯Êı
+	// åˆ›å»ºç¡¬ä»¶bufferå‡½æ•°
 	bool CreateHwBuffer();
-	// ÅúÁ¿»æÖÆÎÄ×Ö
+	// æ‰¹é‡ç»˜åˆ¶æ–‡å­—
 	void FlushText();
 
 	virtual SrVertexBuffer* AllocateNormalizedVertexBuffer( uint32 count, bool fastmode = false );
@@ -75,12 +75,10 @@ private:
 
 	
 
-	// DXÓ²¼ş¶ÔÏó
-	struct IDirect3D9* m_d3d9;
-	struct IDirect3DDevice9* m_hwDevice;
-	struct IDirect3DSurface9* m_drawSurface;
+	HWND m_window;
+	std::vector<uint32> m_frameBuffer;
 	
-	// ¹âÕ¤´¦ÀíÆ÷
+	// å…‰æ …å¤„ç†å™¨
 	SrRasterizer* m_rasterizer;
 
 	uint32 m_renderState;
@@ -100,11 +98,8 @@ private:
 	SrHandleList m_swHandles;
 
 
-	HFONT m_bigFont;
-	HFONT m_smallFont;
 	SrTextLines m_textLines;
 };
 
 #endif // SrRenderer_h__
-
 

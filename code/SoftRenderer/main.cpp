@@ -66,14 +66,13 @@ static void ApplyRendererCommandLine(const char* commandLine)
 	SetOptionEnvironment(commandLine, "--hash-output=", "SR_HASH_OUTPUT");
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPTSTR    lpCmdLine,
-                     int       nCmdShow)
+int main(int argc, char** argv)
 {
+	std::string commandLine;
+	for (int i = 1; i < argc; ++i) { if (i > 1) commandLine += ' '; commandLine += argv[i]; }
 	SrSetCurrentThreadName("SoftRenderer Main");
 	PERFORMANCEAPI_INSTRUMENT("Application.Run");
-	ApplyRendererCommandLine(lpCmdLine ? lpCmdLine : "");
+	ApplyRendererCommandLine(commandLine.c_str());
 	// mem leak detecting code...
 	// Enable run-time memory check for debug builds.
 #if (defined(DEBUG) || defined(_DEBUG))
@@ -94,7 +93,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		app.RegisterTask(new SrModelViewerApp);
 	}
 
-	app.Init(hInstance);
+	if (!app.Init()) return 1;
 	app.Run();
 	app.Destroy();
 

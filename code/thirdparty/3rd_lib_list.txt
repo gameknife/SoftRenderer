@@ -1,2 +1,2 @@
-directx sdk june2010 : for Hw Text Flushing
+MiniFB 0.10.x : cross-platform window, framebuffer presentation, and input (fetched by CMake)
 havok sdk free win32 : for Animation Driven

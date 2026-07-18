@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "BasicShaders.h"
 #include "../SrSwRendererCpu/SrFragmentBuffer.h"
 #include "../SrSwRendererCpu/SrRasterizer.h"
@@ -8,12 +8,12 @@
 
 GlobalEnvironment* gEnv = NULL;
 
-extern "C" __declspec(dllexport) void ModuleInit( GlobalEnvironment* pgEnv )
+extern "C" SR_EXPORT void ModuleInit( GlobalEnvironment* pgEnv )
 {
 	gEnv = pgEnv;
 }
 
-extern "C" __declspec(dllexport) SrSwShader* LoadShader( const char* shaderName )
+extern "C" SR_EXPORT SrSwShader* LoadShader( const char* shaderName )
 {
 	std::vector<SrSwShader*> shaders;
 	shaders.push_back( &g_FlatShadingShader );
@@ -344,7 +344,7 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 	diffuseAcc = diffuseAcc * matDiff * cBuffer->difColor;
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec;
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
-	if (!_finite(diffuseAcc.x) || !_finite(diffuseAcc.y) || !_finite(diffuseAcc.z) || !_finite(diffuseAcc.w))
+	if (!std::isfinite(diffuseAcc.x) || !std::isfinite(diffuseAcc.y) || !std::isfinite(diffuseAcc.z) || !std::isfinite(diffuseAcc.w))
 		diffuseAcc = float4(0.f);
 
 	// srgb��ԭ
@@ -605,7 +605,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 			}
 			diff = diff / d;
 			d*= 0.3f;
-			ao += max(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0f / (1.0f + d) ) * 2.f * (jit ? 2.f : 1.f);
+			ao += (std::max)(0.0f ,float3::dot(normalDir,diff) ) * ( 1.0f / (1.0f + d) ) * 2.f * (jit ? 2.f : 1.f);
 		}
 
 		// ƽ��AO
@@ -627,7 +627,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	diffuseAcc += cBuffer->spcColor * specularAcc * matSpec.x;
 
 	diffuseAcc = Clamp(diffuseAcc, 0.f, 1.f);	
-	if (!_finite(diffuseAcc.x) || !_finite(diffuseAcc.y) || !_finite(diffuseAcc.z) || !_finite(diffuseAcc.w))
+	if (!std::isfinite(diffuseAcc.x) || !std::isfinite(diffuseAcc.y) || !std::isfinite(diffuseAcc.z) || !std::isfinite(diffuseAcc.w))
 		diffuseAcc = float4(0.f);
 
 	// srgb��ԭ

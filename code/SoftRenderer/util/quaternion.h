@@ -1,11 +1,11 @@
 /**
   @file quaternion.h
   
-  @brief SoftRendererÊıÑ§¿â£ºËÄÔªÊıÀà
+  @brief SoftRendereræ•°å­¦åº“ï¼šå››å…ƒæ•°ç±»
 
   @author Kaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -19,11 +19,8 @@ float operator | (const Quat& q, const Quat& p);
 
 SR_ALIGN struct Quat
 {
- 	union
- 	{
-		SR_ALIGN struct{float3 v; float w;};
- 		SR_ALIGN struct{ float x , y , z, w; };
- 	};
+	float3 v;
+	float w;
 
 	 Quat() {}
 
@@ -35,17 +32,17 @@ SR_ALIGN struct Quat
 	}
 	 Quat( float angle, const float3 &axis) : w(angle),v(axis) {};
 
-	// ËÄÔªÊı µ¥³Ë
+	// å››å…ƒæ•° å•ä¹˜
 	void operator *= (float op) {	w*=op; v*=op;	}
 
-	// ËÄÔªÊıÏàµ±¶Ô±È
+	// å››å…ƒæ•°ç›¸å½“å¯¹æ¯”
 	//bool operator==(const Quat &q) const { return IsEqual(q,0.0000001f); }
 	//bool operator!=(const Quat &q) const { return !(*this == q); }
 
-	 // ËÄÔªÊıÇóÄæ
+	 // å››å…ƒæ•°æ±‚é€†
 	Quat operator ! () const;
 
-	// ¼ì²éÊÇ·ñÎªµ¥Î»ËÄÔªÊı
+	// æ£€æŸ¥æ˜¯å¦ä¸ºå•ä½å››å…ƒæ•°
 	bool IsIdentity() const { return w == 1 && v.x == 0 && v.y == 0 && v.z == 0; }
 	void SetIdentity(void);
 	static Quat CreateIdentity(void);

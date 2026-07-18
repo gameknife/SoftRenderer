@@ -12,7 +12,7 @@
 #define SrSponzaApp_h__
 
 #include "prerequisite.h"
-#include "srappframework.h"
+#include "SrAppFramework.h"
 #include "InputManager.h"
 
 class SrSponzaApp :

@@ -49,6 +49,8 @@ public:
 	{
 		return m_runningFlag->GetEvent();
 	}
+	void WaitUntilReady() { m_runningFlag->Wait(); }
+	void Stop() { Terminate(); m_waitFlag->Set(); }
 
 private:
 	int m_threadId;
@@ -122,11 +124,10 @@ private:
 	SrBatchState m_batchState;
 	std::vector<SrBatchWorkerStats> m_batchWorkerStats;
 	std::atomic<bool> m_batchActive;
-	LARGE_INTEGER m_batchTimerFrequency;
+	double m_batchTimerFrequency;
 	float m_lastBatchBusyRatio;
 	float m_lastBatchBalance;
 };
 
 #endif
-
 

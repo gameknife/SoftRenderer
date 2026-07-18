@@ -3,23 +3,22 @@
   
   @author yikaiming
 
-  ������־ history
+  锟斤拷锟斤拷锟斤拷志 history
   ver:1.0
    
  */
 
-#include "StdAfx.h"
+#include "stdafx.h"
 
-#include <d3d9.h>
+#include <filesystem>
 
 #include "SrSoftRenderer.h"
-#include "srBitmap.h"
+#include "SrBitmap.h"
 #include "SrRasterizer.h"
 #include "SrProfiler.h"
 #include "SrSwShader.h"
 #include "SrFragmentBuffer.h"
 #include "SrPerformance.h"
-#include <gl/GL.h>
 #include <fstream>
 
 #include "mmgr/mmgr.h"
@@ -51,6 +50,7 @@ namespace
 	SrVertexBufferArray g_inFlightNormalizedVBs;
 	uint32 g_inFlightFrameNumber = 0;
 
+	#ifdef _WIN32
 	static bool BuildFontCache(HFONT font, SrCachedFont& cache)
 	{
 		HDC dc = CreateCompatibleDC(NULL);
@@ -88,6 +88,7 @@ namespace
 		cache.ready = true;
 		return true;
 	}
+	#endif
 
 	static uint64_t HashBytes(uint64_t hash, const void* data, size_t size)
 	{
@@ -170,9 +171,7 @@ namespace
 }
 
 SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
-	m_d3d9(NULL),
-	m_drawSurface(NULL),
-	m_hwDevice(NULL),
+	m_window(NULL),
 	m_cachedBuffer(NULL),
 	m_bufferPitch(0),
 	m_renderState(0),
@@ -184,66 +183,23 @@ SrSoftRenderer::SrSoftRenderer(void):IRenderer(eRt_Software),
 	m_textureStages.assign( SR_MAX_TEXTURE_STAGE_NUM , NULL );
 	m_normalizeVBAllocSize = 0;
 
-	// create HFONT
-	LOGFONT lfont;
-	memset   (&lfont,   0,   sizeof   (LOGFONT));   
-	lfont.lfHeight=14;
-	lfont.lfWeight=800;   
-	lfont.lfClipPrecision=CLIP_LH_ANGLES; 
-	lfont.lfQuality = NONANTIALIASED_QUALITY; // THIS COULD BOOST
-	strcpy_s( lfont.lfFaceName, "verdana" );
-	m_bigFont = CreateFontIndirect( &lfont );
-
-	lfont.lfHeight=12;
-	lfont.lfWeight=0;  
-	m_smallFont = CreateFontIndirect( &lfont );
-
 }
 
 SrSoftRenderer::~SrSoftRenderer(void)
 {
-	DeleteObject(m_smallFont);
-	DeleteObject(m_bigFont);
 }
 
 bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 {
 	PERFORMANCEAPI_INSTRUMENT("Renderer.Init");
-	//////////////////////////////////////////////////////////////////////////
-	// create d3d device for Show Soft Buffer
-	if( NULL == ( m_d3d9 = Direct3DCreate9( D3D_SDK_VERSION ) ) )
-		return false;
-
-	D3DPRESENT_PARAMETERS d3dpp; 
-	ZeroMemory( &d3dpp, sizeof(d3dpp) );
-	d3dpp.Windowed = TRUE;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	// bpp 32 XRGB
-	d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
-	d3dpp.EnableAutoDepthStencil = FALSE;
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
-	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-	d3dpp.BackBufferWidth = width;
-	d3dpp.BackBufferHeight = height;
-	d3dpp.Flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
-
-	// Create the D3DDevice
-	if( FAILED( m_d3d9->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, hWnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-		&d3dpp, &m_hwDevice ) ) )
-	{
-		MessageBoxA(hWnd, "Unable to create D3D device", "", MB_OK);
-		return false;
-	}
-
-	// Get backBuffrt
-	m_hwDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_drawSurface);
-	BuildFontCache(m_bigFont, g_bigFontCache);
-	BuildFontCache(m_smallFont, g_smallFontCache);
+	m_window = hWnd;
+	m_frameBuffer.assign(static_cast<size_t>(width) * height, 0);
+	m_cachedBuffer = m_frameBuffer.data();
+	m_bufferPitch = width * static_cast<int>(sizeof(uint32));
 
 	m_normalizeVertexBuffer = (SrRendVertex*)_mm_malloc_custom( SR_NORMALIZE_VB_MAX_SIZE * sizeof(SrRendVertex), 16 );
 
-	// ������դ��������
+	// 锟斤拷锟斤拷锟斤拷栅锟斤拷锟斤拷锟斤拷锟斤拷
 	m_rasterizer = new SrRasterizer;
 	m_rasterizer->Init(this);
 
@@ -266,7 +222,6 @@ bool SrSoftRenderer::ShutdownRenderer()
 			m_textLines.swap(g_inFlightTextLines);
 			FlushText();
 			m_textLines.clear();
-			m_drawSurface->UnlockRect();
 			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
 				delete g_inFlightNormalizedVBs[i];
 			g_inFlightNormalizedVBs.clear();
@@ -288,9 +243,8 @@ bool SrSoftRenderer::ShutdownRenderer()
 
 	SAFE_DELETE( m_rasterizer );
 
-	SAFE_RELEASE( m_drawSurface );
-	SAFE_RELEASE( m_hwDevice );
-	SAFE_RELEASE( m_d3d9 );
+	m_frameBuffer.clear();
+	m_cachedBuffer = NULL;
 
 	return true;
 }
@@ -314,7 +268,8 @@ bool SrSoftRenderer::Swap()
 	PERFORMANCEAPI_INSTRUMENT("Main.Swap");
 	m_renderState |= eRS_Swaping;
 
-	m_hwDevice->Present(NULL, NULL, NULL, NULL);
+	if (gEnv->present && !gEnv->present(m_window, m_cachedBuffer))
+		return false;
 
 	m_renderState &= ~eRS_Swaping;
 	return true;
@@ -342,7 +297,7 @@ void SrSoftRenderer::EndFrame()
 			m_textLines.swap(g_inFlightTextLines);
 			FlushText();
 			m_textLines.clear();
-			m_drawSurface->UnlockRect();
+			Swap();
 			m_textLines.swap(g_inFlightTextLines);
 			for (uint32 i = 0; i < g_inFlightNormalizedVBs.size(); ++i)
 				delete g_inFlightNormalizedVBs[i];
@@ -365,37 +320,23 @@ void SrSoftRenderer::EndFrame()
 		g_inFlightTextLines.swap(m_textLines);
 		g_inFlightNormalizedVBs.swap(m_normlizedVBs);
 
-		// Geometry is already running. Present/Lock stays on the D3D main
-		// thread, then releases the coordinator to continue into raster work.
+		// Present the completed frame, then hand the persistent CPU surface to the next frame.
 		m_rasterizer->PresentPendingFrame();
 		{
 			PERFORMANCEAPI_INSTRUMENT("Main.LockFrameSurface");
-			D3DLOCKED_RECT lockinfo;
-			memset(&lockinfo, 0, sizeof(lockinfo));
-			const HRESULT result = m_drawSurface->LockRect(&lockinfo, NULL, D3DLOCK_DISCARD);
-			if (result == S_OK)
-			{
-				m_cachedBuffer = lockinfo.pBits;
-				m_bufferPitch = lockinfo.Pitch;
-				m_rasterizer->SignalFrameSurface(true);
-			}
-			else
-				m_rasterizer->SignalFrameSurface(false);
+			m_cachedBuffer = m_frameBuffer.data();
+			m_bufferPitch = g_context->width * static_cast<int>(sizeof(uint32));
+			m_rasterizer->SignalFrameSurface(true);
 		}
 	}
 	else
 	{
 		gEnv->profiler->Update();
-		D3DLOCKED_RECT lockinfo;
-		memset(&lockinfo, 0, sizeof(lockinfo));
-		if (m_drawSurface->LockRect(&lockinfo, NULL, D3DLOCK_DISCARD) != S_OK)
-			return;
-		m_cachedBuffer = lockinfo.pBits;
-		m_bufferPitch = lockinfo.Pitch;
+		m_cachedBuffer = m_frameBuffer.data();
+		m_bufferPitch = g_context->width * static_cast<int>(sizeof(uint32));
 		m_rasterizer->Flush();
 		WriteFrameHash(m_frameCount, m_cachedBuffer, m_bufferPitch);
 		FlushText();
-		m_drawSurface->UnlockRect();
 		m_textLines.clear();
 		Swap();
 		for (uint32 i = 0; i < m_normlizedVBs.size(); ++i)
@@ -576,24 +517,14 @@ bool SrSoftRenderer::InnerInitShaders()
 {
 	m_swShaders.clear();
 
-	std::string dir = "\\shader\\";
-	std::string path = "\\shader\\*.swsl";
+	std::string dir = "shader";
 	getMediaPath(dir);
-	getMediaPath(path);
-	 
-	WIN32_FIND_DATAA fd;
-	HANDLE hff = FindFirstFileA(path.c_str(), &fd);
-	BOOL bIsFind = TRUE;
-	 
-	while(hff && bIsFind)
+	if (!std::filesystem::exists(dir)) return false;
+	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(dir))
 	{
-	 	if(fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+		if(entry.is_regular_file() && entry.path().extension() == ".swsl")
 	 	{
-	 		// do not get into
-	 	}
-	 	else
-	 	{
-	 		std::string fullpath = dir + fd.cFileName;
+			std::string fullpath = entry.path().string();
 	 
 	 		// load dll shaders
 	 		HMODULE hDllHandle = 0;
@@ -603,6 +534,7 @@ bool SrSoftRenderer::InnerInitShaders()
 				fnModuleInit fnCount = (fnModuleInit)(GetProcAddress( hDllHandle, "ModuleInit" ));
 	 			fnLoadShader fnLoad = (fnLoadShader)(GetProcAddress( hDllHandle, "LoadShader" ));
 	 
+				if (!fnCount || !fnLoad) { FreeLibrary(hDllHandle); continue; }
 				fnCount(gEnv);
 
 				// add other shaders
@@ -622,7 +554,6 @@ bool SrSoftRenderer::InnerInitShaders()
  	 			m_swHandles.push_back(hDllHandle);
 	 		}		
 	 	}
-	 	bIsFind = FindNextFileA(hff, &fd);
 	}
 
 

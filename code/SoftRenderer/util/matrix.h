@@ -1,11 +1,11 @@
 /**
   @file matrix.h
   
-  @brief SoftRendererÊıÑ§¿â£º¾ØÕóÀà
+  @brief SoftRendereræ•°å­¦åº“ï¼šçŸ©é˜µç±»
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -17,7 +17,7 @@
 #define SR_MATRIX44_INDEX( c , r ) ( c * 4 + r )
 
 /**
-	*@brief float33 ÈıÎ¬¾ØÕóÀà£¬Ìá¹©ÈıÎ¬¾ØÕóµÄ»ù±¾ÔËËã²Ù×÷¡£
+	*@brief float33 ä¸‰ç»´çŸ©é˜µç±»ï¼Œæä¾›ä¸‰ç»´çŸ©é˜µçš„åŸºæœ¬è¿ç®—æ“ä½œã€‚
 */
 SR_ALIGN struct float33
 {
@@ -169,7 +169,7 @@ public:
 
 
 /**
-	*@brief float44 ËÄÎ¬¾ØÕóÀà£¬Ìá¹©ËÄÎ¬¾ØÕóµÄ»ù±¾ÔËËã²Ù×÷£¬¼°Ò»Ğ©ÌØÊâ¾ØÕóµÄ¹¹Ôì¡£
+	*@brief float44 å››ç»´çŸ©é˜µç±»ï¼Œæä¾›å››ç»´çŸ©é˜µçš„åŸºæœ¬è¿ç®—æ“ä½œï¼ŒåŠä¸€äº›ç‰¹æ®ŠçŸ©é˜µçš„æ„é€ ã€‚
 */
 SR_ALIGN struct float44
 {
@@ -179,7 +179,9 @@ public:
 		float _m[4][4];
 		float m[16];
 		SR_ALIGN struct{ float m00; float m01; float m02; float m03; float m10; float m11; float m12; float m13; float m20; float m21; float m22; float m23; float m30; float m31; float m32; float m33;	};
+		#ifdef SR_USE_SIMD
 		struct{__m128 row0, row1, row2, row3;};
+		#endif
 		struct{float3 row0_float3, row1_float3, row2_float3, row3_float3;};
 		struct{float4 row0_float4, row1_float4, row2_float4, row3_float4;};
 	};
@@ -221,7 +223,7 @@ public:
 	}
 
 	/**
-	 *@brief È¡ÔªËØ
+	 *@brief å–å…ƒç´ 
 	 *@return float * 
 	 *@param const int p 
 	 */
@@ -231,7 +233,7 @@ public:
 	}
 
 	/**
-	 *@brief ¾ØÕó³Ë·¨
+	 *@brief çŸ©é˜µä¹˜æ³•
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -244,7 +246,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ¾ØÕó¼Ó·¨
+	 *@brief çŸ©é˜µåŠ æ³•
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -257,7 +259,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ¾ØÕó³Ë·¨
+	 *@brief çŸ©é˜µä¹˜æ³•
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -286,7 +288,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ¾ØÕóÏà¼Ó
+	 *@brief çŸ©é˜µç›¸åŠ 
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -300,7 +302,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ¾ØÕóÏà¼õ
+	 *@brief çŸ©é˜µç›¸å‡
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -314,7 +316,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ¾ØÕóÏà³Ë
+	 *@brief çŸ©é˜µç›¸ä¹˜
 	 *@return float44 
 	 *@param const float44 & p 
 	 */
@@ -339,7 +341,7 @@ public:
 	}
 	
 	/**
-	 *@brief ±ä»»4Î¬ÏòÁ¿
+	 *@brief å˜æ¢4ç»´å‘é‡
 	 *@return float4 
 	 *@param const float4 & p 
 	 */
@@ -352,7 +354,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief Ğı×ª3Î¬ÏòÁ¿
+	 *@brief æ—‹è½¬3ç»´å‘é‡
 	 *@return float3 
 	 *@param const float3 & p 
 	 */
@@ -364,7 +366,7 @@ public:
 		return tmp;
 	}		
 	/**
-	 *@brief ¾ØÕóÏàËÆÅĞ¶Ï
+	 *@brief çŸ©é˜µç›¸ä¼¼åˆ¤æ–­
 	 *@return bool 
 	 *@param const float44 & p 
 	 */
@@ -380,7 +382,7 @@ public:
 		return true;
 	}
 	/**
-	 *@brief ¾ØÕóÏàËÆÅĞ¶Ï
+	 *@brief çŸ©é˜µç›¸ä¼¼åˆ¤æ–­
 	 *@return bool 
 	 *@param const float44 & p 
 	 */
@@ -396,7 +398,7 @@ public:
 		return false;
 	}
 	/**
-	 *@brief ÀûÓÃËÄÎ¬¾ØÕó±ä»»ÏòÁ¿
+	 *@brief åˆ©ç”¨å››ç»´çŸ©é˜µå˜æ¢å‘é‡
 	 *@return float3 
 	 *@param const float3 & p 
 	 */
@@ -408,7 +410,7 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ÀûÓÃËÄÎ¬¾ØÕóĞı×ªÏòÁ¿
+	 *@brief åˆ©ç”¨å››ç»´çŸ©é˜µæ—‹è½¬å‘é‡
 	 *@return float3 
 	 *@param const float3 & p 
 	 */
@@ -432,13 +434,13 @@ public:
 		return tmp;
 	}
 	/**
-	 *@brief ×óÊÖÏµµÄÊÓÍ¼¾ØÕó¹¹Ôì
+	 *@brief å·¦æ‰‹ç³»çš„è§†å›¾çŸ©é˜µæ„é€ 
 	 *@return float44 & 
 	 *@param float3 & from 
 	 *@param float3 & to 
 	 *@param float3 & up 
 	 */
-	float44 &LookatLH( float3 &from , float3 &to , float3 &up )
+	float44 &LookatLH( const float3 &from , const float3 &to , const float3 &up )
 	{
 		*this = CreateIdentity();
 
@@ -455,7 +457,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ÓÒÊÖÏµµÄÊÓÍ¼¾ØÕó¹¹Ôì
+	 *@brief å³æ‰‹ç³»çš„è§†å›¾çŸ©é˜µæ„é€ 
 	 *@return float44 & 
 	 *@param const float3 & from 
 	 *@param const float3 & to 
@@ -477,7 +479,7 @@ public:
 		return *this;
 	}
  	/**
- 	 *@brief ×óÊÖÏµµÄÍ¸ÊÓ¾ØÕó¹¹Ôì
+	 *@brief å·¦æ‰‹ç³»çš„é€è§†çŸ©é˜µæ„é€ 
  	 *@return float44 & 
  	 *@param float fovy 
  	 *@param float aspect 
@@ -505,7 +507,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief ÓÒÊÖÏµµÄÍ¸ÊÓ¾ØÕó¹¹Ôì
+	 *@brief å³æ‰‹ç³»çš„é€è§†çŸ©é˜µæ„é€ 
 	 *@return float44 & 
 	 *@param float fovy 
 	 *@param float aspect 
@@ -526,7 +528,7 @@ public:
 		return *this;
 	}
 	/**
-	 *@brief Çó×ªÖÃ
+	 *@brief æ±‚è½¬ç½®
 	 *@return void 
 	 */
 	inline void Transpose()
@@ -534,7 +536,7 @@ public:
 		Transpose(*this);
 	}
 	/**
-	 *@brief ¾ØÕóÇó×ªÖÃ
+	 *@brief çŸ©é˜µæ±‚è½¬ç½®
 	 *@return void 
 	 *@param const float44 & M 
 	 */
@@ -558,9 +560,9 @@ public:
 	}
 
 	/**
-	 *@brief ¾ØÕóÇóÄæ
+	 *@brief çŸ©é˜µæ±‚é€†
 	 *@return void 
-	 *@remark ¶ÔÓÚÕı½»¾ØÕó£¬Ö±½ÓÊ¹ÓÃTRANSPOSEÇóÄæ£¬·Ç³£¿ìËÙ
+	 *@remark å¯¹äºæ­£äº¤çŸ©é˜µï¼Œç›´æ¥ä½¿ç”¨TRANSPOSEæ±‚é€†ï¼Œéå¸¸å¿«é€Ÿ
 	 */
 	inline void Inverse()
 	{
@@ -638,7 +640,7 @@ public:
 
 
 	/**
-	 *@brief ÀûÓÃscale, rotation, position¹¹ÔìĞÂµÄÊÀ½ç¾ØÕó
+	 *@brief åˆ©ç”¨scale, rotation, positionæ„é€ æ–°çš„ä¸–ç•ŒçŸ©é˜µ
 	 *@return void 
 	 *@param const float3 & s 
 	 *@param const Quat & q 
@@ -654,7 +656,7 @@ public:
 	}
 
 	/**
-	 *@brief È¡µÃĞĞÓÅÏÈµÄ¾ØÕóµÄÎ»ÒÆÖµ
+	 *@brief å–å¾—è¡Œä¼˜å…ˆçš„çŸ©é˜µçš„ä½ç§»å€¼
 	 *@return float3 
 	 */
 	float3 float44::GetTranslate() const
@@ -668,7 +670,7 @@ public:
 	}
 
 	/**
-	 *@brief ¾²Ì¬º¯Êı£º¹¹Ôìµ¥Î»¾ØÕó
+	 *@brief é™æ€å‡½æ•°ï¼šæ„é€ å•ä½çŸ©é˜µ
 	 *@return float44 
 	 */
 	static float44 float44::CreateIdentity()
@@ -677,7 +679,7 @@ public:
 	}
 
 	/**
-	 *@brief ¾²Ì¬º¯Êı£º¹¹Ôì0¾ØÕó
+	 *@brief é™æ€å‡½æ•°ï¼šæ„é€ 0çŸ©é˜µ
 	 *@return float44 
 	 */
 	static float44 float44::CreateZero()

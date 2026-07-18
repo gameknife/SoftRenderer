@@ -1,11 +1,11 @@
 /**
   @file IRenderer.h
   
-  @brief ¹«¹²µÄäÖÈ¾½á¹¹ÉùÃ÷
+  @brief å…¬å…±çš„æ¸²æŸ“ç»“æ„å£°æ˜
 
   @author yikaiming
 
-  ¸ü¸ÄÈÕÖ¾ history
+  æ›´æ”¹æ—¥å¿— history
   ver:1.0
    
  */
@@ -61,34 +61,34 @@ public:
 
 	virtual const char* getName() =0;
 
-	// Æô¶¯£¬¹Ø±Õº¯Êı
+	// å¯åŠ¨ï¼Œå…³é—­å‡½æ•°
 	virtual bool Resize(uint32 width, uint32 height)=0;
 	virtual uint32 getWidth() =0;
 	virtual uint32 getHeight() =0;
 
-	// Ö¡¿ØÖÆº¯Êı
+	// å¸§æ§åˆ¶å‡½æ•°
 	virtual void BeginFrame()=0;
 	virtual void EndFrame()=0;
 
-	// Ó²¼şClear
+	// ç¡¬ä»¶Clear
 	virtual bool HwClear()=0;
 
-	// »ñÈ¡ScreenBufferº¯Êı
+	// è·å–ScreenBufferå‡½æ•°
 	virtual void* getBuffer() =0;
 
-	// ÎÆÀíÍ¨µÀÉèÖÃ
+	// çº¹ç†é€šé“è®¾ç½®
 	virtual bool SetTextureStage( const SrTexture* texture, int stage )=0;
 	virtual void ClearTextureStage()=0;
 
 	virtual bool UpdateVertexBuffer(SrVertexBuffer* target) {return true;}
 	virtual bool UpdateIndexBuffer(SrIndexBuffer* target) {return true;}
 
-	// äÖÈ¾µ÷ÓÃ
+	// æ¸²æŸ“è°ƒç”¨
 	virtual bool DrawPrimitive( SrPrimitve* primitive )=0;
 	virtual bool DrawLine(const float3& from, const float3& to)=0;
 	virtual bool DrawScreenText(const char* str, int x,int y, uint32 size, DWORD color = SR_UICOLOR_HIGHLIGHT) =0;
 
-	// ShaderÉèÖÃ
+	// Shaderè®¾ç½®
 	virtual bool SetShader(const SrShader* shader) =0;
 	virtual bool SetShaderConstant( uint32 slot, const float* constantStart, uint32 vec4Count ) =0;
 

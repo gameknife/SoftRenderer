@@ -4,48 +4,64 @@ An experimental software renderer for learning and research.
 
 ## Environment
 
-SoftRenderer is a Windows x64/MSVC project. The following components are
-required:
+SoftRenderer uses [MiniFB](https://github.com/emoon/minifb) for its window,
+framebuffer presentation, keyboard, and mouse support. DirectX and DirectInput
+are no longer required. The macOS build has been verified on Apple Silicon.
+Windows and Linux/Wayland are configured through the same CMake project.
 
-- Visual Studio with the Desktop development with C++ workload
-- CMake 3.20 or newer
-- The DirectX SDK files included under `code/thirdparty/dxsdk/`
+All platforms require CMake 3.20 or newer. On macOS, install the Xcode Command
+Line Tools. On Windows, use Visual Studio with the Desktop development with C++ workload.
+On Linux/Wayland, MiniFB additionally needs a C/C++ toolchain, `pkg-config`, and
+the Wayland client, cursor, and xkbcommon development packages. On Debian/Ubuntu:
+
+```sh
+sudo apt install build-essential cmake pkg-config libwayland-dev libxkbcommon-dev
+```
 
 ## Quick start
 
-Run `buildrun.bat` from the repository root, or double-click it in Explorer:
+Run `buildrun.sh` from the repository root:
 
-```bat
-buildrun.bat
+```sh
+./buildrun.sh
 ```
 
-The script automatically selects the newest Visual Studio generator available
-to CMake, configures an x64 Release build in `out/cmake-x64`, builds
-SoftRenderer, and launches `bin/SoftRenderer.exe`.
+On macOS the script configures `out/macos`; on Linux it configures
+`out/linux-wayland` with MiniFB's Wayland backend. It then builds SoftRenderer
+and launches `bin/SoftRenderer`.
+
+On Windows, run `buildrun.bat` from a Visual Studio-capable command prompt.
 
 To build without launching the application:
 
-```bat
-buildrun.bat --build-only
+```sh
+./buildrun.sh --build-only
 ```
 
 ## Manual CMake build
 
-For a Visual Studio generator available on your machine, configure and build
-the x64 Release target with:
+Configure and build a macOS Release target with:
 
-```powershell
-cmake -S . -B out/cmake-x64 -G "Visual Studio 18 2026" -A x64
-cmake --build out/cmake-x64 --config Release --target SoftRenderer
+```sh
+cmake -S . -B out/macos -DCMAKE_BUILD_TYPE=Release
+cmake --build out/macos --parallel
 ```
 
-If your installed Visual Studio version is different, replace the generator
-name accordingly. Run the application with `bin` as the working directory:
+For Linux/Wayland:
 
-```powershell
-Push-Location bin
-& .\SoftRenderer.exe
-Pop-Location
+```sh
+cmake -S . -B out/linux-wayland -DCMAKE_BUILD_TYPE=Release -DSR_LINUX_WAYLAND=ON
+cmake --build out/linux-wayland --parallel
+```
+
+Set `SR_LINUX_WAYLAND=OFF` to use MiniFB's X11/OpenGL backend instead. On
+Windows, `buildrun.bat --build-only` configures and builds the x64 Release target.
+
+The runtime locates its assets relative to the executable, so it can be started
+from any working directory:
+
+```sh
+./bin/SoftRenderer
 ```
 
 ## Output layout
@@ -54,8 +70,8 @@ Build outputs are written directly to the repository's `bin/` directory:
 
 ```text
 bin/
-├── SoftRenderer.exe
-├── renderer/SrSwRendererCpu.dll
+├── SoftRenderer
+├── renderer/SrSwRendererCpu.dylib  # .dll on Windows, .so on Linux
 ├── shader/BasicShaders.swsl
 ├── shader/AdvanceShaders.swsl
 └── media/                  # tracked runtime assets
@@ -78,9 +94,9 @@ with the CPU model and worker information.
 
 Build and run the deterministic tile layout/binning tests with:
 
-```powershell
-cmake --build out/cmake-x64 --config Release --target SoftRendererTests
-ctest --test-dir out/cmake-x64 -C Release --output-on-failure
+```sh
+cmake --build out/macos --target SoftRendererTests
+ctest --test-dir out/macos --output-on-failure
 ```
 
 ## Renderer options
