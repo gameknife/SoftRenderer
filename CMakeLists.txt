@@ -1,11 +1,21 @@
 cmake_minimum_required(VERSION 3.20)
 project(SoftRenderer LANGUAGES C CXX)
 
+# The desktop and UWP/Xbox targets use the same statically linked renderer
+# sources. UWP has a dedicated packaged host because it has no MiniFB window.
+if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+    add_subdirectory(uwp)
+    return()
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
+# The desktop executable owns the complete renderer and its windowing
+# dependency. Do not let a parent build turn MiniFB into another DLL.
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build SoftRenderer dependencies statically" FORCE)
 set(MINIFB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(MINIFB_BUILD_VERSION_INFO OFF CACHE BOOL "" FORCE)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -28,7 +38,11 @@ set(SR_RUNTIME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(SR_COMMON_INCLUDE_DIRS "${SR_CORE_DIR}" "${SR_RENDERER_DIR}")
 
 function(sr_configure_target target)
-    target_include_directories(${target} PRIVATE ${SR_COMMON_INCLUDE_DIRS})
+    target_include_directories(${target} PRIVATE
+        ${SR_COMMON_INCLUDE_DIRS}
+        "${SR_CODE_DIR}/BasicShaders"
+        "${SR_CODE_DIR}/AdvanceShaders"
+    )
     if(MSVC)
         target_compile_options(${target} PRIVATE /W3 /fp:fast)
         target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -58,7 +72,6 @@ function(sr_set_runtime_layout target subdirectory)
         # other multi-config generators from appending a Release subfolder.
         RUNTIME_OUTPUT_DIRECTORY "$<1:${output_directory}>"
         LIBRARY_OUTPUT_DIRECTORY "$<1:${output_directory}>"
-        ARCHIVE_OUTPUT_DIRECTORY "$<1:${output_directory}>"
     )
 endfunction()
 
@@ -87,16 +100,7 @@ set(SR_APP_SOURCES
     "${SR_CORE_DIR}/util/memfile.cpp"
 )
 
-add_executable(SoftRenderer ${SR_APP_SOURCES})
-sr_configure_target(SoftRenderer)
-target_link_libraries(SoftRenderer PRIVATE minifb Threads::Threads ${CMAKE_DL_LIBS})
-if(APPLE)
-    target_link_options(SoftRenderer PRIVATE -Wl,-export_dynamic)
-endif()
-sr_set_runtime_layout(SoftRenderer "")
-
 set(SR_RENDERER_SOURCES
-    "${SR_RENDERER_DIR}/module_def.cpp"
     "${SR_RENDERER_DIR}/SrFragmentBuffer.cpp"
     "${SR_RENDERER_DIR}/SrRasTaskDispatcher.cpp"
     "${SR_RENDERER_DIR}/SrRasTasks.cpp"
@@ -107,36 +111,31 @@ set(SR_RENDERER_SOURCES
     "${SR_RENDERER_DIR}/SrTileRenderer.cpp"
     "${SR_RENDERER_DIR}/SrTileBinner.cpp"
 )
-add_library(SrSwRendererCpu SHARED ${SR_RENDERER_SOURCES})
-sr_configure_target(SrSwRendererCpu)
-target_link_libraries(SrSwRendererCpu PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
-if(WIN32)
-    target_link_libraries(SrSwRendererCpu PRIVATE gdi32)
-endif()
-set_target_properties(SrSwRendererCpu PROPERTIES PREFIX "")
-sr_set_runtime_layout(SrSwRendererCpu "renderer")
 
-add_library(BasicShaders SHARED "${SR_CODE_DIR}/BasicShaders/BasicShaders.cpp")
-sr_configure_target(BasicShaders)
-set_target_properties(BasicShaders PROPERTIES PREFIX "" OUTPUT_NAME BasicShaders SUFFIX ".swsl")
-sr_set_runtime_layout(BasicShaders "shader")
+set(SR_SHADER_SOURCES
+    "${SR_CODE_DIR}/BasicShaders/BasicShaders.cpp"
+    "${SR_CODE_DIR}/AdvanceShaders/AdvanceShaders.cpp"
+)
 
-add_library(AdvanceShaders SHARED "${SR_CODE_DIR}/AdvanceShaders/AdvanceShaders.cpp")
-sr_configure_target(AdvanceShaders)
-set_target_properties(AdvanceShaders PROPERTIES PREFIX "" OUTPUT_NAME AdvanceShaders SUFFIX ".swsl")
-sr_set_runtime_layout(AdvanceShaders "shader")
-
-if(APPLE)
-    foreach(target SrSwRendererCpu BasicShaders AdvanceShaders)
-        target_link_options(${target} PRIVATE -Wl,-undefined,dynamic_lookup)
-    endforeach()
-endif()
-
-add_dependencies(SoftRenderer SrSwRendererCpu BasicShaders AdvanceShaders)
+# The renderer and all software shaders are part of the main executable. No
+# renderer/ or shader/ runtime plugin directories are produced or scanned.
+add_executable(SoftRenderer
+    ${SR_APP_SOURCES}
+    ${SR_RENDERER_SOURCES}
+    ${SR_SHADER_SOURCES}
+)
+sr_configure_target(SoftRenderer)
+target_compile_definitions(SoftRenderer PRIVATE SR_STATIC_BUILD)
+target_link_libraries(SoftRenderer PRIVATE minifb Threads::Threads)
+sr_set_runtime_layout(SoftRenderer "")
 
 enable_testing()
-add_executable(SoftRendererTests "${SR_RENDERER_DIR}/tests/SrTileTests.cpp" "${SR_RENDERER_DIR}/SrTileBinner.cpp")
-target_include_directories(SoftRendererTests PRIVATE "${SR_RENDERER_DIR}")
+add_executable(SoftRendererTests
+    "${SR_RENDERER_DIR}/tests/SrTileTests.cpp"
+    "${SR_RENDERER_DIR}/SrTileBinner.cpp"
+    "${SR_CORE_DIR}/SrTexture.cpp"
+)
+target_include_directories(SoftRendererTests PRIVATE "${SR_RENDERER_DIR}" "${SR_CORE_DIR}")
 sr_set_runtime_layout(SoftRendererTests "")
 add_test(NAME SoftRenderer.TileLayout COMMAND SoftRendererTests)
 

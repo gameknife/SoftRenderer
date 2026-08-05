@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <CppWinRTMergedDir>$(MSBuildProjectDirectory)\$(IntDir)Merged\</CppWinRTMergedDir>
+    <CppWinRTUnmergedDir>$(MSBuildProjectDirectory)\$(IntDir)Unmerged\</CppWinRTUnmergedDir>
+  </PropertyGroup>
+
+  <Target Name="CppWinRTFixIntermediateDirs"
+          BeforeTargets="Midl;CppWinRTMakeProjections;CppWinRTMergeProjectWinMDInputs">
+    <PropertyGroup>
+      <CppWinRTMergedDir>$(MSBuildProjectDirectory)\$(IntDir)Merged\</CppWinRTMergedDir>
+      <CppWinRTUnmergedDir>$(MSBuildProjectDirectory)\$(IntDir)Unmerged\</CppWinRTUnmergedDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <Midl Update="@(Midl)"
+            MetadataFileName="$(CppWinRTUnmergedDir)%(Filename).winmd" />
+    </ItemGroup>
+    <MakeDir Directories="$(CppWinRTMergedDir);$(CppWinRTUnmergedDir)" />
+  </Target>
+
+  <Target Name="CppWinRTNormalizeMdMergeInputs"
+          BeforeTargets="GetCppWinRTMdMergeInputs">
+    <ItemGroup>
+      <Midl Update="@(Midl)" OutputDirectory="" />
+    </ItemGroup>
+  </Target>
+</Project>

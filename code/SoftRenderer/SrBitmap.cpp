@@ -40,7 +40,7 @@ struct SrBitmapInfoHeader
 #pragma pack(pop)
 
 
-SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
+SrBitmap::SrBitmap(const char* filename):SrTexture(filename), m_rawData(NULL)
 {
 	std::string realpath(filename);
 	getMediaPath(realpath);
@@ -49,7 +49,8 @@ SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 
 	bitmapfile.Open(realpath.c_str());
 
-	if (bitmapfile.IsOpen())
+	if (bitmapfile.IsOpen() && bitmapfile.Size() >=
+		static_cast<int>(sizeof(SrBitmapFileHeader) + sizeof(SrBitmapInfoHeader)))
 	{
 		const char* start = bitmapfile.Data();
 
@@ -61,21 +62,56 @@ SrBitmap::SrBitmap(const char* filename):SrTexture(filename)
 		GtLog("BMP file openup[%s] width: %d | height: %d | bpp: %d | offset: %d | size: %d kb", getName(),
 			info->width, info->height, info->bitCount, header->pixelOffset, header->size / 1024 );
 
-		// 基本数据读取
-		m_width = info->width;
-		m_height = abs(info->height);
-		m_bpp = info->bitCount / 8;
-		m_pitch = -m_width * m_bpp * m_height / info->height;
-		// copy file
-		m_rawData = (uint8*)_mm_malloc_custom( m_bpp * m_width * m_height, 16);
+		const int width = info->width;
+		const int bpp = info->bitCount / 8;
+		if (header->type != 0x4d42 || width <= 0 ||
+			info->height == 0 || info->height == INT32_MIN ||
+			(bpp != 3 && bpp != 4) || info->compression != 0 ||
+			header->pixelOffset > static_cast<uint32>(bitmapfile.Size()))
+		{
+			GtLogError( "[ResourceManager] Bitmap[%s] has an unsupported or invalid format.", getName() );
+			return;
+		}
+
+		const int height = abs(info->height);
+		const size_t sourcePitch = (static_cast<size_t>(width) * bpp + 3u) & ~size_t(3u);
+		const size_t sourceSize = sourcePitch * height;
+		if (sourceSize > static_cast<size_t>(bitmapfile.Size() - header->pixelOffset))
+		{
+			GtLogError( "[ResourceManager] Bitmap[%s] has an unsupported or invalid format.", getName() );
+			return;
+		}
+
+		// Normalize all sampled textures to BGRA32. This removes the 24/32-bit
+		// branch and the three-byte address multiply from the sampling hot path.
+		ConfigureStorage(width, height, 4, true, true);
+		m_rawData = (uint8*)_mm_malloc_custom(m_storageSize, 16);
+		if (!m_rawData)
+		{
+			GtLogError( "[ResourceManager] Bitmap[%s] allocation failed.", getName() );
+			return;
+		}
+		m_data = m_rawData;
+		memset(m_data, 0, m_storageSize);
 		const uint8* colorstart = reinterpret_cast<const uint8*>(start + header->pixelOffset);
 
-		memcpy(m_rawData, colorstart, m_bpp * m_width * m_height);
-
-		if (m_pitch < 0)
+		// Positive-height BMPs store rows bottom-up. Reorient and swizzle once
+		// during loading so sampling only needs the Morton address calculation.
+		for (int y = 0; y < m_height; ++y)
 		{
-			m_data = m_rawData + m_bpp * m_width * m_height;
+			const int sourceY = info->height > 0 ? m_height - 1 - y : y;
+			const uint8* sourceRow = colorstart + static_cast<size_t>(sourceY) * sourcePitch;
+			for (int x = 0; x < m_width; ++x)
+			{
+				const uint8* source = sourceRow + static_cast<size_t>(x) * bpp;
+				uint8* target = m_data + GetTexelOffset(x, y);
+				target[0] = source[0];
+				target[1] = source[1];
+				target[2] = source[2];
+				target[3] = bpp == 4 ? source[3] : 0xff;
+			}
 		}
+		GenerateMipmaps();
 		
 	}
 	else

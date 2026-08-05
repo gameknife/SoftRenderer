@@ -44,6 +44,11 @@ public:
 	virtual void SRFASTCALL ProcessRasterize(void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false) const = 0;
 	virtual void SRFASTCALL ProcessPixel(uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address) const =0;
 	virtual uint32 GetPixelDependencyFlags() const { return ePd_ReadsFullGBuffer; }
+	virtual float2 GetTextureCoordinates(const void* vertex) const
+	{
+		const SrRendVertex* value = static_cast<const SrRendVertex*>(vertex);
+		return float2{{{value->channel1.w, value->channel2.w}}};
+	}
 
 public:
 	class SrShader* m_bindShader;

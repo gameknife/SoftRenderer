@@ -113,6 +113,16 @@ SR_ALIGN struct SrRendPrimitve
 SR_ALIGN class SrRasterizer
 {
 public:
+	struct SrTextureGradientPlane
+	{
+		float uOverWDx;
+		float uOverWDy;
+		float vOverWDx;
+		float vOverWDy;
+		float inverseWDx;
+		float inverseWDy;
+	};
+
 	/**
 	 *@brief ��դ���������Σ�������Ⱦ����
 	 */
@@ -120,8 +130,10 @@ public:
 	{
 		SrRendVertex p[3];
 		SrRendPrimitve* primitive;
+		SrTextureGradientPlane textureGradient;
 		bool prepared;
-		SrRastTriangle() : primitive(NULL), prepared(false) {}
+		SrRastTriangle()
+			: primitive(NULL), textureGradient{}, prepared(false) {}
 	};
 
 
@@ -175,11 +187,11 @@ public:
 	// ��դ��ƽ��������
 	static void Rasterize_Bottom_Tri_F( SrRastTriangle& tri );
 	// ��դ��ɨ����
-	static void Rasterize_ScanLine( uint32 line, float fstart, float fcount, const void* vertA, const void* vertB, SrRendPrimitve* primitive, ERasterizeMode rMode = eRm_WireFrame, bool toptri = true );
+	static void Rasterize_ScanLine( uint32 line, float fstart, float fcount, const void* vertA, const void* vertB, SrRendPrimitve* primitive, const SrTextureGradientPlane& textureGradient, ERasterizeMode rMode = eRm_WireFrame, bool toptri = true );
 	// ��դ�� ��Ҫ�ü�� ɨ����
-	static void Rasterize_ScanLine_Clipped( uint32 line, float fstart, float fcount, float clipStart, float clipCount, const void* vertA, const void* vertB, SrRendPrimitve* primitive, ERasterizeMode rMode = eRm_Solid );
+	static void Rasterize_ScanLine_Clipped( uint32 line, float fstart, float fcount, float clipStart, float clipCount, const void* vertA, const void* vertB, SrRendPrimitve* primitive, const SrTextureGradientPlane& textureGradient, ERasterizeMode rMode = eRm_Solid );
 	// ��դ����дpixel
-	static void Rasterize_WritePixel( const void* vertA, const void* vertB, float ratio, SrFragment* thisBuffer, SrRendPrimitve* primitive, uint32 address );
+	static void Rasterize_WritePixel( const void* vertA, const void* vertB, float ratio, SrFragment* thisBuffer, SrRendPrimitve* primitive, uint32 address, const SrTextureGradientPlane& textureGradient );
 
 	static int Draw_Line(int x0, int y0, int x1, int y1, int color, uint32 *vb_start, int lpitch);
 	static int Clip_Line(int &x1,int &y1,int &x2, int &y2);

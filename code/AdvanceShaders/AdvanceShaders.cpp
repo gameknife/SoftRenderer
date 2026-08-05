@@ -13,31 +13,6 @@
 
 #include "mmgr/mmgr.h"
 
-GlobalEnvironment* gEnv = NULL;
-
-extern "C" SR_EXPORT void ModuleInit( GlobalEnvironment* pgEnv )
-{
-	gEnv = pgEnv;
-}
-
-extern "C" SR_EXPORT SrSwShader* LoadShader( const char* shaderName )
-{
-	std::vector<SrSwShader*> shaders;
-	shaders.push_back( &g_SkinSimShader );
-	shaders.push_back( &g_FresnelNormalShader );
-	shaders.push_back( &g_HairShader );
-
-	for (uint32 i=0; i < shaders.size(); ++i)
-	{
-		if ( !_stricmp(shaders[i]->getName(), shaderName))
-		{
-			return shaders[i];
-		}
-	}
-
-	return NULL;
-}
-
 SrSkinSimShader g_SkinSimShader;
 SrFresnelNormalShader g_FresnelNormalShader;
 SrHairShader g_HairShader;
@@ -138,11 +113,11 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	// 采样diffuse颜色
 	float2 tc0{in->worldpos_tx.w, in->normal_ty.w};
 
-	uint32 col = context->Tex2D( tc0, 0 );
+	uint32 col = context->Tex2D(tc0, 0, static_cast<const SrFragment*>(pIn));
 	float4 matDiff = uint32_2_float4(col);
 
 	// 采样次表面颜色
-	col = context->Tex2D( tc0, 4 );
+	col = context->Tex2D(tc0, 4, static_cast<const SrFragment*>(pIn));
 	float4 matSSS = uint32_2_float4(col);
 
 	// diffuse颜色 作 srgb
@@ -159,7 +134,7 @@ void SrSkinSimShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	float33 tangent2world = float33_from_rows( tangentDir, binormalDir, normalDir );
 
 	// 采样normal
-	uint32 nor = context->Tex2D( tc0, 1 );
+	uint32 nor = context->Tex2D(tc0, 1, static_cast<const SrFragment*>(pIn));
 	float4 norf = uint32_2_float4(nor);
 
 	// 将0-1处理到-1到1空间
@@ -289,7 +264,7 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 
 	// 采样diffuse颜色
 	float2 tc0{in->worldpos_tx.w, in->normal_ty.w};
-	uint32 col = context->Tex2D( tc0, 0 );
+	uint32 col = context->Tex2D(tc0, 0, static_cast<const SrFragment*>(pIn));
 	float4 matDiff = uint32_2_float4(col);
 
 	// diffuse 作 srgb
@@ -306,7 +281,7 @@ void SrFresnelNormalShader::ProcessPixel( uint32* pOut, const void* pIn, const S
 	float33 tangent2world = float33_from_rows( tangentDir, binormalDir, normalDir );
 
 	// 采样normal
-	uint32 nor = context->Tex2D( tc0, 1 );
+	uint32 nor = context->Tex2D(tc0, 1, static_cast<const SrFragment*>(pIn));
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;
@@ -397,7 +372,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 
 	// 采样diffuse颜色
 	float2 tc0{ in->worldpos_tx.w, in->normal_ty.w };
-	uint32 col = context->Tex2D( tc0, 0 );
+	uint32 col = context->Tex2D(tc0, 0, static_cast<const SrFragment*>(pIn));
 	float4 matDiff = uint32_2_float4(col);
 
 	// diffuse 作 srgb
@@ -422,7 +397,7 @@ void SRFASTCALL SrHairShader::ProcessPixel( uint32* pOut, const void* pIn, const
 
 	// 截断到0-1
 
-	uint32 colspec = context->Tex2D( tc0, 1 );
+	uint32 colspec = context->Tex2D(tc0, 1, static_cast<const SrFragment*>(pIn));
 	float4 matSpec = uint32_2_float4(colspec);
 
 	//diffuseAcc = (diffuseAcc + 0.5f) * matDiff;

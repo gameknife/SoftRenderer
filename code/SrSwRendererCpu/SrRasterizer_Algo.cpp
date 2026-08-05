@@ -22,6 +22,35 @@ namespace
 	thread_local std::vector<SrRasterizer::SrRastTriangle>* g_triangleCollector = NULL;
 	thread_local SrTileRect g_tileRect;
 	thread_local bool g_tileRectEnabled = false;
+
+	static inline uint32 PackTextureGradient(
+		const SrFragment* fragment, const SrSwShader* shader,
+		const SrRasterizer::SrTextureGradientPlane& gradient)
+	{
+		const float inverseW = fragment->hpos.w;
+		if (abs(inverseW) <= SR_EQUAL_PRECISION)
+			return 0;
+
+		const float2 uv = shader->GetTextureCoordinates(fragment);
+		const float reciprocalInverseW = 1.f / inverseW;
+		const float duDx =
+			(gradient.uOverWDx - uv.x * gradient.inverseWDx) * reciprocalInverseW;
+		const float dvDx =
+			(gradient.vOverWDx - uv.y * gradient.inverseWDx) * reciprocalInverseW;
+		const float duDy =
+			(gradient.uOverWDy - uv.x * gradient.inverseWDy) * reciprocalInverseW;
+		const float dvDy =
+			(gradient.vOverWDy - uv.y * gradient.inverseWDy) * reciprocalInverseW;
+		const float du = (std::max)(abs(duDx), abs(duDy));
+		const float dv = (std::max)(abs(dvDx), abs(dvDy));
+		uint32 duBits;
+		uint32 dvBits;
+		memcpy(&duBits, &du, sizeof(duBits));
+		memcpy(&dvBits, &dv, sizeof(dvBits));
+		// Two non-negative bfloat16 values fit in SrFragment's existing
+		// 32-bit tail slot and preserve the wide range needed by UV gradients.
+		return (duBits >> 16) | (dvBits & 0xffff0000u);
+	}
 }
 
 void SrRasterizer::SetTriangleCollector(std::vector<SrRastTriangle>* collector)
@@ -65,6 +94,57 @@ bool SrRasterizer::PrepareTriangle(SrRastTriangle& calTri)
 	SrRendVertex* p[3] = { &calTri.p[0], &calTri.p[1], &calTri.p[2] };
 	SrRendVertex tmp[3] = { calTri.p[0], calTri.p[1], calTri.p[2] };
 	calTri.primitive->shader->ProcessPatch(p[0], p[1], p[2], &tmp[0], &tmp[1], &tmp[2], &calTri.primitive->shaderConstants);
+
+	// Build screen-space planes for u/w, v/w and 1/w. The local UV
+	// derivatives are recovered per pixel with the quotient rule; using one
+	// affine UV footprint for the whole triangle over-selects mip levels under
+	// strong perspective.
+	const float2 uv[3] = {
+		calTri.primitive->shader->GetTextureCoordinates(p[0]),
+		calTri.primitive->shader->GetTextureCoordinates(p[1]),
+		calTri.primitive->shader->GetTextureCoordinates(p[2])
+	};
+	float screenX[3], screenY[3];
+	float inverseW[3], uOverW[3], vOverW[3];
+	for (int i = 0; i < 3; ++i)
+	{
+		inverseW[i] = 1.f / p[i]->pos.w;
+		uOverW[i] = uv[i].x * inverseW[i];
+		vOverW[i] = uv[i].y * inverseW[i];
+		screenX[i] = (p[i]->pos.x * inverseW[i] * .5f + .5f) * g_context->width;
+		screenY[i] = (-p[i]->pos.y * inverseW[i] * .5f + .5f) * g_context->height;
+	}
+	const float dx1 = screenX[1] - screenX[0];
+	const float dy1 = screenY[1] - screenY[0];
+	const float dx2 = screenX[2] - screenX[0];
+	const float dy2 = screenY[2] - screenY[0];
+	const float determinant = dx1 * dy2 - dx2 * dy1;
+	if (abs(determinant) > SR_EQUAL_PRECISION)
+	{
+		const float inverseDeterminant = 1.f / determinant;
+		const float du1 = uOverW[1] - uOverW[0];
+		const float du2 = uOverW[2] - uOverW[0];
+		const float dv1 = vOverW[1] - vOverW[0];
+		const float dv2 = vOverW[2] - vOverW[0];
+		const float dq1 = inverseW[1] - inverseW[0];
+		const float dq2 = inverseW[2] - inverseW[0];
+		calTri.textureGradient.uOverWDx =
+			(du1 * dy2 - du2 * dy1) * inverseDeterminant;
+		calTri.textureGradient.uOverWDy =
+			(du2 * dx1 - du1 * dx2) * inverseDeterminant;
+		calTri.textureGradient.vOverWDx =
+			(dv1 * dy2 - dv2 * dy1) * inverseDeterminant;
+		calTri.textureGradient.vOverWDy =
+			(dv2 * dx1 - dv1 * dx2) * inverseDeterminant;
+		calTri.textureGradient.inverseWDx =
+			(dq1 * dy2 - dq2 * dy1) * inverseDeterminant;
+		calTri.textureGradient.inverseWDy =
+			(dq2 * dx1 - dq1 * dx2) * inverseDeterminant;
+	}
+	else
+	{
+		calTri.textureGradient = SrTextureGradientPlane{};
+	}
 	for (int i = 0; i < 3; ++i)
 	{
 		SrRendVertex* vertex = p[i];
@@ -217,7 +297,7 @@ void SrRasterizer::RasterizeTriangle( SrRastTriangle& calTri, bool subtri )
 	}
 }
 
-void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, const void* vertA, const void* vertB, SrRendPrimitve* primitive, ERasterizeMode rMode /*= eRm_WireFrame*/, bool toptri /*= true */ )
+void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, const void* vertA, const void* vertB, SrRendPrimitve* primitive, const SrTextureGradientPlane& textureGradient, ERasterizeMode rMode /*= eRm_WireFrame*/, bool toptri /*= true */ )
 {
 	int start = (int)fstart;
 	int end = (int)fend + 1;
@@ -265,12 +345,13 @@ void SrRasterizer::Rasterize_ScanLine( uint32 line, float fstart, float fend, co
 		SrFragment* thisBuffer = fBuffer->fBuffer + address;
 		{
 			// ztest �����ٹ�դ��֮ǰ������ʱ����Ԥ��zֵ����ǰkill�������
-			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
+			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address,
+				textureGradient);
 		}
 	}
 }
 
-void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float fend, float fclipStart, float fclipEnd, const void* vertA, const void* vertB, SrRendPrimitve* primitive, ERasterizeMode rMode /*= eRm_Solid */ )
+void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float fend, float fclipStart, float fclipEnd, const void* vertA, const void* vertB, SrRendPrimitve* primitive, const SrTextureGradientPlane& textureGradient, ERasterizeMode rMode /*= eRm_Solid */ )
 {
 	int start = (int)fstart;
 	int end = (int)fend + 1;
@@ -327,7 +408,8 @@ void SrRasterizer::Rasterize_ScanLine_Clipped( uint32 line, float fstart, float 
 		SrFragment* thisBuffer = fBuffer->fBuffer + address;
 		{
 			// ztest �����ٹ�դ��֮ǰ������ʱ����Ԥ��zֵ����ǰkill�������
-			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address);
+			Rasterize_WritePixel(vertA, vertB, ratio, thisBuffer, primitive, address,
+				textureGradient);
 		}
 	}
 }
@@ -461,7 +543,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			}
 
 			// ɨ����
-			Rasterize_ScanLine(loop_y, xs, xe, leftVert, rightVert, tri.primitive, eRm_Solid );
+			Rasterize_ScanLine(loop_y, xs, xe, leftVert, rightVert, tri.primitive,
+				tri.textureGradient, eRm_Solid );
 			
 			// ����ʼĩ�㵽��һ��
 			xs+=dx_left;
@@ -534,7 +617,8 @@ void SrRasterizer::Rasterize_Top_Tri_F( SrRastTriangle& tri )
 			}
 
 			// ɨ����
-			Rasterize_ScanLine_Clipped(loop_y, xs, xe, left, right, leftVert, rightVert, tri.primitive, eRm_Solid );
+			Rasterize_ScanLine_Clipped(loop_y, xs, xe, left, right, leftVert, rightVert,
+				tri.primitive, tri.textureGradient, eRm_Solid );
 		} 
 
 	} 
@@ -660,7 +744,8 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 			}
 
 			// draw the line
-			Rasterize_ScanLine(loop_y, xs, xe, leftVert, rightVert, tri.primitive, eRm_Solid );
+			Rasterize_ScanLine(loop_y, xs, xe, leftVert, rightVert, tri.primitive,
+				tri.textureGradient, eRm_Solid );
 
 			xs+=dx_left;
 			xe+=dx_right;
@@ -732,13 +817,14 @@ void SrRasterizer::Rasterize_Bottom_Tri_F( SrRastTriangle& tri )
 #endif
 			}
 
-			Rasterize_ScanLine_Clipped(loop_y, xs, xe, left, right, leftVert, rightVert,  tri.primitive, eRm_Solid );
+			Rasterize_ScanLine_Clipped(loop_y, xs, xe, left, right, leftVert, rightVert,
+				tri.primitive, tri.textureGradient, eRm_Solid );
 		}
 
 	}
 }
 
-void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, float ratio, SrFragment* thisBuffer, SrRendPrimitve* primitive, uint32 address )
+void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, float ratio, SrFragment* thisBuffer, SrRendPrimitve* primitive, uint32 address, const SrTextureGradientPlane& textureGradient )
 {
 	float4* posA = (float4*)vertA;
 	float4* posB = (float4*)vertB;
@@ -785,6 +871,8 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 		
 		thisBuffer->primitive = primitive;
 		thisBuffer->drawSequence = primitive->drawSequence;
+		thisBuffer->packedTexcoordGradient =
+			PackTextureGradient(thisBuffer, primitive->shader, textureGradient);
 	}
 	else
 	{
@@ -798,6 +886,8 @@ void SrRasterizer::Rasterize_WritePixel( const void* vertA, const void* vertB, f
 		
 		tmpBuffer.primitive = primitive;
 		tmpBuffer.drawSequence = primitive->drawSequence;
+		tmpBuffer.packedTexcoordGradient =
+			PackTextureGradient(&tmpBuffer, primitive->shader, textureGradient);
 		
 // 		uint32 color = primitive->shaderConstants.Tex2D( float2(tmpBuffer.worldpos_tx.w, tmpBuffer.normal_ty.w), 0 );
 // 		if ( ( color & 0xFF000000 ) >> 24 < 1 )

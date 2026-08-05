@@ -146,8 +146,6 @@ bool SrSoftRenderer::InitRenderer( HWND hWnd, int width, int height, int bpp )
 	m_shaderConstants = (float4*)_mm_malloc_custom( eSC_ShaderConstantCount * sizeof(float4), 16 );
 	memset(m_shaderConstants, 0, eSC_ShaderConstantCount * sizeof(float4));
 
-	InnerInitShaders();
-
 	return true;
 }
 
@@ -166,12 +164,6 @@ bool SrSoftRenderer::ShutdownRenderer()
 		}
 		m_rasterizer->PresentPendingFrame();
 	}
-
-	for (uint32 i=0; i < m_swHandles.size(); ++i)
-	{
-		FreeLibrary( m_swHandles[i] );
-	}
-	m_swHandles.clear();
 
 	_mm_free_custom(m_normalizeVertexBuffer);
 	m_normalizeVertexBuffer = 0;
@@ -320,6 +312,15 @@ uint32 SrSoftRenderer::getHeight()
 	return g_context->height;
 }
 
+void SrSoftRenderer::RegisterStaticShader(SrSwShader* shader, SrShader* binding)
+{
+	if (!shader || !binding)
+		return;
+
+	shader->m_bindShader = binding;
+	m_swShaders.push_back(shader);
+}
+
 bool SrSoftRenderer::DrawLine( const float3& from, const float3& to )
 {
 	m_rasterizer->DrawLine(from, to);
@@ -387,54 +388,33 @@ uint32 SrSoftRenderer::Tex2D( float2& texcoord, const SrTexture* texture  ) cons
 	return ret;
 }
 
-typedef void (*fnModuleInit)(GlobalEnvironment* pgEnv);
-typedef SrSwShader* (*fnLoadShader)(const char* shaderName);
-
-bool SrSoftRenderer::InnerInitShaders()
+uint32 SrSoftRenderer::Tex2DGrad(float2& texcoord, const SrTexture* texture,
+	uint32 packedTexcoordGradient) const
 {
-	m_swShaders.clear();
+	if (!texture)
+		return 0;
 
-	std::string dir = "shader";
-	getMediaPath(dir);
-	if (!std::filesystem::exists(dir)) return false;
-	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(dir))
+	const uint32 duBits = (packedTexcoordGradient & 0xffffu) << 16;
+	const uint32 dvBits = packedTexcoordGradient & 0xffff0000u;
+	float du;
+	float dv;
+	memcpy(&du, &duBits, sizeof(du));
+	memcpy(&dv, &dvBits, sizeof(dv));
+	const float footprintU = du * texture->getWidth();
+	const float footprintV = dv * texture->getHeight();
+	const float footprintSquared =
+		footprintU * footprintU + footprintV * footprintV;
+	uint32 mipLevel = 0;
+	if (footprintSquared >= 2.f)
 	{
-		if(entry.is_regular_file() && entry.path().extension() == ".swsl")
-	 	{
-			std::string fullpath = entry.path().string();
-	 
-	 		// load dll shaders
-	 		HMODULE hDllHandle = 0;
-	 		hDllHandle = LoadLibraryA( fullpath.c_str() );
-	 		if (hDllHandle)
-	 		{
-				fnModuleInit fnCount = (fnModuleInit)(GetProcAddress( hDllHandle, "ModuleInit" ));
-	 			fnLoadShader fnLoad = (fnLoadShader)(GetProcAddress( hDllHandle, "LoadShader" ));
-	 
-				if (!fnCount || !fnLoad) { FreeLibrary(hDllHandle); continue; }
-				fnCount(gEnv);
-
-				// add other shaders
-				SrResourceManager* resMng = (SrResourceManager*)gEnv->resourceMgr;
-				SrResourceLibrary::iterator it = resMng->m_shaderLibrary.begin();
-				for (; it != resMng->m_shaderLibrary.end(); ++it)
-				{
-					SrSwShader* shader = fnLoad(it->second->getName());
-					if (shader)
-					{
-						shader->m_bindShader = reinterpret_cast<SrShader*>(it->second);
-						m_swShaders.push_back(shader);
-					}
-					
-				}
-
- 	 			m_swHandles.push_back(hDllHandle);
-	 		}		
-	 	}
+		uint32 footprintBits;
+		memcpy(&footprintBits, &footprintSquared, sizeof(footprintBits));
+		const int exponent = static_cast<int>((footprintBits >> 23) & 0xffu) - 127;
+		mipLevel = static_cast<uint32>((exponent + 1) >> 1);
 	}
-
-
-	return true;
+	const ESamplerFilter filter = g_context->IsFeatureEnable(eRFeature_LinearFiltering)
+		? eSF_Linear : eSF_Nearest;
+	return texture->Get(texcoord, filter, static_cast<float>(mipLevel));
 }
 
 const char* SrSoftRenderer::getName()

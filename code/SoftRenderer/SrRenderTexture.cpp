@@ -4,15 +4,13 @@
 
 SrRenderTexture::SrRenderTexture( const char* name, int width, int height, int bpp ):SrTexture(name)
 {
-	m_width = width;
-	m_height = height;
-	m_bpp = bpp;
-	m_data = NULL;
+	// Render targets are exposed as linear frame buffers. Keep that write
+	// contract; sampled file textures use the cache-friendly Morton layout.
+	ConfigureStorage(width, height, bpp, false);
 	m_texType = eBt_internal;
-	m_pitch = bpp * width;
 	// allocate buffer
-	m_data = (uint8*)_mm_malloc_custom(width * height * bpp, 16);
-	memset(m_data, 0, width * height * bpp );
+	m_data = (uint8*)_mm_malloc_custom(m_storageSize, 16);
+	memset(m_data, 0, m_storageSize);
 }
 
 SrRenderTexture::~SrRenderTexture(void)

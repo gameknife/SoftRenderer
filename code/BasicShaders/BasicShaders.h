@@ -28,6 +28,10 @@ public:
 	virtual void SRFASTCALL ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false ) const;
 	virtual void SRFASTCALL ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const;
 	virtual uint32 GetPixelDependencyFlags() const { return ePd_LocalPixel; }
+	virtual float2 GetTextureCoordinates(const void* vertex) const
+	{
+		return static_cast<const SrRendVertex*>(vertex)->channel3.xy;
+	}
 };
 
 class SrGourandShader : public SrSwShader
@@ -40,6 +44,10 @@ public:
 	virtual void SRFASTCALL ProcessRasterize( void* rOut, const void* rInRef0, const void* rInRef1, const void* rInRef2, float ratio, const SrShaderContext* context, bool final = false ) const;
 	virtual void SRFASTCALL ProcessPixel( uint32* pOut, const void* pIn, const SrShaderContext* context, uint32 address ) const;
 	virtual uint32 GetPixelDependencyFlags() const { return ePd_LocalPixel; }
+	virtual float2 GetTextureCoordinates(const void* vertex) const
+	{
+		return static_cast<const SrRendVertex*>(vertex)->channel3.xy;
+	}
 };
 
 class SrPhongShader : public SrSwShader

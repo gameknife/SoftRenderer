@@ -13,6 +13,11 @@
 
 #include "prerequisite.h"
 
+#if defined(SR_UWP)
+#include <cstdint>
+#include <winrt/Windows.UI.Core.h>
+#endif
+
 struct SInputSymbol;
 struct SKeyState;
 
@@ -280,7 +285,18 @@ public:
 
 	void AddListener( IInputEventListener* listener );
 	void RemoveListener( IInputEventListener* listener );
+#if defined(SR_UWP)
+	void OnKeyDown(winrt::Windows::UI::Core::CoreWindow const&, winrt::Windows::UI::Core::KeyEventArgs const& args);
+	void OnKeyUp(winrt::Windows::UI::Core::CoreWindow const&, winrt::Windows::UI::Core::KeyEventArgs const& args);
+	void OnPointerMoved(winrt::Windows::UI::Core::CoreWindow const&, winrt::Windows::UI::Core::PointerEventArgs const& args);
+	void OnPointerPressed(winrt::Windows::UI::Core::CoreWindow const&, winrt::Windows::UI::Core::PointerEventArgs const& args);
+	void OnPointerReleased(winrt::Windows::UI::Core::CoreWindow const&, winrt::Windows::UI::Core::PointerEventArgs const& args);
+	void OnPointerWheelChanged(winrt::Windows::UI::Core::CoreWindow const&, winrt::Windows::UI::Core::PointerEventArgs const& args);
+#endif
 private:
+#if defined(SR_UWP)
+	using CoreWindow = winrt::Windows::UI::Core::CoreWindow;
+#endif
 	HWND m_window;
 	InputEventListeners		m_listeners;
 	std::vector<SKeyState> m_keys;
@@ -288,6 +304,25 @@ private:
 	std::vector<uint8> m_mouseDown;
 	int m_mouseX;
 	int m_mouseY;
+#if defined(SR_UWP)
+	CoreWindow m_coreWindow{ nullptr };
+	CoreWindow::KeyDown_revoker m_keyDownRevoker;
+	CoreWindow::KeyUp_revoker m_keyUpRevoker;
+	CoreWindow::PointerMoved_revoker m_pointerMovedRevoker;
+	CoreWindow::PointerPressed_revoker m_pointerPressedRevoker;
+	CoreWindow::PointerReleased_revoker m_pointerReleasedRevoker;
+	CoreWindow::PointerWheelChanged_revoker m_pointerWheelChangedRevoker;
+	std::map<EKeyId, bool> m_down;
+	std::map<EKeyId, EDeviceId> m_downDevices;
+	std::uint32_t m_gamepadButtons{};
+	bool m_gamepadConnected{};
+	bool m_mousePositionInitialized{};
+
+	static EKeyId ToKeyId(winrt::Windows::System::VirtualKey key);
+	void SetKey(EKeyId key, bool down, EDeviceId device);
+	void PostMouseDelta(EKeyId key, float value);
+	void UpdateGamepad();
+#endif
 	void PostState(SKeyState& state, EDeviceId device, EInputState inputState, float value);
 };
 

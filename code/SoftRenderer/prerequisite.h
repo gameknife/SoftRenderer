@@ -147,7 +147,6 @@ struct ILogger;
 struct SrRendContext;
 
 typedef std::vector<SrShader*> SrShaderList;
-typedef std::vector<HMODULE> SrHandleList;
 
 //////////////////////////////////////////////////////////////////////////
 // ȫ�ֻ���
@@ -385,6 +384,7 @@ SR_ALIGN struct SrFragment
 	///< 4 x float4 �����ݷ�Χ
 	SrRendPrimitve*	primitive;	///< primitive����
 	uint32			drawSequence;
+	uint32			packedTexcoordGradient;
 };
 
 struct SrFragmentBufferSync

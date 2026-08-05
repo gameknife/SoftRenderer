@@ -39,6 +39,19 @@ SR_ALIGN struct SrShaderContext
 		return ret;
 	}
 
+	uint32 Tex2D(const float2& texcoord, uint32 stage, const SrFragment* fragment) const
+	{
+		uint32 ret = 0x00000000;
+		if (stage < textureStage.size() && textureStage[stage] != 0)
+		{
+			float2 sampleCoord = texcoord;
+			ret = gEnv->renderer->Tex2DGrad(
+				sampleCoord, textureStage[stage],
+				fragment->packedTexcoordGradient);
+		}
+		return ret;
+	}
+
 	void * operator new(size_t size) {return _mm_malloc_custom(size, 16);}
 	void operator delete(void *memoryToBeDeallocated) {_mm_free_custom(memoryToBeDeallocated);}
 };

@@ -1,0 +1,39 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "xbox-release",
+      "displayName": "SoftRenderer Xbox One UWP Release",
+      "generator": "Visual Studio 18 2026",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "binaryDir": "${sourceDir}/out/build/xbox-release",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_NAME": "WindowsStore",
+        "CMAKE_SYSTEM_VERSION": "10.0.26100.0",
+        "CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION": "10.0.26100.0",
+        "CMAKE_VS_NUGET_PACKAGE_RESTORE": "ON"
+      }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "SoftRenderer Windows UWP Release",
+      "inherits": "xbox-release",
+      "binaryDir": "${sourceDir}/out/build/windows-release"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "xbox-release",
+      "configurePreset": "xbox-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release",
+      "configuration": "Release"
+    }
+  ]
+}

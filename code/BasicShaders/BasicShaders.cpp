@@ -6,32 +6,6 @@
 #include "mmgr/mmgr.h"
 
 
-GlobalEnvironment* gEnv = NULL;
-
-extern "C" SR_EXPORT void ModuleInit( GlobalEnvironment* pgEnv )
-{
-	gEnv = pgEnv;
-}
-
-extern "C" SR_EXPORT SrSwShader* LoadShader( const char* shaderName )
-{
-	std::vector<SrSwShader*> shaders;
-	shaders.push_back( &g_FlatShadingShader );
-	shaders.push_back( &g_PhongShadingShader );
-	shaders.push_back( &g_GourandShadingShader );
-	shaders.push_back( &g_PhongShadingWithNormalShader );
-
-	for (uint32 i=0; i < shaders.size(); ++i)
-	{
-		if ( !_stricmp(shaders[i]->getName(), shaderName))
-		{
-			return shaders[i];
-		}
-	}
-
-	return NULL;
-}
-
 SrFlatShader g_FlatShadingShader;
 SrPhongShader g_PhongShadingShader;
 SrGourandShader g_GourandShadingShader;
@@ -156,7 +130,8 @@ void SrFlatShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderCo
 	float2 texcoord = in->texcoord.xy;
 
 	// ����diffuse��ɫ
-	uint32 col = context->Tex2D( texcoord, 0 );
+	uint32 col = context->Tex2D(
+		texcoord, 0, static_cast<const SrFragment*>(pIn));
 	float4 colf = uint32_2_float4(col);
 
 	// srgb
@@ -240,7 +215,8 @@ void SrGourandShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShade
 	SrPixelShader_Constants* cBuffer = (SrPixelShader_Constants*)(context->GetPixelShaderConstantPtr());
 
 	// ����diffuse��ɫ
-	uint32 col = context->Tex2D( in->texcoord.xy, 0 );
+	uint32 col = context->Tex2D(
+		in->texcoord.xy, 0, static_cast<const SrFragment*>(pIn));
 	float4 colf = uint32_2_float4(col);
 
 	// diffuse �� srgb
@@ -314,7 +290,7 @@ void SrPhongShader::ProcessPixel( uint32* pOut, const void* pIn, const SrShaderC
 
 	// ����diffuse��ɫ
 	float2 tc0{ in->worldpos_tx.w, in->normal_ty.w };
-	uint32 col = context->Tex2D( tc0, 0 );
+	uint32 col = context->Tex2D(tc0, 0, static_cast<const SrFragment*>(pIn));
 	float4 matDiff = uint32_2_float4(col);
 	float matSpec = matDiff.a;
 	// diffuse �� srgb
@@ -524,7 +500,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	float2 tc0{in->worldpos_tx.w, in->normal_ty.w};
 	
 	// ����diffuse��ɫ
-	uint32 col = context->Tex2D( tc0, 0 );
+	uint32 col = context->Tex2D(tc0, 0, static_cast<const SrFragment*>(pIn));
 	float4 matDiff = uint32_2_float4(col);
 	float4 matSpec{matDiff.a, matDiff.a, matDiff.a, matDiff.a};
 	// diffuse �� srgb
@@ -541,7 +517,7 @@ void SRFASTCALL SrPhongWithNormalShader::ProcessPixel( uint32* pOut, const void*
 	float33 tangent2world = float33_from_rows( tangentDir, binormalDir, normalDir );
 
 	// ����normal
-	uint32 nor = context->Tex2D( tc0, 1 );
+	uint32 nor = context->Tex2D(tc0, 1, static_cast<const SrFragment*>(pIn));
 	float4 norf = uint32_2_float4(nor);
 
 	float3 normalTangent = norf.xyz;

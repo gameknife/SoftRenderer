@@ -14,8 +14,6 @@
 #include "SrAppFramework.h"
 #include "InputManager.h"
 
-typedef std::vector<IRenderer*> SrRendererList;
-
 class SoftRenderApp : public IInputEventListener
 {
 public:
@@ -36,9 +34,6 @@ public:
 private:
 	HWND m_hWnd;
 	SrApps m_tasks;
-	SrRendererList m_renderers;
-	SrHandleList m_rendHandles;
-	uint32 m_currRendererIndex;
 
 	void LoadShaderList();
 

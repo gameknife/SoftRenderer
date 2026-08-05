@@ -2,21 +2,20 @@
 #include "SrPerformance.h"
 #include "SoftRenderApp.h"
 #include <MiniFB.h>
-#include <filesystem>
 #include "SrMesh.h"
 #include "InputManager.h"
 #include "SrProfiler.h"
 #include "SrShader.h"
 #include "SrLogger.h"
+#include "SrSoftRenderer.h"
+#include "BasicShaders.h"
+#include "AdvanceShaders.h"
 
 #include "mmgr/mmgr.h"
 
 GlobalEnvironment* gEnv = NULL;
 SrLogger* g_logger = NULL;
 SrRendContext* g_context = NULL;
-
-typedef IRenderer* (*fnLoadRenderer)(GlobalEnvironment* pgEnv);
-typedef void (*fnFreeRenderer)();
 
 // MiniFB destroys its window data before returning MFB_STATE_EXIT on macOS.
 // Keep a single authoritative live pointer so renderer shutdown cannot present
@@ -39,7 +38,7 @@ static bool PresentMiniFB(HWND window, const void* buffer)
 }
 
 SoftRenderApp::SoftRenderApp(void)
-	: m_hWnd(NULL), m_currRendererIndex(0), m_curr_task(0), m_lastTitleUpdate(0.f)
+	: m_hWnd(NULL), m_curr_task(0), m_lastTitleUpdate(0.f)
 {
 }
 
@@ -297,23 +296,6 @@ bool SoftRenderApp::OnInputEvent( const SInputEvent &event )
 	switch(event.keyId)
 	{
 		case eKI_Tilde:
-			{
-// temporary mute hw renderer [4/6/2015 gameKnife]
-// 				if (event.state == eIS_Pressed)
-// 				{
-// 					m_currRendererIndex++;
-// 					if (m_currRendererIndex >= m_renderers.size())
-// 					{
-// 						m_currRendererIndex = 0;
-// 					}
-// 
-// 					gEnv->renderer->ShutdownRenderer();
-// 
-// 					gEnv->renderer = m_renderers[m_currRendererIndex];
-// 
-// 					gEnv->renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32);
-// 				}
-			}
 			break;
 
 		case eKI_Up:
@@ -354,6 +336,9 @@ bool SoftRenderApp::OnInputEvent( const SInputEvent &event )
 
 void SoftRenderApp::LoadShaderList()
 {
+	// All shader implementations are linked into the executable.
+	gEnv->resourceMgr->AddShader( new SrShader( "flat", eVd_F4F4F4  ));
+	gEnv->resourceMgr->AddShader( new SrShader( "gourand", eVd_F4F4  ));
 	gEnv->resourceMgr->AddShader( new SrShader( "default", eVd_F4F4F4  ));
 	gEnv->resourceMgr->AddShader( new SrShader( "skin", eVd_F4F4F4F4U4  ));
 	gEnv->resourceMgr->AddShader( new SrShader( "hair", eVd_F4F4F4  ));
@@ -365,42 +350,37 @@ void SoftRenderApp::LoadShaderList()
 
 bool SoftRenderApp::InitRenderers()
 {
-	std::string dir = "renderer";
-	getMediaPath(dir);
-	if (std::filesystem::exists(dir))
+	SrSoftRenderer* renderer = new SrSoftRenderer();
+	if (!renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32))
 	{
-		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(dir))
-		{
-			if (!entry.is_regular_file() || entry.path().filename().string().find("SrSwRendererCpu") == std::string::npos) continue;
-			const std::string rendererPath = entry.path().string();
-			HMODULE handle = LoadLibraryA(rendererPath.c_str());
-			if (!handle) { GtLogError("Unable to load renderer: %s", SrGetLastDynamicLibraryError()); continue; }
-			fnLoadRenderer load = reinterpret_cast<fnLoadRenderer>(GetProcAddress(handle, "LoadRenderer"));
-			if (!load) { FreeLibrary(handle); continue; }
-			m_renderers.push_back(load(gEnv));
-			m_rendHandles.push_back(handle);
-		}
-	}
-
-	if ( m_renderers.empty() )
-	{
+		delete renderer;
 		return false;
 	}
-	m_currRendererIndex = 0;
-	gEnv->renderer = m_renderers[m_currRendererIndex];
-	return gEnv->renderer->InitRenderer(m_hWnd, g_context->width, g_context->height, 32);
+
+	renderer->RegisterStaticShader(&g_FlatShadingShader,
+		gEnv->resourceMgr->GetShader("flat"));
+	renderer->RegisterStaticShader(&g_GourandShadingShader,
+		gEnv->resourceMgr->GetShader("gourand"));
+	renderer->RegisterStaticShader(&g_PhongShadingShader,
+		gEnv->resourceMgr->GetShader("default"));
+	renderer->RegisterStaticShader(&g_PhongShadingWithNormalShader,
+		gEnv->resourceMgr->GetShader("default_normal"));
+	renderer->RegisterStaticShader(&g_SkinSimShader,
+		gEnv->resourceMgr->GetShader("skin"));
+	renderer->RegisterStaticShader(&g_FresnelNormalShader,
+		gEnv->resourceMgr->GetShader("fresnel"));
+	renderer->RegisterStaticShader(&g_HairShader,
+		gEnv->resourceMgr->GetShader("hair"));
+	gEnv->renderer = renderer;
+	return true;
 }
 
 void SoftRenderApp::ShutdownRenderers()
 {
-	for (uint32 i=0; i < m_rendHandles.size(); ++i)
-	{
-		m_renderers[i]->ShutdownRenderer();
+	if (!gEnv || !gEnv->renderer)
+		return;
 
-		fnFreeRenderer fnFree = (fnFreeRenderer)(GetProcAddress( m_rendHandles[i], "FreeRenderer" ));
-
-		fnFree();
-
-		FreeLibrary( m_rendHandles[i] );
-	}
+	gEnv->renderer->ShutdownRenderer();
+	delete gEnv->renderer;
+	gEnv->renderer = nullptr;
 }

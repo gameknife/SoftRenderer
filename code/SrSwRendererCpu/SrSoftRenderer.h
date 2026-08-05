@@ -59,6 +59,12 @@ public:
 	virtual bool SetShaderConstant( uint32 slot, const float* constantStart, uint32 vec4Count );
 
 	virtual uint32 Tex2D( float2& texcoord, const SrTexture* texture ) const;
+	virtual uint32 Tex2DGrad(float2& texcoord, const SrTexture* texture,
+		uint32 packedTexcoordGradient) const;
+
+	// All targets link the CPU renderer and shader implementations into the
+	// application instead of loading renderer/plugin files at runtime.
+	void RegisterStaticShader(SrSwShader* shader, SrShader* binding);
 
 private:
 	// 交换硬件帧缓冲
@@ -67,10 +73,6 @@ private:
 	bool CreateHwBuffer();
 
 	virtual SrVertexBuffer* AllocateNormalizedVertexBuffer( uint32 count, bool fastmode = false );
-
-	virtual bool InnerInitShaders();
-
-	
 
 	HWND m_window;
 	std::vector<uint32> m_frameBuffer;
@@ -92,8 +94,6 @@ private:
 	const SrSwShader* m_currShader;
 	SrSwShaders m_swShaders;
 	float4* m_shaderConstants;
-	SrHandleList m_swHandles;
-
 };
 
 #endif // SrRenderer_h__

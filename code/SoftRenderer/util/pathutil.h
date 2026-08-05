@@ -25,7 +25,7 @@ inline void getMediaPath(std::string& origin)
 #ifdef _WIN32
 	char buffer[MAX_PATH];
 	char* strLastSlash = NULL;
-	GetModuleFileName( NULL, buffer, MAX_PATH );
+	GetModuleFileNameA( NULL, buffer, MAX_PATH );
 	buffer[MAX_PATH - 1] = 0;
 
 	strLastSlash = strrchr( buffer, '\\' );
