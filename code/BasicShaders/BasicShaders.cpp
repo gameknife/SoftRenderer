@@ -3,6 +3,8 @@
 #include "../SrSwRendererCpu/SrFragmentBuffer.h"
 #include "../SrSwRendererCpu/SrRasterizer.h"
 
+#include <cmath>
+
 #include "mmgr/mmgr.h"
 
 
